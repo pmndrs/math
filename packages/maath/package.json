@@ -2,6 +2,15 @@
   "name": "maath",
   "version": "0.10.8",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmndrs/maath.git",
+    "directory": "packages/maath"
+  },
+  "homepage": "https://github.com/pmndrs/maath#readme",
+  "bugs": {
+    "url": "https://github.com/pmndrs/maath/issues"
+  },
   "main": "dist/maath.cjs.js",
   "module": "dist/maath.esm.js",
   "types": "dist/maath.cjs.d.ts",
