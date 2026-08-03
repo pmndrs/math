@@ -1,12 +1,19 @@
 import { defineConfig } from 'rolldown';
 
-// Single-package build: bundle the library entrypoint to an ESM file.
-// `three` (and its types) are peer deps, so keep them external.
+// One bundle per entrypoint. Rolldown emits a shared chunk for code used by
+// more than one entry (e.g. core vec/mat used by geometry), so there's no
+// duplication across the entry bundles.
 export default defineConfig({
-    input: './src/index.ts',
-    external: ['three'],
+    input: {
+        index: './src/index.ts',
+        geometry: './src/geometry/index.ts',
+        easing: './src/easing/index.ts',
+        random: './src/random/index.ts',
+        noise: './src/noise/index.ts',
+        color: './src/color/index.ts',
+    },
     output: {
-        file: 'dist/index.js',
+        dir: 'dist',
         format: 'es',
         sourcemap: true,
         exports: 'named',
