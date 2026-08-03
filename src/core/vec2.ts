@@ -1,3 +1,4 @@
+import type { MutableArrayLike } from './arrays';
 import * as scalar from './scalar';
 import type { Mat2 } from './mat2';
 import type { Mat2d } from './mat2d';
@@ -63,6 +64,32 @@ export function set(out: Vec2, x: number, y: number): Vec2 {
     out[0] = x;
     out[1] = y;
     return out;
+}
+
+/**
+ * Sets the components of a vec2 from a buffer
+ * @param out the receiving vector
+ * @param buffer the source buffer
+ * @param startIndex the starting index in the buffer
+ * @returns out
+ */
+export function fromBuffer(out: Vec2, buffer: ArrayLike<number>, startIndex: number): Vec2 {
+    out[0] = buffer[startIndex];
+    out[1] = buffer[startIndex + 1];
+    return out;
+}
+
+/**
+ * Writes the components of a vec2 to a buffer
+ * @param outBuffer The output buffer
+ * @param vec The source vector
+ * @param startIndex The starting index in the buffer
+ * @returns The output buffer
+ */
+export function toBuffer(outBuffer: MutableArrayLike<number>, vec: Vec2, startIndex: number): MutableArrayLike<number> {
+    outBuffer[startIndex] = vec[0];
+    outBuffer[startIndex + 1] = vec[1];
+    return outBuffer;
 }
 
 /**

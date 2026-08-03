@@ -1,3 +1,4 @@
+import type { MutableArrayLike } from './arrays';
 import { EPSILON } from './scalar';
 import type { Euler, EulerOrder } from './euler';
 import type { Mat3 } from './mat3';
@@ -17,6 +18,36 @@ export type Quat = [x: number, y: number, z: number, w: number];
  */
 export function create(): Quat {
     return [0, 0, 0, 1];
+}
+
+/**
+ * Sets the components of a quat from a buffer
+ * @param out the receiving quaternion
+ * @param buffer the source buffer
+ * @param startIndex the starting index in the buffer
+ * @returns out
+ */
+export function fromBuffer(out: Quat, buffer: ArrayLike<number>, startIndex: number): Quat {
+    out[0] = buffer[startIndex];
+    out[1] = buffer[startIndex + 1];
+    out[2] = buffer[startIndex + 2];
+    out[3] = buffer[startIndex + 3];
+    return out;
+}
+
+/**
+ * Writes the components of a quat to a buffer
+ * @param outBuffer The output buffer
+ * @param q The source quaternion
+ * @param startIndex The starting index in the buffer
+ * @returns The output buffer
+ */
+export function toBuffer(outBuffer: MutableArrayLike<number>, q: Quat, startIndex: number): MutableArrayLike<number> {
+    outBuffer[startIndex] = q[0];
+    outBuffer[startIndex + 1] = q[1];
+    outBuffer[startIndex + 2] = q[2];
+    outBuffer[startIndex + 3] = q[3];
+    return outBuffer;
 }
 
 /**
