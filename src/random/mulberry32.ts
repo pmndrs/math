@@ -1,23 +1,37 @@
-import type { RandomGenerator } from './random';
+/**
+ * State of a Mulberry32 PRNG: a single 32-bit accumulator that {@link sample}
+ * advances on each call. Create one with {@link create}.
+ *
+ * Unlike a closure-based generator, the state is a plain object — so it can be
+ * inspected, cloned (to fork a sequence), or serialised.
+ */
+export type Mulberry32 = { a: number };
 
 /**
- * Creates a Mulberry32 seeded pseudo-random number generator.
+ * Creates Mulberry32 PRNG state seeded with `seed`.
+ *
  * Mulberry32 is a simple, fast, and effective PRNG that passes statistical tests
  * and has good distribution properties.
  *
  * @param seed the seed value (32-bit integer)
- * @returns a generator that returns numbers in the range [0, 1)
+ * @returns state to pass to {@link sample}
  */
-export function create(seed: number): RandomGenerator {
-    let a = seed;
+export function create(seed: number): Mulberry32 {
+    return { a: seed };
+}
 
-    return () => {
-        a += 0x6d2b79f5;
-        let t = a;
-        t = Math.imul(t ^ (t >>> 15), t | 1);
-        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
+/**
+ * Advances `state` and returns the next number in the range [0, 1).
+ *
+ * @param state PRNG state created with {@link create}, mutated in place
+ * @returns a number in the range [0, 1)
+ */
+export function sample(state: Mulberry32): number {
+    state.a += 0x6d2b79f5;
+    let t = state.a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 
 /**
