@@ -1,5 +1,4 @@
-/** A function that returns a random number in the range [0, 1). */
-export type RandomGenerator = () => number;
+import type { RandomGenerator } from './random';
 
 /**
  * Creates a Mulberry32 seeded pseudo-random number generator.
@@ -9,7 +8,7 @@ export type RandomGenerator = () => number;
  * @param seed the seed value (32-bit integer)
  * @returns a generator that returns numbers in the range [0, 1)
  */
-export function createMulberry32(seed: number): RandomGenerator {
+export function create(seed: number): RandomGenerator {
     let a = seed;
 
     return () => {
@@ -23,7 +22,7 @@ export function createMulberry32(seed: number): RandomGenerator {
 
 /**
  * Generates a random 32-bit unsigned integer seed, suitable for use with
- * {@link createMulberry32}.
+ * {@link create}.
  */
 export function seed(): number {
     return (Math.random() * 2 ** 32) >>> 0;
