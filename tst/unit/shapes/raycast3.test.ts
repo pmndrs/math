@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { vec3 } from '../../../src';
-import type { Box3, Vec3 } from '../../../src/geometry';
-import { raycast3 } from '../../../src/geometry';
+import type { Box3, Vec3 } from '../../../src/shapes';
+import { raycast3 } from '../../../src/shapes';
 
 describe('raycast3', () => {
     describe('intersectsTriangle', () => {

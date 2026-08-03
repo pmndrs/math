@@ -6,6 +6,7 @@ import { defineConfig } from 'rolldown';
 export default defineConfig({
     input: {
         index: './src/index.ts',
+        shapes: './src/shapes/index.ts',
         geometry: './src/geometry/index.ts',
         time: './src/time/index.ts',
         random: './src/random/index.ts',

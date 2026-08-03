@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { vec3 } from '../../../src';
-import type { Mat4, Vec3 } from '../../../src/geometry';
-import { plane3 } from '../../../src/geometry';
+import type { Mat4, Vec3 } from '../../../src/shapes';
+import { plane3 } from '../../../src/shapes';
 
 describe('plane3', () => {
     describe('fromNormalAndPoint', () => {
