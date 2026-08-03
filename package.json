@@ -22,9 +22,9 @@
       "import": "./dist/geometry.js",
       "types": "./dist/src/geometry/index.d.ts"
     },
-    "./easing": {
-      "import": "./dist/easing.js",
-      "types": "./dist/src/easing/index.d.ts"
+    "./time": {
+      "import": "./dist/time.js",
+      "types": "./dist/src/time/index.d.ts"
     },
     "./random": {
       "import": "./dist/random.js",
@@ -55,7 +55,7 @@
     "test": "vitest run ./tst",
     "typecheck-docs": "tsc --project docs/tsconfig.json --noEmit",
     "docs": "(cd docs && node ./build.js)",
-    "typedoc": "typedoc --tsconfig ./tsconfig.json --name \"maath docs\" --out ./dist-typedoc ./src/index.ts ./src/geometry/index.ts ./src/easing/index.ts ./src/random/index.ts ./src/noise/index.ts ./src/color/index.ts",
+    "typedoc": "typedoc --tsconfig ./tsconfig.json --name \"maath docs\" --out ./dist-typedoc ./src/index.ts ./src/geometry/index.ts ./src/time/index.ts ./src/random/index.ts ./src/noise/index.ts ./src/color/index.ts",
     "build:docs": "pnpm run docs && pnpm run typedoc",
     "release": "pnpm run build && pnpm run test && pnpm run build:examples && pnpm run build:docs && pnpm run build:website"
   },

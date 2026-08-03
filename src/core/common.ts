@@ -80,6 +80,22 @@ export const clamp = (value: number, min: number, max: number): number => {
 };
 
 /**
+ * Loops `t` so that it is never larger than `length` and never smaller than 0.
+ */
+export function repeat(t: number, length: number): number {
+    return clamp(t - Math.floor(t / length) * length, 0, length);
+}
+
+/**
+ * Calculates the shortest signed difference between two angles (in radians).
+ */
+export function deltaAngle(current: number, target: number): number {
+    let delta = repeat(target - current, Math.PI * 2);
+    if (delta > Math.PI) delta -= Math.PI * 2;
+    return delta;
+}
+
+/**
  * Remaps a number from one range to another.
  */
 export function remap(number: number, inLow: number, inHigh: number, outLow: number, outHigh: number): number {
