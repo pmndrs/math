@@ -1,5 +1,11 @@
 import * as common from './common';
-import type { Mat3, Mat4, MutableArrayLike, Quat, Vec3 } from './types';
+import type { MutableArrayLike } from './common';
+import type { Mat3 } from './mat3';
+import type { Mat4 } from './mat4';
+import type { Quat } from './quat';
+
+/** A 3D vector */
+export type Vec3 = [x: number, y: number, z: number];
 
 /**
  * Creates a new, empty vec3

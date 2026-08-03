@@ -1,5 +1,12 @@
 import * as common from './common';
-import type { Mat2, Mat2d, Mat3, Mat4, Vec2, Vec3 } from './types';
+import type { Mat2 } from './mat2';
+import type { Mat2d } from './mat2d';
+import type { Mat3 } from './mat3';
+import type { Mat4 } from './mat4';
+import type { Vec3 } from './vec3';
+
+/** A 2D vector */
+export type Vec2 = [x: number, y: number];
 
 /**
  * Creates a new, empty vec2

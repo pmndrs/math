@@ -1,6 +1,12 @@
 import * as common from './common';
 import * as mat3 from './mat3';
-import type { Euler, EulerOrder, Mat3, Mat4, Quat, Vec3 } from './types';
+import type { Euler, EulerOrder } from './euler';
+import type { Mat3 } from './mat3';
+import type { Mat4 } from './mat4';
+import type { Vec3 } from './vec3';
+
+/** A quaternion that represents rotation */
+export type Quat = [x: number, y: number, z: number, w: number];
 import * as vec3 from './vec3';
 import * as vec4 from './vec4';
 

@@ -1,5 +1,9 @@
 import * as common from './common';
-import type { Mat4, Quat, Vec4 } from './types';
+import type { Mat4 } from './mat4';
+import type { Quat } from './quat';
+
+/** A 4D vector */
+export type Vec4 = [x: number, y: number, z: number, w: number];
 
 /**
  * Creates a new, empty vec4

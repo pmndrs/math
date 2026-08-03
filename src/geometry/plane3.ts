@@ -1,5 +1,13 @@
-import type { Plane3, Sphere } from './types';
-import type { Mat4, Vec3 } from '../core/types';
+import type { Mat4 } from '../core/mat4';
+import type { Vec3 } from '../core/vec3';
+import type { Sphere } from './sphere';
+
+/**
+ * A plane in 3D space
+ * normal - a unit length vector defining the normal of the plane.
+ * constant - the signed distance from the origin to the plane.
+ */
+export type Plane3 = { normal: Vec3; constant: number };
 import * as vec3 from '../core/vec3';
 
 /**

@@ -1,7 +1,14 @@
 import { clamp, EPSILON } from './common';
 import * as mat4 from './mat4';
 import * as quat from './quat';
-import type { Euler, EulerOrder, Mat4, Quat } from './types';
+import type { Mat4 } from './mat4';
+import type { Quat } from './quat';
+
+/** Euler orders */
+export type EulerOrder = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx';
+
+/** A Euler in 3D space, with an optional order (default is 'xyz') */
+export type Euler = [x: number, y: number, z: number, order?: EulerOrder];
 
 /**
  * Creates a new Euler with default values (0, 0, 0, 'xyz').

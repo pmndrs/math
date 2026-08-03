@@ -1,4 +1,7 @@
-import type { Quat, Vec2, Vec3, Vec4 } from '../core/types';
+import type { Quat } from '../core/quat';
+import type { Vec2 } from '../core/vec2';
+import type { Vec3 } from '../core/vec3';
+import type { Vec4 } from '../core/vec4';
 import type { RandomGenerator } from './mulberry32';
 
 /**

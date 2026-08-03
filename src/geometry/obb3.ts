@@ -1,7 +1,13 @@
 import * as mat3 from '../core/mat3';
 import * as mat4 from '../core/mat4';
-import type { Box3, OBB3 } from './types';
-import type { Mat3, Mat4, Quat, Vec3 } from '../core/types';
+import type { Mat3 } from '../core/mat3';
+import type { Mat4 } from '../core/mat4';
+import type { Quat } from '../core/quat';
+import type { Vec3 } from '../core/vec3';
+import type { Box3 } from './box3';
+
+/** An oriented bounding box in 3D space */
+export type OBB3 = { center: Vec3; halfExtents: Vec3; rotation: Mat3 };
 import * as vec3 from '../core/vec3';
 
 export function create(): OBB3 {
