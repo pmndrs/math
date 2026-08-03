@@ -1,5 +1,8 @@
 import * as common from './common';
-import type { Mat2d, Vec2 } from './types';
+import type { Vec2 } from './vec2';
+
+/** A 2D affine transform matrix */
+export type Mat2d = [e1: number, e2: number, e3: number, e4: number, e5: number, e6: number];
 
 /**
  * Creates a new identity mat2d

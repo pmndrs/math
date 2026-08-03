@@ -1,4 +1,4 @@
-import type { Vec2 } from '../core/types';
+import type { Vec2 } from '../core/vec2';
 
 /**
  * Calculates the closest point on a line segment to a given point

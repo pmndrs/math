@@ -1,5 +1,14 @@
 import * as common from './common';
-import type { Spherical, Vec2, Vec3 } from './types';
+import type { Vec2 } from './vec2';
+import type { Vec3 } from './vec3';
+
+/**
+ * A point in spherical coordinates [r, theta, phi] (Three.js / OpenGL convention)
+ *  r     - radial distance from the origin
+ *  theta - azimuthal angle in the XZ plane from the +Z axis (radians, range [-π, π])
+ *  phi   - polar angle from the +Y axis (radians, range [0, π])
+ */
+export type Spherical = [r: number, theta: number, phi: number];
 
 /**
  * Creates a new spherical coordinate at r=1, theta=0, phi=0

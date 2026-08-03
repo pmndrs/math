@@ -1,5 +1,8 @@
 import * as common from './common';
-import type { Mat2, Vec2 } from './types';
+import type { Vec2 } from './vec2';
+
+/** A 2x2 matrix */
+export type Mat2 = [e1: number, e2: number, e3: number, e4: number];
 
 /**
  * Creates a new identity mat2

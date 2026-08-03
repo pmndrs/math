@@ -1,6 +1,6 @@
 import { EPSILON } from '../core/common';
-import type { Circle } from './types';
-import type { Vec2 } from '../core/types';
+import type { Vec2 } from '../core/vec2';
+import type { Circle } from './circle';
 import * as vec2 from '../core/vec2';
 
 const _circumcircleV1 = /*@__PURE__*/ vec2.create();

@@ -1,7 +1,12 @@
 import * as common from './common';
 import * as mat4 from './mat4';
 import * as quat from './quat';
-import type { Mat4, Quat, Quat2, Vec3 } from './types';
+import type { Mat4 } from './mat4';
+import type { Quat } from './quat';
+import type { Vec3 } from './vec3';
+
+/** A dual quaternion that represents both rotation and translation */
+export type Quat2 = [x: number, y: number, z: number, w: number, x2: number, y2: number, z2: number, w2: number];
 
 /**
  * Creates a new identity dual quat

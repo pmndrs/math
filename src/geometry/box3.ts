@@ -1,5 +1,10 @@
-import type { Box3, Plane3, Sphere } from './types';
-import type { Mat4, Vec3 } from '../core/types';
+import type { Mat4 } from '../core/mat4';
+import type { Vec3 } from '../core/vec3';
+import type { Plane3 } from './plane3';
+import type { Sphere } from './sphere';
+
+/** A box in 3D space */
+export type Box3 = [minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number];
 import * as common from '../core/common';
 import * as vec3 from '../core/vec3';
 

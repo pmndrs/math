@@ -1,5 +1,5 @@
-import type { Box3 } from './types';
-import type { Vec3 } from '../core/types';
+import type { Vec3 } from '../core/vec3';
+import type { Box3 } from './box3';
 
 /**
  * Computes the axis-aligned bounding box of a triangle defined by three vertices.

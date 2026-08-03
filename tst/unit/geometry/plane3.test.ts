@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Mat4, Plane3, Vec3 } from '../../../src/geometry';
+import type { Mat4, Vec3 } from '../../../src/geometry';
 import { plane3 } from '../../../src/geometry';
 import { vec3 } from '../../../src';
 

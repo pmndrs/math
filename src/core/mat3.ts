@@ -1,5 +1,11 @@
 import * as common from './common';
-import type { Mat2d, Mat3, Mat4, Quat, Vec2 } from './types';
+import type { Mat2d } from './mat2d';
+import type { Mat4 } from './mat4';
+import type { Quat } from './quat';
+import type { Vec2 } from './vec2';
+
+/** A 3x3 matrix */
+export type Mat3 = [e1: number, e2: number, e3: number, e4: number, e5: number, e6: number, e7: number, e8: number, e9: number];
 
 /**
  * Creates a new identity mat3

@@ -1,4 +1,4 @@
-import type { Vec3 } from '../core/types';
+import type { Vec3 } from '../core/vec3';
 
 // Adapated from https://github.com/josephg/noisejs
 // 

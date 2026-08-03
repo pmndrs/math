@@ -1,5 +1,27 @@
 import * as common from './common';
-import type { Mat4, Quat, Quat2, Vec3 } from './types';
+import type { Quat } from './quat';
+import type { Quat2 } from './quat2';
+import type { Vec3 } from './vec3';
+
+/** A 4x4 matrix */
+export type Mat4 = [
+    e1: number,
+    e2: number,
+    e3: number,
+    e4: number,
+    e5: number,
+    e6: number,
+    e7: number,
+    e8: number,
+    e9: number,
+    e10: number,
+    e11: number,
+    e12: number,
+    e13: number,
+    e14: number,
+    e15: number,
+    e16: number,
+];
 
 /**
  * Creates a new identity mat4
