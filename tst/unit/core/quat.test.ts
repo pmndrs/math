@@ -10,6 +10,26 @@ describe('quat', () => {
         });
     });
 
+    describe('fromBuffer', () => {
+        it('should set components from buffer', () => {
+            const out: Quat = [0, 0, 0, 0];
+            const buffer = [10, 20, 30, 40, 50, 60];
+            const result = quat.fromBuffer(out, buffer, 1);
+            expect(result).toEqual([20, 30, 40, 50]);
+            expect(result).toBe(out);
+        });
+    });
+
+    describe('toBuffer', () => {
+        it('should write components to buffer', () => {
+            const q: Quat = [1, 2, 3, 4];
+            const buffer = new Array(6).fill(0);
+            const result = quat.toBuffer(buffer, q, 1);
+            expect(buffer).toEqual([0, 1, 2, 3, 4, 0]);
+            expect(result).toBe(buffer);
+        });
+    });
+
     describe('identity', () => {
         it('should set quaternion to identity', () => {
             const q: Quat = [1, 2, 3, 4];

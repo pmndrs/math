@@ -50,6 +50,24 @@ describe('vec4', () => {
         });
     });
 
+    describe('fromBuffer', () => {
+        it('should set components from buffer', () => {
+            const buffer = [10, 20, 30, 40, 50, 60];
+            const result = vec4.fromBuffer(out, buffer, 1);
+            expect(result).toEqual([20, 30, 40, 50]);
+            expect(result).toBe(out);
+        });
+    });
+
+    describe('toBuffer', () => {
+        it('should write components to buffer', () => {
+            const buffer = new Array(6).fill(0);
+            const result = vec4.toBuffer(buffer, a, 1);
+            expect(buffer).toEqual([0, 1, 2, 3, 4, 0]);
+            expect(result).toBe(buffer);
+        });
+    });
+
     describe('add', () => {
         it('should add two vectors', () => {
             const result = vec4.add(out, a, b);

@@ -1,3 +1,4 @@
+import type { MutableArrayLike } from './arrays';
 import * as scalar from './scalar';
 import type { Mat4 } from './mat4';
 import type { Quat } from './quat';
@@ -78,6 +79,36 @@ export function set(out: Vec4, x: number, y: number, z: number, w: number): Vec4
     out[2] = z;
     out[3] = w;
     return out;
+}
+
+/**
+ * Sets the components of a vec4 from a buffer
+ * @param out the receiving vector
+ * @param buffer the source buffer
+ * @param startIndex the starting index in the buffer
+ * @returns out
+ */
+export function fromBuffer(out: Vec4, buffer: ArrayLike<number>, startIndex: number): Vec4 {
+    out[0] = buffer[startIndex];
+    out[1] = buffer[startIndex + 1];
+    out[2] = buffer[startIndex + 2];
+    out[3] = buffer[startIndex + 3];
+    return out;
+}
+
+/**
+ * Writes the components of a vec4 to a buffer
+ * @param outBuffer The output buffer
+ * @param vec The source vector
+ * @param startIndex The starting index in the buffer
+ * @returns The output buffer
+ */
+export function toBuffer(outBuffer: MutableArrayLike<number>, vec: Vec4, startIndex: number): MutableArrayLike<number> {
+    outBuffer[startIndex] = vec[0];
+    outBuffer[startIndex + 1] = vec[1];
+    outBuffer[startIndex + 2] = vec[2];
+    outBuffer[startIndex + 3] = vec[3];
+    return outBuffer;
 }
 
 /**
