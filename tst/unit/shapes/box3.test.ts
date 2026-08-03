@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { Box3, Mat4, Plane3, Sphere, Vec3 } from '../../../src/geometry';
-import { box3 } from '../../../src/geometry';
+import type { Box3, Mat4, Plane3, Sphere, Vec3 } from '../../../src/shapes';
+import { box3 } from '../../../src/shapes';
 
 describe('box3', () => {
     describe('create', () => {

@@ -4,8 +4,8 @@ import * as mat3 from '../../../src/core/mat3';
 import * as mat4 from '../../../src/core/mat4';
 import * as quat from '../../../src/core/quat';
 import * as vec3 from '../../../src/core/vec3';
-import * as box3 from '../../../src/geometry/box3';
-import * as obb3 from '../../../src/geometry/obb3';
+import * as box3 from '../../../src/shapes/box3';
+import * as obb3 from '../../../src/shapes/obb3';
 
 describe('obb3', () => {
     describe('setFromBox3', () => {
