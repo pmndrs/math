@@ -27,7 +27,7 @@ describe('color', () => {
 
     it('sRGB round-trips (fromSRGB <-> toSRGB)', () => {
         const srgb: [number, number, number] = [0.2, 0.5, 0.8];
-        const back = color.toSRGB(color.fromSRGB(srgb));
+        const back = color.toSRGB([0, 0, 0], color.fromSRGB(srgb));
         expect(back[0]).toBeCloseTo(srgb[0], 6);
         expect(back[1]).toBeCloseTo(srgb[1], 6);
         expect(back[2]).toBeCloseTo(srgb[2], 6);
