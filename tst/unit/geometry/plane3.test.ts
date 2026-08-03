@@ -62,7 +62,7 @@ describe('plane3', () => {
             const p2 = plane3.fromNormalAndConstant(plane3.create(), [0, 1, 0], -2);
             const p3 = plane3.fromNormalAndConstant(plane3.create(), [0, 0, 1], -3);
             const out = vec3.create();
-            expect(plane3.intersect(p1, p2, p3, out)).toBe(true);
+            expect(plane3.intersect(out, p1, p2, p3)).toBe(true);
             expect(out[0]).toBeCloseTo(1, 10);
             expect(out[1]).toBeCloseTo(2, 10);
             expect(out[2]).toBeCloseTo(3, 10);
@@ -74,7 +74,7 @@ describe('plane3', () => {
             const p2 = plane3.fromNormalAndConstant(plane3.create(), [0, 3, 0], -6);
             const p3 = plane3.fromNormalAndConstant(plane3.create(), [0, 0, 1], -3);
             const out = vec3.create();
-            expect(plane3.intersect(p1, p2, p3, out)).toBe(true);
+            expect(plane3.intersect(out, p1, p2, p3)).toBe(true);
             expect(out[0]).toBeCloseTo(1, 10);
             expect(out[1]).toBeCloseTo(2, 10);
             expect(out[2]).toBeCloseTo(3, 10);
@@ -85,7 +85,7 @@ describe('plane3', () => {
             const p2 = plane3.fromNormalAndConstant(plane3.create(), [0, 1, 0], 0);
             const p3 = plane3.fromNormalAndConstant(plane3.create(), [0, 0, 1], 0);
             const out = vec3.create();
-            expect(plane3.intersect(p1, p2, p3, out)).toBe(true);
+            expect(plane3.intersect(out, p1, p2, p3)).toBe(true);
             expect(out[0]).toBeCloseTo(0, 10);
             expect(out[1]).toBeCloseTo(0, 10);
             expect(out[2]).toBeCloseTo(0, 10);
@@ -96,7 +96,7 @@ describe('plane3', () => {
             const p2 = plane3.fromNormalAndConstant(plane3.create(), [1, 0, 0], -1); // parallel to p1
             const p3 = plane3.fromNormalAndConstant(plane3.create(), [0, 1, 0], 0);
             const out = vec3.fromValues(9, 9, 9);
-            expect(plane3.intersect(p1, p2, p3, out)).toBe(false);
+            expect(plane3.intersect(out, p1, p2, p3)).toBe(false);
             expect(out).toEqual([9, 9, 9]);
         });
 
@@ -106,7 +106,7 @@ describe('plane3', () => {
             const p2 = plane3.fromNormalAndConstant(plane3.create(), [0, 1, 0], -7);
             const p3 = plane3.fromNormalAndConstant(plane3.create(), [0, 0, 1], -0.5);
             const out = vec3.create();
-            expect(plane3.intersect(p1, p2, p3, out)).toBe(true);
+            expect(plane3.intersect(out, p1, p2, p3)).toBe(true);
             expect(out[0]).toBeCloseTo(-4, 10);
             expect(out[1]).toBeCloseTo(7, 10);
             expect(out[2]).toBeCloseTo(0.5, 10);
@@ -154,7 +154,7 @@ describe('plane3', () => {
             const p2 = plane3.fromNormalAndConstant(plane3.create(), [0, 1, 0], -2);
             const p3 = plane3.fromNormalAndConstant(plane3.create(), [0, 0, 1], -3);
             const out = vec3.create();
-            const ret = plane3.intersect(p1, p2, p3, out);
+            const ret = plane3.intersect(out, p1, p2, p3);
             // returns boolean (not a fresh vector) and mutates the provided out
             expect(typeof ret).toBe('boolean');
             expect(out).toBe(out);

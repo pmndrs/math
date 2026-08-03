@@ -241,13 +241,13 @@ export function exactEquals(a: Plane3, b: Plane3): boolean {
 
 /**
  * Finds the intersection point of three planes
+ * @param out - The output point where the three planes intersect
  * @param p1 - First plane
  * @param p2 - Second plane
  * @param p3 - Third plane
- * @param out - The output point where the three planes intersect
  * @returns True if intersection exists, false if planes are degenerate or parallel
  */
-export function intersect(p1: Plane3, p2: Plane3, p3: Plane3, out: Vec3): boolean {
+export function intersect(out: Vec3, p1: Plane3, p2: Plane3, p3: Plane3): boolean {
     // point = -(d1*(N2×N3) + d2*(N3×N1) + d3*(N1×N2)) / (N1·(N2×N3))
     // Cramer's rule: the three cross products are the columns of adj(M) and are reused
     // between the determinant and the numerator. fully scalar, zero allocations.

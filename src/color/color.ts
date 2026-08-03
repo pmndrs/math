@@ -67,7 +67,7 @@ export function fromSRGB(srgb: [number, number, number]): Color {
 }
 
 /** Write the sRGB gamma-encoded [r, g, b] of a linear Color into `out` (values [0, 1]). */
-export function toSRGB(c: Color, out: [number, number, number] = [0, 0, 0]): [number, number, number] {
+export function toSRGB(out: [number, number, number], c: Color): [number, number, number] {
     out[0] = linearToSrgb(c[0]);
     out[1] = linearToSrgb(c[1]);
     out[2] = linearToSrgb(c[2]);
