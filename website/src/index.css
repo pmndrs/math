@@ -1,0 +1,52 @@
+:root {
+    color-scheme: dark;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    color: #eee;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+main {
+    text-align: center;
+    padding: 2rem;
+}
+
+h1 {
+    margin: 0;
+    font-size: clamp(3rem, 12vw, 6rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+}
+
+.subtitle {
+    margin: 0.5rem 0 2rem;
+    color: #888;
+}
+
+.links {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.links a {
+    color: #6cf;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}

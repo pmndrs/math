@@ -1,0 +1,8 @@
+node_modules
+dist
+dist-*
+examples/dist
+website/dist
+*.tsbuildinfo
+tmp
+.DS_Store

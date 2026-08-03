@@ -1,0 +1,20 @@
+{
+    "name": "maath-examples",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "rm -rf ./dist && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "maath": "workspace:*",
+        "three": "^0.134.0"
+    },
+    "devDependencies": {
+        "@types/three": "^0.134.0",
+        "typescript": "^5.9.2",
+        "vite": "^7.3.1"
+    }
+}
