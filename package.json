@@ -1,0 +1,65 @@
+{
+  "name": "maath",
+  "version": "1.0.0-alpha.1",
+  "description": "a collection of math helpers for graphics and simulations",
+  "keywords": ["math", "vector", "matrix", "quaternion", "euler", "random", "noise"],
+  "license": "MIT",
+  "repository": "github:pmndrs/maath",
+  "homepage": "https://github.com/pmndrs/maath",
+  "bugs": {
+    "url": "https://github.com/pmndrs/maath/issues"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/src/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/src/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rm -rf ./dist && run-p build:bundle build:dts",
+    "build:bundle": "rolldown --config rolldown.config.mjs",
+    "build:dts": "tsc -p tsconfig.build.json && node scripts/add-js-extensions-dts.mjs",
+    "build:examples": "pnpm --filter maath-examples build",
+    "build:website": "pnpm --filter website build",
+    "format": "biome format --write src/. tst/.",
+    "lint": "biome lint --write src/. tst/.",
+    "test": "vitest run ./tst",
+    "typecheck-docs": "tsc --project docs/tsconfig.json --noEmit",
+    "docs": "(cd docs && node ./build.js)",
+    "typedoc": "typedoc --tsconfig ./tsconfig.json --name \"maath docs\" --out ./dist-typedoc ./src/index.ts",
+    "build:docs": "run-s docs typedoc",
+    "release": "run-s build test build:examples build:docs build:website"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "peerDependencies": {
+    "@types/three": ">=0.134.0",
+    "three": ">=0.134.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/three": {
+      "optional": true
+    },
+    "three": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "@types/three": "^0.134.0",
+    "npm-run-all2": "^9.0.1",
+    "rolldown": "^1.0.2",
+    "three": "^0.134.0",
+    "typedoc": "^0.28.16",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
