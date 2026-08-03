@@ -1,12 +1,6 @@
 import type { Vec3 } from '../core/vec3';
 import type { Box3 } from './box3';
 
-/** A ray in 3D space */
-export type Ray3 = {
-    origin: Vec3;
-    direction: Vec3;
-};
-
 /**
  * Result of a ray-triangle intersection test
  * @see createIntersectsTriangleResult

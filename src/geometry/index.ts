@@ -20,7 +20,6 @@ export * as segment2 from './segment2';
 export * as triangle3 from './triangle3';
 
 export * as raycast3 from './raycast3';
-export type { Ray3 } from './raycast3';
 
 export * from './circumcircle';
 export * from './quickhull2';
