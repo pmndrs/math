@@ -711,9 +711,7 @@ describe('mat4', () => {
             expect(result[11]).toBe(-1);
             expect(result[10]).toBeCloseTo(100 / (0.1 - 100));
             expect(result[14]).toBeCloseTo((100 * 0.1) / (0.1 - 100));
-            expect(result[10]).not.toBe(
-                mat4.perspectiveFromFieldOfViewNO(mat4.create(), fov, 0.1, 100)[10],
-            );
+            expect(result[10]).not.toBe(mat4.perspectiveFromFieldOfViewNO(mat4.create(), fov, 0.1, 100)[10]);
         });
     });
 

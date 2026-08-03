@@ -156,12 +156,12 @@ const CSS_COLORS: Record<string, number> = {
 
 /** Convert a single sRGB gamma-encoded channel [0, 1] to linear light [0, 1]. */
 function srgbChannelToLinear(c: number): number {
-    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 }
 
 /** Convert a single linear light channel [0, 1] to sRGB gamma-encoded [0, 1]. */
 function linearChannelToSrgb(c: number): number {
-    return c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+    return c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
 }
 
 // ---------------------------------------------------------------------------
@@ -230,9 +230,9 @@ export type Color = [r: number, g: number, b: number];
 
 /** Accepted input types for creating or parsing a Color */
 export type ColorInput =
-    | string                     // '#f00', '#ff0000', 'red', 'rgb(255,0,0)', 'hsl(0,100%,50%)'
-    | number                     // 0xff0000 integer (sRGB gamma)
-    | [number, number, number];  // [r, g, b] linear floats [0, 1]
+    | string // '#f00', '#ff0000', 'red', 'rgb(255,0,0)', 'hsl(0,100%,50%)'
+    | number // 0xff0000 integer (sRGB gamma)
+    | [number, number, number]; // [r, g, b] linear floats [0, 1]
 
 /** Create a new Color initialized to black [0, 0, 0]. */
 export function create(): Color {
@@ -346,7 +346,7 @@ function parse(input: ColorInput): Color | null {
 
     const hex = CSS_COLORS[s];
     if (hex !== undefined) {
-        return parseHex6('#' + hex.toString(16).padStart(6, '0'));
+        return parseHex6(`#${hex.toString(16).padStart(6, '0')}`);
     }
 
     console.warn(`[gpucat] color: unrecognised color input: "${input}"`);

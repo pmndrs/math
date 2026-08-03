@@ -1,5 +1,3 @@
-/** biome-ignore-all assist/source/organizeImports: ordering */
-
 export * from './common';
 
 export * as vec2 from './vec2';

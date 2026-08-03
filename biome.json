@@ -19,5 +19,11 @@
             }
         }
     },
-    "javascript": { "formatter": { "quoteStyle": "single" } }
+    "javascript": { "formatter": { "quoteStyle": "single" } },
+    "overrides": [
+        {
+            "includes": ["**/index.ts"],
+            "assist": { "actions": { "source": { "organizeImports": "off" } } }
+        }
+    ]
 }

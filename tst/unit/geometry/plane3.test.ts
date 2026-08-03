@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { vec3 } from '../../../src';
 import type { Mat4, Vec3 } from '../../../src/geometry';
 import { plane3 } from '../../../src/geometry';
-import { vec3 } from '../../../src';
 
 describe('plane3', () => {
     describe('fromNormalAndPoint', () => {
@@ -29,7 +29,11 @@ describe('plane3', () => {
             plane3.fromCoplanarPoints(p, [1, 0, 0], [0, 1, 0], [0, 0, 1]);
             expect(vec3.length(p.normal)).toBeCloseTo(1, 10);
             // every input point lies on the plane → signed distance ~0
-            for (const pt of [[1, 0, 0], [0, 1, 0], [0, 0, 1]] as Vec3[]) {
+            for (const pt of [
+                [1, 0, 0],
+                [0, 1, 0],
+                [0, 0, 1],
+            ] as Vec3[]) {
                 expect(plane3.distanceToPoint(p, pt)).toBeCloseTo(0, 10);
             }
         });

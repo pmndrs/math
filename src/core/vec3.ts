@@ -1,5 +1,5 @@
-import * as common from './common';
 import type { MutableArrayLike } from './common';
+import * as common from './common';
 import type { Mat3 } from './mat3';
 import type { Mat4 } from './mat4';
 import type { Quat } from './quat';
@@ -816,7 +816,6 @@ export function finite(a: Vec3): boolean {
     return Number.isFinite(a[0]) && Number.isFinite(a[1]) && Number.isFinite(a[2]);
 }
 
-
 /**
  * Determines if a scale vector represents an inside-out transformation (reflection)
  * Returns true if an odd number of scale components are negative
@@ -828,7 +827,7 @@ export function isScaleInsideOut(scale: Vec3): boolean {
     // create a bitmask of which components are negative
     // each component that is < 0 contributes a bit (1, 2, or 4)
     const mask = (scale[0] < 0 ? 1 : 0) | (scale[1] < 0 ? 2 : 0) | (scale[2] < 0 ? 4 : 0);
-    
+
     // count the number of set bits and return true if odd
     // popcount: count number of 1-bits in the mask
     let count = 0;
@@ -874,4 +873,3 @@ export const len = length;
  * Alias for {@link squaredLength}
  */
 export const sqrLen = squaredLength;
-

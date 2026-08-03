@@ -1,7 +1,7 @@
 import type { Vec3 } from '../core/vec3';
 
 // Adapated from https://github.com/josephg/noisejs
-// 
+//
 // ```
 // A speed-improved perlin and simplex noise algorithms for 2D.
 //

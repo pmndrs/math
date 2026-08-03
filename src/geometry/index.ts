@@ -1,6 +1,3 @@
-/** biome-ignore-all assist/source/organizeImports: ordering */
-
-// re-export the core types this domain builds on (type-only, erased at build)
 export type * from '../core';
 
 export * as box3 from './box3';

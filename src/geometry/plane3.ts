@@ -1,5 +1,6 @@
 import type { Mat4 } from '../core/mat4';
 import type { Vec3 } from '../core/vec3';
+import * as vec3 from '../core/vec3';
 import type { Sphere } from './sphere';
 
 /**
@@ -8,7 +9,6 @@ import type { Sphere } from './sphere';
  * constant - the signed distance from the origin to the plane.
  */
 export type Plane3 = { normal: Vec3; constant: number };
-import * as vec3 from '../core/vec3';
 
 /**
  * Creates a new plane with normal (0, 1, 0) and constant 0

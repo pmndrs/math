@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import * as box3 from '../../../src/geometry/box3';
 import * as euler from '../../../src/core/euler';
 import * as mat3 from '../../../src/core/mat3';
 import * as mat4 from '../../../src/core/mat4';
-import * as obb3 from '../../../src/geometry/obb3';
 import * as quat from '../../../src/core/quat';
 import * as vec3 from '../../../src/core/vec3';
+import * as box3 from '../../../src/geometry/box3';
+import * as obb3 from '../../../src/geometry/obb3';
 
 describe('obb3', () => {
     describe('setFromBox3', () => {
@@ -171,7 +171,6 @@ describe('obb3', () => {
 
             expect(obb3.intersectsOBB3(obb1, obb2)).toBe(false);
         });
-
     });
 
     describe('intersectsBox3', () => {
@@ -254,12 +253,12 @@ describe('obb3', () => {
             // Original Y-axis [0,1,0] -> after Y rot -> [0,1,0] -> after Z rot -> [-1,0,0]
             // Original Z-axis [0,0,1] -> after Y rot -> [1,0,0] -> after Z rot -> [0,1,0]
             const r = result.rotation;
-            expect(r[0]).toBeCloseTo(0);  // X-axis x
-            expect(r[1]).toBeCloseTo(0);  // X-axis y
+            expect(r[0]).toBeCloseTo(0); // X-axis x
+            expect(r[1]).toBeCloseTo(0); // X-axis y
             expect(r[2]).toBeCloseTo(-1); // X-axis z
             expect(r[3]).toBeCloseTo(-1); // Y-axis x
-            expect(r[4]).toBeCloseTo(0);  // Y-axis y
-            expect(r[5]).toBeCloseTo(0);  // Y-axis z
+            expect(r[4]).toBeCloseTo(0); // Y-axis y
+            expect(r[5]).toBeCloseTo(0); // Y-axis z
         });
 
         it('scales half extents correctly', () => {

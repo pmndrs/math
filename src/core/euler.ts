@@ -1,8 +1,8 @@
 import { clamp, EPSILON } from './common';
-import * as mat4 from './mat4';
-import * as quat from './quat';
 import type { Mat4 } from './mat4';
+import * as mat4 from './mat4';
 import type { Quat } from './quat';
+import * as quat from './quat';
 
 /** Euler orders */
 export type EulerOrder = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx';

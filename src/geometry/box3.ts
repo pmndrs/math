@@ -1,12 +1,12 @@
+import * as common from '../core/common';
 import type { Mat4 } from '../core/mat4';
 import type { Vec3 } from '../core/vec3';
+import * as vec3 from '../core/vec3';
 import type { Plane3 } from './plane3';
 import type { Sphere } from './sphere';
 
 /** A box in 3D space */
 export type Box3 = [minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number];
-import * as common from '../core/common';
-import * as vec3 from '../core/vec3';
 
 /**
  * Create a new empty Box3 with "min" set to positive infinity and "max" set to negative infinity
@@ -14,8 +14,12 @@ import * as vec3 from '../core/vec3';
  */
 export function create(): Box3 {
     return [
-        Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY,
-        Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY,
+        Number.POSITIVE_INFINITY,
+        Number.POSITIVE_INFINITY,
+        Number.POSITIVE_INFINITY,
+        Number.NEGATIVE_INFINITY,
+        Number.NEGATIVE_INFINITY,
+        Number.NEGATIVE_INFINITY,
     ];
 }
 
@@ -130,14 +134,7 @@ export function empty(out: Box3): Box3 {
  * @returns True if the boxes are equal, false otherwise
  */
 export function exactEquals(a: Box3, b: Box3): boolean {
-    return (
-        a[0] === b[0] &&
-        a[1] === b[1] &&
-        a[2] === b[2] &&
-        a[3] === b[3] &&
-        a[4] === b[4] &&
-        a[5] === b[5]
-    );
+    return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3] && a[4] === b[4] && a[5] === b[5];
 }
 
 /**
@@ -384,9 +381,15 @@ export function transformMat4(out: Box3, box: Box3, mat: Mat4): Box3 {
     const ey = (bMaxY - bMinY) * 0.5;
     const ez = (bMaxZ - bMinZ) * 0.5;
 
-    const m0 = mat[0], m1 = mat[1], m2 = mat[2];
-    const m4 = mat[4], m5 = mat[5], m6 = mat[6];
-    const m8 = mat[8], m9 = mat[9], m10 = mat[10];
+    const m0 = mat[0],
+        m1 = mat[1],
+        m2 = mat[2];
+    const m4 = mat[4],
+        m5 = mat[5],
+        m6 = mat[6];
+    const m8 = mat[8],
+        m9 = mat[9],
+        m10 = mat[10];
 
     const tcx = m0 * cx + m4 * cy + m8 * cz + mat[12];
     const tcy = m1 * cx + m5 * cy + m9 * cz + mat[13];
@@ -413,9 +416,14 @@ export function transformMat4(out: Box3, box: Box3, mat: Mat4): Box3 {
  * @returns true if the point is inside or on the boundary of the box
  */
 export function containsPoint(box: Box3, point: Vec3): boolean {
-    return point[0] >= box[0] && point[0] <= box[3] &&
-           point[1] >= box[1] && point[1] <= box[4] &&
-           point[2] >= box[2] && point[2] <= box[5];
+    return (
+        point[0] >= box[0] &&
+        point[0] <= box[3] &&
+        point[1] >= box[1] &&
+        point[1] <= box[4] &&
+        point[2] >= box[2] &&
+        point[2] <= box[5]
+    );
 }
 
 /**
@@ -425,9 +433,14 @@ export function containsPoint(box: Box3, point: Vec3): boolean {
  * @returns true if the container Box3 completely contains the contained Box3
  */
 export function containsBox3(container: Box3, contained: Box3): boolean {
-    return contained[0] >= container[0] && contained[3] <= container[3] &&
-           contained[1] >= container[1] && contained[4] <= container[4] &&
-           contained[2] >= container[2] && contained[5] <= container[5];
+    return (
+        contained[0] >= container[0] &&
+        contained[3] <= container[3] &&
+        contained[1] >= container[1] &&
+        contained[4] <= container[4] &&
+        contained[2] >= container[2] &&
+        contained[5] <= container[5]
+    );
 }
 
 /**
