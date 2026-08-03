@@ -59,11 +59,11 @@ export function choice<T>(random: RandomGenerator, items: T[]): T {
 
 /**
  * Writes a random unit-length Vec2 into out.
- * @param random the random generator to use
  * @param out the receiving vector
+ * @param random the random generator to use
  * @returns out
  */
-export function vec2(random: RandomGenerator, out: Vec2 = [0, 0]): Vec2 {
+export function vec2(out: Vec2, random: RandomGenerator): Vec2 {
     const r = random() * 2.0 * Math.PI;
     out[0] = Math.cos(r);
     out[1] = Math.sin(r);
@@ -72,11 +72,11 @@ export function vec2(random: RandomGenerator, out: Vec2 = [0, 0]): Vec2 {
 
 /**
  * Writes a random unit-length Vec3 into out.
- * @param random the random generator to use
  * @param out the receiving vector
+ * @param random the random generator to use
  * @returns out
  */
-export function vec3(random: RandomGenerator, out: Vec3 = [0, 0, 0]): Vec3 {
+export function vec3(out: Vec3, random: RandomGenerator): Vec3 {
     const r = random() * 2.0 * Math.PI;
     const z = random() * 2.0 - 1.0;
     const zScale = Math.sqrt(1.0 - z * z);
@@ -89,11 +89,11 @@ export function vec3(random: RandomGenerator, out: Vec3 = [0, 0, 0]): Vec3 {
 
 /**
  * Writes a random unit-length Vec4 into out.
- * @param random the random generator to use
  * @param out the receiving vector
+ * @param random the random generator to use
  * @returns out
  */
-export function vec4(random: RandomGenerator, out: Vec4 = [0, 0, 0, 0]): Vec4 {
+export function vec4(out: Vec4, random: RandomGenerator): Vec4 {
     // Marsaglia, George. Choosing a Point from the Surface of a
     // Sphere. Ann. Math. Statist. 43 (1972), no. 2, 645--646.
     // http://projecteuclid.org/euclid.aoms/1177692644;
@@ -117,11 +117,11 @@ export function vec4(random: RandomGenerator, out: Vec4 = [0, 0, 0, 0]): Vec4 {
 
 /**
  * Writes a random unit quaternion into out.
- * @param random the random generator to use
  * @param out the receiving quaternion
+ * @param random the random generator to use
  * @returns out
  */
-export function quat(random: RandomGenerator, out: Quat = [0, 0, 0, 0]): Quat {
+export function quat(out: Quat, random: RandomGenerator): Quat {
     // Implementation of http://planning.cs.uiuc.edu/node198.html
     const u1 = random();
     const u2 = random();
