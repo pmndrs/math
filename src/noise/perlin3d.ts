@@ -1,4 +1,4 @@
-import { fade, lerp } from '../core/common';
+import { fade, lerp } from '../core/scalar';
 import { createPermutation, dot3, type Permutation } from './permutation';
 
 /** A seeded 3D Perlin noise generator. Create one with {@link create}. */

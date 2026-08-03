@@ -1,4 +1,4 @@
-import * as common from './common';
+import * as scalar from './scalar';
 import type { Mat4 } from './mat4';
 import type { Quat } from './quat';
 
@@ -214,10 +214,10 @@ export function max(out: Vec4, a: Vec4, b: Vec4): Vec4 {
  * @returns out
  */
 export function round(out: Vec4, a: Vec4): Vec4 {
-    out[0] = common.round(a[0]);
-    out[1] = common.round(a[1]);
-    out[2] = common.round(a[2]);
-    out[3] = common.round(a[3]);
+    out[0] = scalar.round(a[0]);
+    out[1] = scalar.round(a[1]);
+    out[2] = scalar.round(a[2]);
+    out[3] = scalar.round(a[3]);
     return out;
 }
 
@@ -529,10 +529,10 @@ export function equals(a: Vec4, b: Vec4): boolean {
     const b2 = b[2];
     const b3 = b[3];
     return (
-        Math.abs(a0 - b0) <= common.EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
-        Math.abs(a1 - b1) <= common.EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1)) &&
-        Math.abs(a2 - b2) <= common.EPSILON * Math.max(1.0, Math.abs(a2), Math.abs(b2)) &&
-        Math.abs(a3 - b3) <= common.EPSILON * Math.max(1.0, Math.abs(a3), Math.abs(b3))
+        Math.abs(a0 - b0) <= scalar.EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
+        Math.abs(a1 - b1) <= scalar.EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1)) &&
+        Math.abs(a2 - b2) <= scalar.EPSILON * Math.max(1.0, Math.abs(a2), Math.abs(b2)) &&
+        Math.abs(a3 - b3) <= scalar.EPSILON * Math.max(1.0, Math.abs(a3), Math.abs(b3))
     );
 }
 

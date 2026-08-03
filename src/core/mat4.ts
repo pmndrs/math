@@ -1,4 +1,4 @@
-import * as common from './common';
+import { EPSILON } from './scalar';
 import type { Quat } from './quat';
 import type { Quat2 } from './quat2';
 import type { Vec3 } from './vec3';
@@ -880,7 +880,7 @@ export function rotate(out: Mat4, a: Mat4, rad: number, axis: Vec3): Mat4 | null
     let z = axis[2];
     let len = Math.sqrt(x * x + y * y + z * z);
 
-    if (len < common.EPSILON) {
+    if (len < EPSILON) {
         return null;
     }
 
@@ -1153,7 +1153,7 @@ export function fromRotation(out: Mat4, rad: number, axis: Vec3): Mat4 | null {
     let z = axis[2];
     let len = Math.sqrt(x * x + y * y + z * z);
 
-    if (len < common.EPSILON) {
+    if (len < EPSILON) {
         return null;
     }
 
@@ -2096,9 +2096,9 @@ export function lookAt(out: Mat4, eye: Vec3, center: Vec3, up: Vec3): Mat4 {
     const centerz = center[2];
 
     if (
-        Math.abs(eyex - centerx) < common.EPSILON &&
-        Math.abs(eyey - centery) < common.EPSILON &&
-        Math.abs(eyez - centerz) < common.EPSILON
+        Math.abs(eyex - centerx) < EPSILON &&
+        Math.abs(eyey - centery) < EPSILON &&
+        Math.abs(eyez - centerz) < EPSILON
     ) {
         return identity(out);
     }
@@ -2444,22 +2444,22 @@ export function equals(a: Mat4, b: Mat4): boolean {
     const b15 = b[15];
 
     return (
-        Math.abs(a0 - b0) <= common.EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
-        Math.abs(a1 - b1) <= common.EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1)) &&
-        Math.abs(a2 - b2) <= common.EPSILON * Math.max(1.0, Math.abs(a2), Math.abs(b2)) &&
-        Math.abs(a3 - b3) <= common.EPSILON * Math.max(1.0, Math.abs(a3), Math.abs(b3)) &&
-        Math.abs(a4 - b4) <= common.EPSILON * Math.max(1.0, Math.abs(a4), Math.abs(b4)) &&
-        Math.abs(a5 - b5) <= common.EPSILON * Math.max(1.0, Math.abs(a5), Math.abs(b5)) &&
-        Math.abs(a6 - b6) <= common.EPSILON * Math.max(1.0, Math.abs(a6), Math.abs(b6)) &&
-        Math.abs(a7 - b7) <= common.EPSILON * Math.max(1.0, Math.abs(a7), Math.abs(b7)) &&
-        Math.abs(a8 - b8) <= common.EPSILON * Math.max(1.0, Math.abs(a8), Math.abs(b8)) &&
-        Math.abs(a9 - b9) <= common.EPSILON * Math.max(1.0, Math.abs(a9), Math.abs(b9)) &&
-        Math.abs(a10 - b10) <= common.EPSILON * Math.max(1.0, Math.abs(a10), Math.abs(b10)) &&
-        Math.abs(a11 - b11) <= common.EPSILON * Math.max(1.0, Math.abs(a11), Math.abs(b11)) &&
-        Math.abs(a12 - b12) <= common.EPSILON * Math.max(1.0, Math.abs(a12), Math.abs(b12)) &&
-        Math.abs(a13 - b13) <= common.EPSILON * Math.max(1.0, Math.abs(a13), Math.abs(b13)) &&
-        Math.abs(a14 - b14) <= common.EPSILON * Math.max(1.0, Math.abs(a14), Math.abs(b14)) &&
-        Math.abs(a15 - b15) <= common.EPSILON * Math.max(1.0, Math.abs(a15), Math.abs(b15))
+        Math.abs(a0 - b0) <= EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
+        Math.abs(a1 - b1) <= EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1)) &&
+        Math.abs(a2 - b2) <= EPSILON * Math.max(1.0, Math.abs(a2), Math.abs(b2)) &&
+        Math.abs(a3 - b3) <= EPSILON * Math.max(1.0, Math.abs(a3), Math.abs(b3)) &&
+        Math.abs(a4 - b4) <= EPSILON * Math.max(1.0, Math.abs(a4), Math.abs(b4)) &&
+        Math.abs(a5 - b5) <= EPSILON * Math.max(1.0, Math.abs(a5), Math.abs(b5)) &&
+        Math.abs(a6 - b6) <= EPSILON * Math.max(1.0, Math.abs(a6), Math.abs(b6)) &&
+        Math.abs(a7 - b7) <= EPSILON * Math.max(1.0, Math.abs(a7), Math.abs(b7)) &&
+        Math.abs(a8 - b8) <= EPSILON * Math.max(1.0, Math.abs(a8), Math.abs(b8)) &&
+        Math.abs(a9 - b9) <= EPSILON * Math.max(1.0, Math.abs(a9), Math.abs(b9)) &&
+        Math.abs(a10 - b10) <= EPSILON * Math.max(1.0, Math.abs(a10), Math.abs(b10)) &&
+        Math.abs(a11 - b11) <= EPSILON * Math.max(1.0, Math.abs(a11), Math.abs(b11)) &&
+        Math.abs(a12 - b12) <= EPSILON * Math.max(1.0, Math.abs(a12), Math.abs(b12)) &&
+        Math.abs(a13 - b13) <= EPSILON * Math.max(1.0, Math.abs(a13), Math.abs(b13)) &&
+        Math.abs(a14 - b14) <= EPSILON * Math.max(1.0, Math.abs(a14), Math.abs(b14)) &&
+        Math.abs(a15 - b15) <= EPSILON * Math.max(1.0, Math.abs(a15), Math.abs(b15))
     );
 }
 

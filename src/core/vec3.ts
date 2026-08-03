@@ -1,5 +1,5 @@
-import type { MutableArrayLike } from './common';
-import * as common from './common';
+import type { MutableArrayLike } from './arrays';
+import * as scalar from './scalar';
 import type { Mat3 } from './mat3';
 import type { Mat4 } from './mat4';
 import type { Quat } from './quat';
@@ -286,9 +286,9 @@ export function max(out: Vec3, a: Vec3, b: Vec3): Vec3 {
  * @returns out
  */
 export function round(out: Vec3, a: Vec3): Vec3 {
-    out[0] = common.round(a[0]);
-    out[1] = common.round(a[1]);
-    out[2] = common.round(a[2]);
+    out[0] = scalar.round(a[0]);
+    out[1] = scalar.round(a[1]);
+    out[2] = scalar.round(a[2]);
     return out;
 }
 
@@ -801,9 +801,9 @@ export function equals(a: Vec3, b: Vec3): boolean {
     const b1 = b[1];
     const b2 = b[2];
     return (
-        Math.abs(a0 - b0) <= common.EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
-        Math.abs(a1 - b1) <= common.EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1)) &&
-        Math.abs(a2 - b2) <= common.EPSILON * Math.max(1.0, Math.abs(a2), Math.abs(b2))
+        Math.abs(a0 - b0) <= scalar.EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
+        Math.abs(a1 - b1) <= scalar.EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1)) &&
+        Math.abs(a2 - b2) <= scalar.EPSILON * Math.max(1.0, Math.abs(a2), Math.abs(b2))
     );
 }
 

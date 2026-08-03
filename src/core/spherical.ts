@@ -1,4 +1,4 @@
-import * as common from './common';
+import * as scalar from './scalar';
 import type { Vec2 } from './vec2';
 import type { Vec3 } from './vec3';
 
@@ -127,7 +127,7 @@ function wrapAngle(a: number): number {
  * @returns out
  */
 export function lerp(out: Spherical, a: Spherical, b: Spherical, t: number): Spherical {
-    out[0] = common.lerp(a[0], b[0], t);
+    out[0] = scalar.lerp(a[0], b[0], t);
     out[1] = a[1] + wrapAngle(b[1] - a[1]) * t;
     out[2] = a[2] + wrapAngle(b[2] - a[2]) * t;
     return out;
@@ -167,7 +167,7 @@ export const fromVec3 = setFromVec3;
  * @returns out
  */
 export function makeSafe(out: Spherical, a: Spherical): Spherical {
-    const EPS = common.EPSILON;
+    const EPS = scalar.EPSILON;
     out[0] = a[0];
     out[1] = a[1];
     out[2] = Math.max(EPS, Math.min(Math.PI - EPS, a[2]));
@@ -240,7 +240,7 @@ export function toVec2(out: Vec2, a: Spherical): Vec2 {
  * @returns true if approximately equal
  */
 export function equals(a: Spherical, b: Spherical): boolean {
-    return common.equals(a[0], b[0]) && common.equals(a[1], b[1]) && common.equals(a[2], b[2]);
+    return scalar.equals(a[0], b[0]) && scalar.equals(a[1], b[1]) && scalar.equals(a[2], b[2]);
 }
 
 /**
