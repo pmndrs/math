@@ -7,7 +7,7 @@ export default defineConfig({
     input: {
         index: './src/index.ts',
         geometry: './src/geometry/index.ts',
-        easing: './src/easing/index.ts',
+        time: './src/time/index.ts',
         random: './src/random/index.ts',
         noise: './src/noise/index.ts',
         color: './src/color/index.ts',
