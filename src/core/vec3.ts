@@ -124,7 +124,7 @@ export function fromBuffer(out: Vec3, buffer: ArrayLike<number>, startIndex: num
  * @param startIndex The starting index in the buffer
  * @returns The output buffer
  */
-export function toBuffer(outBuffer: MutableArrayLike<number>, vec: Vec3, startIndex: number): ArrayLike<number> {
+export function toBuffer(outBuffer: MutableArrayLike<number>, vec: Vec3, startIndex: number): MutableArrayLike<number> {
     outBuffer[startIndex] = vec[0];
     outBuffer[startIndex + 1] = vec[1];
     outBuffer[startIndex + 2] = vec[2];
