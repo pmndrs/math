@@ -1,14 +1,14 @@
-import * as mat3 from '../core/mat3';
-import * as mat4 from '../core/mat4';
 import type { Mat3 } from '../core/mat3';
+import * as mat3 from '../core/mat3';
 import type { Mat4 } from '../core/mat4';
+import * as mat4 from '../core/mat4';
 import type { Quat } from '../core/quat';
 import type { Vec3 } from '../core/vec3';
+import * as vec3 from '../core/vec3';
 import type { Box3 } from './box3';
 
 /** An oriented bounding box in 3D space */
 export type OBB3 = { center: Vec3; halfExtents: Vec3; rotation: Mat3 };
-import * as vec3 from '../core/vec3';
 
 export function create(): OBB3 {
     return { center: [0, 0, 0], halfExtents: [1, 1, 1], rotation: mat3.create() };
@@ -135,11 +135,7 @@ export function containsPoint(obb: OBB3, point: Vec3): boolean {
     const ly = dx * r[3] + dy * r[4] + dz * r[5];
     const lz = dx * r[6] + dy * r[7] + dz * r[8];
 
-    return (
-        Math.abs(lx) <= obb.halfExtents[0] &&
-        Math.abs(ly) <= obb.halfExtents[1] &&
-        Math.abs(lz) <= obb.halfExtents[2]
-    );
+    return Math.abs(lx) <= obb.halfExtents[0] && Math.abs(ly) <= obb.halfExtents[1] && Math.abs(lz) <= obb.halfExtents[2];
 }
 
 /**

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Mat3, Mat4, Mat2d, Vec2 } from '../../../src';
+import type { Mat2d, Mat3, Mat4, Vec2 } from '../../../src';
 import { mat3, mat4, quat } from '../../../src';
 
 describe('mat3', () => {

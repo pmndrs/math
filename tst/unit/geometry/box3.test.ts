@@ -982,7 +982,7 @@ describe('box3', () => {
 
             expect(box3.intersectsPlane3(box, plane)).toBe(true);
         });
-        
+
         it('should return false when plane is completely on positive side', () => {
             const box: Box3 = [1, 1, 1, 2, 2, 2];
             const plane: Plane3 = {
@@ -992,7 +992,7 @@ describe('box3', () => {
 
             expect(box3.intersectsPlane3(box, plane)).toBe(false);
         });
-        
+
         it('should return false when plane is completely on negative side', () => {
             const box: Box3 = [0, 0, 0, 1, 1, 1];
             const plane: Plane3 = {
@@ -1002,7 +1002,7 @@ describe('box3', () => {
 
             expect(box3.intersectsPlane3(box, plane)).toBe(false);
         });
-        
+
         it('should return true when plane touches box corner', () => {
             const box: Box3 = [0, 0, 0, 1, 1, 1];
             const plane: Plane3 = {
@@ -1012,7 +1012,7 @@ describe('box3', () => {
 
             expect(box3.intersectsPlane3(box, plane)).toBe(true);
         });
-        
+
         it('should handle plane with negative normal components', () => {
             const box: Box3 = [0, 0, 0, 2, 2, 2];
             const plane: Plane3 = {
@@ -1022,7 +1022,7 @@ describe('box3', () => {
 
             expect(box3.intersectsPlane3(box, plane)).toBe(true);
         });
-        
+
         it('should handle plane parallel to box face', () => {
             const box: Box3 = [0, 0, 0, 1, 1, 1];
             const plane: Plane3 = {
@@ -1032,7 +1032,7 @@ describe('box3', () => {
 
             expect(box3.intersectsPlane3(box, plane)).toBe(true);
         });
-        
+
         it('should handle arbitrary plane orientation', () => {
             const box: Box3 = [-1, -1, -1, 1, 1, 1];
             const plane: Plane3 = {
@@ -1042,7 +1042,7 @@ describe('box3', () => {
 
             expect(box3.intersectsPlane3(box, plane)).toBe(true);
         });
-        
+
         it('should handle plane that just misses box', () => {
             const box: Box3 = [0, 0, 0, 1, 1, 1];
             const plane: Plane3 = {
@@ -1058,12 +1058,7 @@ describe('box3', () => {
         it('should apply translation and scale transformations correctly', () => {
             const box: Box3 = [0, 0, 0, 1, 1, 1];
             // Scale by 2, then translate by (5, 3, 2)
-            const transform: Mat4 = [
-                2, 0, 0, 0,
-                0, 2, 0, 0,
-                0, 0, 2, 0,
-                5, 3, 2, 1,
-            ];
+            const transform: Mat4 = [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 5, 3, 2, 1];
 
             const out = box3.create();
             const result = box3.transformMat4(out, box, transform);
@@ -1080,12 +1075,7 @@ describe('box3', () => {
         it('should handle reflection and negative scale correctly', () => {
             const box: Box3 = [1, 2, 3, 4, 5, 6];
             // Negative scale (reflection)
-            const reflect: Mat4 = [
-                -1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1,
-            ];
+            const reflect: Mat4 = [-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
             const out = box3.create();
             box3.transformMat4(out, box, reflect);
@@ -1103,20 +1093,21 @@ describe('box3', () => {
             // 45 degree rotation around Z axis
             const cos45 = Math.cos(Math.PI / 4);
             const sin45 = Math.sin(Math.PI / 4);
-            const rotation: Mat4 = [
-                cos45, sin45, 0, 0,
-                -sin45, cos45, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1,
-            ];
+            const rotation: Mat4 = [cos45, sin45, 0, 0, -sin45, cos45, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
             const out = box3.create();
             box3.transformMat4(out, box, rotation);
 
             // All 8 corners should be within the resulting AABB
             const corners: Vec3[] = [
-                [0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0],
-                [0, 0, 1], [1, 0, 1], [0, 1, 1], [1, 1, 1],
+                [0, 0, 0],
+                [1, 0, 0],
+                [0, 1, 0],
+                [1, 1, 0],
+                [0, 0, 1],
+                [1, 0, 1],
+                [0, 1, 1],
+                [1, 1, 1],
             ];
 
             // tolerate ULP-scale drift: Arvo-style bounds derive from
@@ -1124,12 +1115,10 @@ describe('box3', () => {
             // formula, which can put boundary corners marginally outside.
             const eps = 1e-12;
             for (const corner of corners) {
-                const x = corner[0], y = corner[1], z = corner[2];
-                const transformed: Vec3 = [
-                    cos45 * x - sin45 * y,
-                    sin45 * x + cos45 * y,
-                    z,
-                ];
+                const x = corner[0],
+                    y = corner[1],
+                    z = corner[2];
+                const transformed: Vec3 = [cos45 * x - sin45 * y, sin45 * x + cos45 * y, z];
                 expect(transformed[0]).toBeGreaterThanOrEqual(out[0] - eps);
                 expect(transformed[0]).toBeLessThanOrEqual(out[3] + eps);
                 expect(transformed[1]).toBeGreaterThanOrEqual(out[1] - eps);
@@ -1141,17 +1130,12 @@ describe('box3', () => {
 
         it('should produce the same result when out and box alias the same array', () => {
             // regression: transformMat4 used to clobber `out` to the empty
-                // sentinel before reading `box`, which destroyed the input
-                // when callers passed the same array for both. Downstream that
-                // poisoned broadphase AABBs to NaN/Infinity.
+            // sentinel before reading `box`, which destroyed the input
+            // when callers passed the same array for both. Downstream that
+            // poisoned broadphase AABBs to NaN/Infinity.
             const initial: Box3 = [1, 2, 3, 4, 6, 8];
             // rotate 90deg around Z, then translate (10, -5, 2.5)
-            const transform: Mat4 = [
-                0, 1, 0, 0,
-                -1, 0, 0, 0,
-                0, 0, 1, 0,
-                10, -5, 2.5, 1,
-            ];
+            const transform: Mat4 = [0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 10, -5, 2.5, 1];
 
             const aliased: Box3 = [...initial] as Box3;
             box3.transformMat4(aliased, aliased, transform);
@@ -1167,12 +1151,7 @@ describe('box3', () => {
 
         it('should preserve the empty-box sentinel when the input is empty', () => {
             const empty = box3.create();
-            const transform: Mat4 = [
-                2, 0, 0, 0,
-                0, 2, 0, 0,
-                0, 0, 2, 0,
-                5, 3, 2, 1,
-            ];
+            const transform: Mat4 = [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 5, 3, 2, 1];
 
             const out = box3.create();
             box3.transformMat4(out, empty, transform);

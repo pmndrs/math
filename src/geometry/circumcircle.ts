@@ -1,7 +1,7 @@
 import { EPSILON } from '../core/common';
 import type { Vec2 } from '../core/vec2';
-import type { Circle } from './circle';
 import * as vec2 from '../core/vec2';
+import type { Circle } from './circle';
 
 const _circumcircleV1 = /*@__PURE__*/ vec2.create();
 const _circumcircleV2 = /*@__PURE__*/ vec2.create();
@@ -50,4 +50,4 @@ export function circumcircle(out: Circle, a: Vec2, b: Vec2, c: Vec2): Circle {
     out.radius = 0;
 
     return out;
-};
+}

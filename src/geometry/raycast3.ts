@@ -43,7 +43,16 @@ export function createIntersectsTriangleResult(): IntersectsTriangleResult {
  * @param c third vertex of triangle
  * @param backfaceCulling if true, backfaces will not be considered hits
  */
-export function intersectsTriangle(out: IntersectsTriangleResult, origin: Vec3, direction: Vec3, length: number, a: Vec3, b: Vec3, c: Vec3, backfaceCulling: boolean): void {
+export function intersectsTriangle(
+    out: IntersectsTriangleResult,
+    origin: Vec3,
+    direction: Vec3,
+    length: number,
+    a: Vec3,
+    b: Vec3,
+    c: Vec3,
+    backfaceCulling: boolean,
+): void {
     // compute edge1 = b - a
     const e1x = b[0] - a[0];
     const e1y = b[1] - a[1];

@@ -8,5 +8,5 @@ export type Sphere = { center: Vec3; radius: number };
  * @returns A new sphere.
  */
 export function create(): Sphere {
-  return { center: [0, 0, 0], radius: 1 };
+    return { center: [0, 0, 0], radius: 1 };
 }
