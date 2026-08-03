@@ -1,4 +1,4 @@
-import * as common from './common';
+import { EPSILON } from './scalar';
 import type { Euler, EulerOrder } from './euler';
 import type { Mat3 } from './mat3';
 import * as mat3 from './mat3';
@@ -68,7 +68,7 @@ export function setAxisAngle(out: Quat, axis: Vec3, rad: number): Quat {
 export function getAxisAngle(out_axis: Vec3, q: Quat): number {
     const rad = Math.acos(q[3]) * 2.0;
     const s = Math.sin(rad / 2.0);
-    if (s > common.EPSILON) {
+    if (s > EPSILON) {
         out_axis[0] = q[0] / s;
         out_axis[1] = q[1] / s;
         out_axis[2] = q[2] / s;
@@ -317,7 +317,7 @@ export function slerp(out: Quat, a: Quat, b: Quat, t: number): Quat {
         bw = -bw;
     }
     // calculate coefficients
-    if (1.0 - cosom > common.EPSILON) {
+    if (1.0 - cosom > EPSILON) {
         // standard case (slerp)
         omega = Math.acos(cosom);
         sinom = Math.sin(omega);
@@ -677,7 +677,7 @@ export const exactEquals = vec4.exactEquals;
  * @returns True if the quaternions are equal, false otherwise.
  */
 export function equals(a: Quat, b: Quat): boolean {
-    return Math.abs(vec4.dot(a, b)) >= 1 - common.EPSILON;
+    return Math.abs(vec4.dot(a, b)) >= 1 - EPSILON;
 }
 
 /**

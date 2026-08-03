@@ -1,4 +1,4 @@
-import { EPSILON } from '../core/common';
+import { EPSILON } from '../core/scalar';
 import type { Vec2 } from '../core/vec2';
 import * as vec2 from '../core/vec2';
 import type { Circle } from './circle';

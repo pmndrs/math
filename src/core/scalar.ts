@@ -111,8 +111,3 @@ export function remapClamp(value: number, inLow: number, inHigh: number, outLow:
     const remapped = outLow + scale * (outHigh - outLow);
     return Math.max(outLow, Math.min(outHigh, remapped));
 }
-
-export type MutableArrayLike<T> = {
-    [index: number]: T;
-    length: number;
-};

@@ -1,4 +1,4 @@
-import * as common from './common';
+import * as scalar from './scalar';
 import type { Mat2 } from './mat2';
 import type { Mat2d } from './mat2d';
 import type { Mat3 } from './mat3';
@@ -211,8 +211,8 @@ export function max(out: Vec2, a: Vec2, b: Vec2): Vec2 {
  * @returns out
  */
 export function round(out: Vec2, a: Vec2): Vec2 {
-    out[0] = common.round(a[0]);
-    out[1] = common.round(a[1]);
+    out[0] = scalar.round(a[0]);
+    out[1] = scalar.round(a[1]);
     return out;
 }
 
@@ -539,8 +539,8 @@ export function equals(a: Vec2, b: Vec2): boolean {
     const b0 = b[0];
     const b1 = b[1];
     return (
-        Math.abs(a0 - b0) <= common.EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
-        Math.abs(a1 - b1) <= common.EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1))
+        Math.abs(a0 - b0) <= scalar.EPSILON * Math.max(1.0, Math.abs(a0), Math.abs(b0)) &&
+        Math.abs(a1 - b1) <= scalar.EPSILON * Math.max(1.0, Math.abs(a1), Math.abs(b1))
     );
 }
 

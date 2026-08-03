@@ -1,4 +1,5 @@
-export * from './common';
+export * from './scalar';
+export type { MutableArrayLike } from './arrays';
 
 export * as vec2 from './vec2';
 export type { Vec2 } from './vec2';
