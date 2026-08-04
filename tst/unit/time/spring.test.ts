@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Vec3 } from '../../../src';
-import { spring } from '../../../src/time';
+import { spring, spring2, spring3, spring4 } from '../../../src/time';
 import type { Spring } from '../../../src/time';
 
 const dt = 1 / 60;
@@ -13,24 +13,24 @@ describe('spring', () => {
         });
 
         it('create2/3/4 should default to resting zero vectors', () => {
-            expect(spring.create2()).toEqual({ value: [0, 0], velocity: [0, 0] });
-            expect(spring.create3()).toEqual({ value: [0, 0, 0], velocity: [0, 0, 0] });
-            expect(spring.create4()).toEqual({ value: [0, 0, 0, 0], velocity: [0, 0, 0, 0] });
+            expect(spring2.create()).toEqual({ value: [0, 0], velocity: [0, 0] });
+            expect(spring3.create()).toEqual({ value: [0, 0, 0], velocity: [0, 0, 0] });
+            expect(spring4.create()).toEqual({ value: [0, 0, 0, 0], velocity: [0, 0, 0, 0] });
         });
 
         it('should copy the initial value, not alias it', () => {
             const initial: Vec3 = [1, 2, 3];
-            const s = spring.create3(initial);
+            const s = spring3.create(initial);
             expect(s.value).toEqual(initial);
             expect(s.value).not.toBe(initial);
             // mutating the spring must not touch the caller's array
-            spring.damp3(s, [9, 9, 9], 0.25, dt);
+            spring3.damp(s, [9, 9, 9], 0.25, dt);
             expect(initial).toEqual([1, 2, 3]);
         });
 
         it('should produce state usable by the spring functions', () => {
-            const s = spring.create3([0, 0, 0]);
-            for (let i = 0; i < 600; i++) spring.damp3(s, [1, 2, 3], 0.25, dt);
+            const s = spring3.create([0, 0, 0]);
+            for (let i = 0; i < 600; i++) spring3.damp(s, [1, 2, 3], 0.25, dt);
             expect(s.value[0]).toBeCloseTo(1, 4);
             expect(s.value[2]).toBeCloseTo(3, 4);
         });
@@ -66,7 +66,7 @@ describe('spring', () => {
             const s: Spring<number> = { value: 0, velocity: 0 };
             let peak = 0;
             for (let i = 0; i < 600; i++) {
-                spring.spring(s, 1, 0.25, 1, dt);
+                spring.update(s, 1, 0.25, 1, dt);
                 peak = Math.max(peak, s.value);
             }
             expect(peak).toBeLessThanOrEqual(1 + 1e-9);
@@ -76,7 +76,7 @@ describe('spring', () => {
             const s: Spring<number> = { value: 0, velocity: 0 };
             let peak = 0;
             for (let i = 0; i < 600; i++) {
-                spring.spring(s, 1, 0.25, 0.3, dt);
+                spring.update(s, 1, 0.25, 0.3, dt);
                 peak = Math.max(peak, s.value);
             }
             expect(peak).toBeGreaterThan(1);
@@ -87,7 +87,7 @@ describe('spring', () => {
             const b: Spring<number> = { value: 0, velocity: 0 };
             for (let i = 0; i < 100; i++) {
                 spring.damp(a, 5, 0.3, dt);
-                spring.spring(b, 5, 0.3, 1, dt);
+                spring.update(b, 5, 0.3, 1, dt);
             }
             expect(a.value).toBe(b.value);
             expect(a.velocity).toBe(b.velocity);
@@ -145,7 +145,7 @@ describe('spring', () => {
             const s: Spring<number> = { value: 0, velocity: 0 };
             let peak = 0;
             for (let i = 0; i < 600; i++) {
-                spring.spring(s, 1, 0.25, 2, dt);
+                spring.update(s, 1, 0.25, 2, dt);
                 peak = Math.max(peak, s.value);
             }
             expect(peak).toBeLessThanOrEqual(1 + 1e-9);
@@ -175,7 +175,7 @@ describe('spring', () => {
             const settle = (response: number) => {
                 const s: Spring<number> = { value: 0, velocity: 0 };
                 for (let i = 0; i < 2000; i++) {
-                    spring.spring(s, 1, spring.fromResponse(response), 1, dt);
+                    spring.update(s, 1, spring.fromResponse(response), 1, dt);
                     if (Math.abs(s.value - 1) < 0.005 && Math.abs(s.velocity) < 0.02) return i;
                 }
                 return Number.POSITIVE_INFINITY;
@@ -197,7 +197,7 @@ describe('spring', () => {
     describe('damp3 (vec3)', () => {
         it('should mutate value and velocity in place and return state', () => {
             const s: Spring<Vec3> = { value: [0, 0, 0], velocity: [0, 0, 0] };
-            const result = spring.damp3(s, [1, 2, 3], 0.25, dt);
+            const result = spring3.damp(s, [1, 2, 3], 0.25, dt);
             expect(result).toBe(s);
             expect(s.value[0]).toBeGreaterThan(0);
             expect(s.velocity[0]).toBeGreaterThan(0);
@@ -205,7 +205,7 @@ describe('spring', () => {
 
         it('should converge to the target vector', () => {
             const s: Spring<Vec3> = { value: [0, 0, 0], velocity: [0, 0, 0] };
-            for (let i = 0; i < 600; i++) spring.damp3(s, [1, 2, 3], 0.25, dt);
+            for (let i = 0; i < 600; i++) spring3.damp(s, [1, 2, 3], 0.25, dt);
             expect(s.value[0]).toBeCloseTo(1, 4);
             expect(s.value[1]).toBeCloseTo(2, 4);
             expect(s.value[2]).toBeCloseTo(3, 4);
@@ -220,7 +220,7 @@ describe('spring', () => {
             ];
             const target: Vec3 = [1, 2, 3];
             for (let i = 0; i < 100; i++) {
-                spring.damp3(v, target, 0.25, dt);
+                spring3.damp(v, target, 0.25, dt);
                 for (let a = 0; a < 3; a++) spring.damp(s[a], target[a], 0.25, dt);
             }
             for (let a = 0; a < 3; a++) expect(v.value[a]).toBeCloseTo(s[a].value, 12);
