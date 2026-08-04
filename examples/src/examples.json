@@ -31,5 +31,16 @@
             "easing"
         ],
         "category": "geometry"
+    },
+    "example-flow-field": {
+        "title": "Flow Field",
+        "description": "Hundreds of particles advected along an angle field from maath's simplex2d noise, leaving flowing rainbow trails.",
+        "tags": [
+            "simplex2d",
+            "noise",
+            "flow-field",
+            "particles"
+        ],
+        "category": "noise"
     }
 }
