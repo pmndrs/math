@@ -12,7 +12,7 @@
     },
     "example-convex-hull-2d": {
         "title": "Convex Hull 2D",
-        "description": "A drifting 2D point cloud with its convex hull recomputed live (maath's quickhull2) \u2014 points light up as they wander onto the hull.",
+        "description": "A drifting 2D point cloud with its convex hull recomputed live (maath's quickhull2) — points light up as they wander onto the hull.",
         "tags": [
             "quickhull2",
             "geometry",
@@ -23,7 +23,7 @@
     },
     "example-circumcircle": {
         "title": "Circumcircle",
-        "description": "A triangle that morphs between shapes with its circumcircle recomputed live (maath's circumcircle) \u2014 watch the circle balloon as the triangle flattens.",
+        "description": "A triangle that morphs between shapes with its circumcircle recomputed live (maath's circumcircle) — watch the circle balloon as the triangle flattens.",
         "tags": [
             "circumcircle",
             "geometry",
@@ -65,7 +65,7 @@
     },
     "example-quaternion-slerp": {
         "title": "Quaternion Slerp",
-        "description": "Two boxes interpolate between the same random orientations \u2014 one with maath's quat.slerp (smooth shortest arc), one lerping euler angles (the wobbly, long-way-round naive approach).",
+        "description": "Two boxes interpolate between the same random orientations — one with maath's quat.slerp (smooth shortest arc), one lerping euler angles (the wobbly, long-way-round naive approach).",
         "tags": [
             "quaternion",
             "slerp",
@@ -75,11 +75,21 @@
     },
     "example-spring": {
         "title": "Spring",
-        "description": "A springy tail that chases the pointer \u2014 the head springs to the cursor and each bead springs to the one ahead (maath's spring2, under-damped so it overshoots and settles).",
+        "description": "A springy tail that chases the pointer — the head springs to the cursor and each bead springs to the one ahead (maath's spring2, under-damped so it overshoots and settles).",
         "tags": [
             "spring",
             "time",
             "vec2"
+        ],
+        "category": "time"
+    },
+    "example-easing": {
+        "title": "Easing",
+        "description": "A gallery of maath's easing functions raced side by side — dots start together and spread apart as each follows its own pacing.",
+        "tags": [
+            "easing",
+            "time",
+            "animation"
         ],
         "category": "time"
     }
