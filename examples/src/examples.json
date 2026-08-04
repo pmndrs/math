@@ -52,5 +52,15 @@
             "colorspace"
         ],
         "category": "color"
+    },
+    "example-simplex-2d-noise-terrain": {
+        "title": "Simplex 2D Noise Terrain",
+        "description": "A rolling terrain whose heights come from maath's simplex2d noise, scrolling like a fly-over; lit and coloured by the flowing rainbow.",
+        "tags": [
+            "simplex2d",
+            "noise",
+            "terrain"
+        ],
+        "category": "noise"
     }
 }
