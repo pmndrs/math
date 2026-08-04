@@ -62,5 +62,15 @@
             "terrain"
         ],
         "category": "noise"
+    },
+    "example-quaternion-slerp": {
+        "title": "Quaternion Slerp",
+        "description": "Two boxes interpolate between the same random orientations \u2014 one with maath's quat.slerp (smooth shortest arc), one lerping euler angles (the wobbly, long-way-round naive approach).",
+        "tags": [
+            "quaternion",
+            "slerp",
+            "euler"
+        ],
+        "category": "basics"
     }
 }
