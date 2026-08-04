@@ -20,5 +20,16 @@
             "vec2"
         ],
         "category": "geometry"
+    },
+    "example-circumcircle": {
+        "title": "Circumcircle",
+        "description": "A triangle that morphs between shapes with its circumcircle recomputed live (maath's circumcircle) \u2014 watch the circle balloon as the triangle flattens.",
+        "tags": [
+            "circumcircle",
+            "geometry",
+            "vec2",
+            "easing"
+        ],
+        "category": "geometry"
     }
 }
