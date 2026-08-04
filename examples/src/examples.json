@@ -72,5 +72,15 @@
             "euler"
         ],
         "category": "basics"
+    },
+    "example-spring": {
+        "title": "Spring",
+        "description": "A springy tail that chases the pointer \u2014 the head springs to the cursor and each bead springs to the one ahead (maath's spring2, under-damped so it overshoots and settles).",
+        "tags": [
+            "spring",
+            "time",
+            "vec2"
+        ],
+        "category": "time"
     }
 }
