@@ -6,14 +6,18 @@
     "scripts": {
         "dev": "vite",
         "build": "rm -rf ./dist && vite build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "screenshot": "node scripts/screenshot.js",
+        "screenshot:build": "pnpm run build && node scripts/screenshot.js"
     },
     "dependencies": {
         "maath": "workspace:*",
-        "three": "^0.134.0"
+        "gpucat": "github:isaac-mason/gpucat",
+        "lil-gui": "^0.20.0"
     },
     "devDependencies": {
-        "@types/three": "^0.134.0",
+        "@playwright/test": "^1.50.0",
+        "@webgpu/types": "^0.1.69",
         "typescript": "^5.9.2",
         "vite": "^7.3.1"
     }

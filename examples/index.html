@@ -1,38 +1,510 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>maath examples</title>
     <style>
-      body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: #111;
-        color: #eee;
-        display: flex;
-        min-height: 100vh;
-        align-items: center;
-        justify-content: center;
-      }
-      main {
-        max-width: 480px;
-        padding: 2rem;
-      }
-      h1 { font-weight: 600; letter-spacing: -0.02em; }
-      a { color: #6cf; text-decoration: none; }
-      ul { list-style: none; padding: 0; }
-      li { margin: 0.5rem 0; padding: 0.75rem 1rem; background: #1c1c1c; border-radius: 8px; }
+        /* mobile-first base styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                sans-serif;
+            background: #222;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+
+            /* vars */
+            --color-background: #222;
+            --color-card: #333;
+            --color-border: #555;
+        }
+
+        /* sidebar - mobile first (hidden by default) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: 320px;
+            background: var(--color-background);
+            color: #fff;
+            overflow-y: auto;
+            border-right: 1px solid var(--color-border);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+
+        .sidebar-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .search-container {
+            margin: 0;
+            border-bottom: 1px solid var(--color-border);
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            border: none;
+            padding: 16px;
+            background: transparent;
+            color: #fff;
+            font-size: 12px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .search-input::placeholder {
+            color: #90a4ae;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #37474f;
+            background: #1e272c;
+        }
+
+        .examples-list {
+            padding: 16px;
+            margin: 0;
+            list-style: none;
+        }
+
+        .examples-list li {
+            margin-bottom: 20px;
+        }
+
+        .examples-list li:last-child {
+            margin-bottom: 16px;
+        }
+
+        .category-header {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #78909c;
+            margin: 0 0 12px 0;
+            list-style: none;
+        }
+
+        .category-group.hidden {
+            display: none;
+        }
+
+        .example-item {
+            display: block;
+            padding: 0;
+            color: #cfd8dc;
+            background-color: var(--color-card);
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.2s, border 0.2s ease;
+            cursor: pointer;
+            border: 3px solid transparent;
+            border-radius: 0.2em;
+            overflow: hidden;
+        }
+
+        .example-item:hover {
+            color: #fff;
+        }
+
+        .example-item.active {
+            color: #fff;
+            border: 3px solid #0277bd;
+        }
+
+        .example-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .example-screenshot {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 0;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        .example-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px 16px 20px 16px;
+        }
+
+        .example-title {
+            font-weight: 500;
+            font-size: 16px;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .example-description {
+            font-size: 13px;
+            color: #b0bec5;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .example-source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #eceff1;
+            text-decoration: none;
+            align-self: flex-start;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(236, 239, 241, 0.25);
+            padding-bottom: 1px;
+            transition: border-color 0.2s, opacity 0.2s;
+            opacity: 0.5;
+        }
+
+        .example-source-link:hover {
+            opacity: 1;
+            border-bottom-color: #eceff1;
+        }
+
+        .content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-header {
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-border);
+            padding: 12px 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hamburger {
+            display: block;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            color: #fff;
+        }
+
+        .content-header h2 {
+            margin: 0;
+            font-size: 16px;
+            color: #fff;
+            flex: 1;
+        }
+
+        .example-frame {
+            flex: 1;
+            border: none;
+            background: #fff;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* tablet and up - enhance the mobile design */
+        @media (min-width: 769px) {
+            .sidebar {
+                position: static;
+                transform: translateX(0);
+                width: 360px;
+                min-width: 360px;
+                max-width: none;
+                box-shadow: none;
+            }
+
+            .content-header {
+                display: none;
+            }
+
+            .examples-list {
+                padding: 20px;
+            }
+
+            .example-info {
+                padding: 20px 20px 24px 20px;
+                gap: 10px;
+            }
+
+            .example-title {
+                font-size: 17px;
+            }
+
+            .example-description {
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .hamburger {
+                display: none;
+            }
+
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
     </style>
-  </head>
-  <body>
-    <main>
-      <h1>maath examples</h1>
-      <p>A collection of small, runnable examples. Add a new example by creating
-        an <code>&lt;example&gt;.html</code> in this folder (vite auto-discovers it).</p>
-      <ul>
-        <li><a href="./example-basic.html">basic — three scene using maath</a></li>
-      </ul>
-    </main>
-  </body>
+</head>
+
+<body>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1>maath</h1>
+        </div>
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Search examples..." />
+        </div>
+        <ul class="examples-list" id="examples-list"></ul>
+    </div>
+
+    <div class="content">
+        <div class="content-header">
+            <button class="hamburger" id="hamburger">☰</button>
+            <h2 id="example-title">Select an example</h2>
+        </div>
+        <iframe class="example-frame" id="example-frame"></iframe>
+    </div>
+
+    <script type="module">
+        import examples from "./src/examples.json" assert { type: "json" };
+
+        // display order for categories
+        const CATEGORY_ORDER = [
+            "geometry",
+            "shapes",
+            "basics",
+            "vectors",
+            "matrices",
+            "noise",
+            "color",
+            "random",
+            "time",
+        ];
+
+        function orderIndex(order, value) {
+            const i = order.indexOf(value);
+            return i === -1 ? order.length : i;
+        }
+
+        function prettyCategory(category) {
+            if (!category) return "Other";
+            return category.charAt(0).toUpperCase() + category.slice(1);
+        }
+
+        function cardHTML(key, example) {
+            return `
+                <li class="example-card" data-example="${key}">
+                    <div class="example-item" data-example="${key}">
+                    <div class="example-preview">
+                        <img src="./screenshots/${key}.png" alt="${example.title}" class="example-screenshot" onerror="this.style.display='none'">
+                        <div class="example-info">
+                        <h3 class="example-title">${example.title}</h3>
+                        <p class="example-description">${example.description}</p>
+                        <a class="example-source-link" href="https://github.com/pmndrs/maath/blob/main/examples/src/${key}.ts" target="_blank" onclick="event.stopPropagation()">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18v-6h6v6M9 6h6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                            source
+                        </a>
+                        </div>
+                    </div>
+                    </div>
+                </li>
+            `;
+        }
+
+        function addExamplesToSidebar() {
+            const examplesList = document.getElementById("examples-list");
+
+            // group entries by category
+            const byCategory = new Map();
+            for (const [key, example] of Object.entries(examples)) {
+                const category = example.category || "other";
+                if (!byCategory.has(category)) byCategory.set(category, []);
+                byCategory.get(category).push([key, example]);
+            }
+
+            const categories = [...byCategory.keys()].sort(
+                (a, b) => orderIndex(CATEGORY_ORDER, a) - orderIndex(CATEGORY_ORDER, b),
+            );
+
+            let html = "";
+            for (const category of categories) {
+                html += `<li class="category-group" data-category="${category}">`;
+                html += `<div class="category-header">${prettyCategory(category)}</div>`;
+                html += `<ul class="examples-list" style="padding:0;">`;
+                for (const [key, example] of byCategory.get(category)) {
+                    html += cardHTML(key, example);
+                }
+                html += `</ul></li>`;
+            }
+
+            examplesList.innerHTML = html;
+        }
+
+        // initialize examples list
+        addExamplesToSidebar();
+
+        const titleElement = document.getElementById("example-title");
+        const frameElement = document.getElementById("example-frame");
+        const hamburger = document.getElementById("hamburger");
+        const sidebar = document.getElementById("sidebar");
+        const sidebarOverlay = document.getElementById("sidebar-overlay");
+        const searchInput = document.getElementById("search-input");
+
+        // search functionality
+        function filterExamples() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const cards = document.querySelectorAll(".example-card");
+
+            cards.forEach((card) => {
+                const exampleKey = card.getAttribute("data-example");
+                const example = examples[exampleKey];
+
+                // search in title, description, and tags
+                const searchableText = [
+                    example.title,
+                    example.description,
+                    ...(example.tags || []),
+                ]
+                    .join(" ")
+                    .toLowerCase();
+
+                card.style.display = searchableText.includes(searchTerm) ? "" : "none";
+            });
+
+            // hide category groups with no visible cards
+            document.querySelectorAll(".category-group").forEach((group) => {
+                const anyVisible = [...group.querySelectorAll(".example-card")].some(
+                    (c) => c.style.display !== "none",
+                );
+                group.classList.toggle("hidden", !anyVisible);
+            });
+        }
+
+        // attach search event listener
+        searchInput.addEventListener("input", filterExamples);
+
+        // handle sidebar clicks
+        function attachEventListeners() {
+            const exampleItems = document.querySelectorAll(".example-item");
+            exampleItems.forEach((item) => {
+                item.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    const exampleKey = item.getAttribute("data-example");
+                    loadExample(exampleKey);
+                });
+            });
+        }
+
+        // mobile navigation
+        hamburger.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            sidebarOverlay.classList.toggle("show");
+        });
+
+        sidebarOverlay.addEventListener("click", () => {
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("show");
+        });
+
+        function loadExample(exampleKey, scrollIntoView) {
+            const example = examples[exampleKey];
+            if (!example) return;
+
+            titleElement.textContent = example.title;
+            frameElement.src = `./${exampleKey}.html`;
+
+            // update active item
+            const exampleItems = document.querySelectorAll(".example-item");
+
+            let activeItem = null;
+            exampleItems.forEach((item) => {
+                item.classList.remove("active");
+                if (item.getAttribute("data-example") === exampleKey) {
+                    item.classList.add("active");
+                    activeItem = item;
+                }
+            });
+
+            // scroll active item into view
+            if (scrollIntoView && activeItem) {
+                activeItem.scrollIntoView({ block: "center", behavior: "auto" });
+            }
+
+            // update URL
+            window.location.hash = exampleKey;
+
+            // close mobile sidebar
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("show");
+        }
+
+        // handle hash changes
+        function handleHashChange(scrollIntoView = false) {
+            const hash = window.location.hash.substring(1);
+            if (hash && examples[hash]) {
+                loadExample(hash, scrollIntoView);
+            } else {
+                // load first example by default
+                const firstExample = Object.keys(examples)[0];
+                loadExample(firstExample, scrollIntoView);
+            }
+        }
+
+        // initialize
+        handleHashChange(true);
+        attachEventListeners();
+        window.addEventListener("hashchange", () => handleHashChange(true));
+    </script>
+</body>
+
 </html>

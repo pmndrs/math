@@ -1,0 +1,61 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #222;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+}
+
+#root {
+    width: 100vw;
+    height: 100vh;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+}
+
+:root {
+    --mc-mono: "Berkeley Mono", "JetBrains Mono", "SFMono-Regular", "SF Mono",
+        ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+    --mc-ink: #eaf1f5;
+    --mc-dim: #8ea3af;
+}
+
+/* readout / stats panel — a soft glass pill in a crisp monospace */
+.mc-info {
+    position: absolute;
+    margin: 0;
+    padding: 9px 13px;
+    font-family: var(--mc-mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    letter-spacing: 0.02em;
+    color: var(--mc-ink);
+    background: rgba(16, 18, 24, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* floating in-scene labels — plain monospace, no pill */
+.mc-label {
+    position: absolute;
+    font-family: var(--mc-mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    color: var(--mc-dim);
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 1px 2px #000;
+}
+
+.mc-dim {
+    color: var(--mc-dim);
+}
