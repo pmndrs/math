@@ -42,5 +42,15 @@
             "particles"
         ],
         "category": "noise"
+    },
+    "example-color-wheel": {
+        "title": "Color Wheel",
+        "description": "An HSL colour wheel built with maath/color (hsl.toColor). Move the pointer to pick a colour and read its HSL / RGB / hex.",
+        "tags": [
+            "color",
+            "hsl",
+            "colorspace"
+        ],
+        "category": "color"
     }
 }
