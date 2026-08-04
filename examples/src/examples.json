@@ -9,5 +9,16 @@
             "vec3"
         ],
         "category": "geometry"
+    },
+    "example-convex-hull-2d": {
+        "title": "Convex Hull 2D",
+        "description": "A drifting 2D point cloud with its convex hull recomputed live (maath's quickhull2) \u2014 points light up as they wander onto the hull.",
+        "tags": [
+            "quickhull2",
+            "geometry",
+            "convex-hull",
+            "vec2"
+        ],
+        "category": "geometry"
     }
 }
