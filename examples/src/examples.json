@@ -1,1 +1,13 @@
-{}
+{
+    "example-convex-hull-3d": {
+        "title": "Convex Hull 3D",
+        "description": "A point cloud (the Stanford bunny, primitives, or random) and its convex hull, computed with maath's quickhull3 and drawn as a rainbow shell over the points.",
+        "tags": [
+            "quickhull3",
+            "geometry",
+            "convex-hull",
+            "vec3"
+        ],
+        "category": "geometry"
+    }
+}
