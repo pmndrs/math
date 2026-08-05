@@ -6,3 +6,6 @@ website/dist
 *.tsbuildinfo
 tmp
 .DS_Store
+
+# labs bench results
+.labs
