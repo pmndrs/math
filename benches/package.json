@@ -1,0 +1,14 @@
+{
+  "name": "benches",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@pmndrs/labs": "^0.6.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.2"
+  }
+}
+  

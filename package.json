@@ -57,6 +57,7 @@
     "format": "biome format --write src/. tst/.",
     "lint": "biome lint --write src/. tst/.",
     "test": "vitest run ./tst",
+    "bench": "pnpm --filter benches exec labs",
     "typecheck-docs": "tsc --project docs/tsconfig.json --noEmit",
     "docs": "(cd docs && node ./build.js)",
     "typedoc": "typedoc --tsconfig ./tsconfig.json --name \"maath docs\" --out ./dist-typedoc ./src/index.ts ./src/shapes/index.ts ./src/geometry/index.ts ./src/time/index.ts ./src/random/index.ts ./src/noise/index.ts ./src/color/index.ts",
