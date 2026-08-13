@@ -46,9 +46,7 @@ describe('color', () => {
     });
 
     it('arithmetic + blending', () => {
-        expect(color.add(color.create(), [0.1, 0.2, 0.3], [0.4, 0, 0.1])).toEqual([
-            0.5, 0.2, expect.closeTo(0.4, 6),
-        ]);
+        expect(color.add(color.create(), [0.1, 0.2, 0.3], [0.4, 0, 0.1])).toEqual([0.5, 0.2, expect.closeTo(0.4, 6)]);
         expect(color.multiplyScalar(color.create(), [0.2, 0.4, 0.6], 0.5)).toEqual([0.1, 0.2, 0.3]);
         expect(color.lerp(color.create(), [0, 0, 0], [1, 1, 1], 0.5)).toEqual([0.5, 0.5, 0.5]);
         expect(color.clamp(color.create(), [2, -1, 0.5])).toEqual([1, 0, 0.5]);

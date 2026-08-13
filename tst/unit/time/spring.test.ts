@@ -167,7 +167,7 @@ describe('spring', () => {
             const k = omega * omega;
             const c = 2 * dampingRatio * omega;
             // SwiftUI Spring(response:dampingFraction:), unit mass
-            expect(k).toBeCloseTo((2 * Math.PI / response) ** 2, 9);
+            expect(k).toBeCloseTo(((2 * Math.PI) / response) ** 2, 9);
             expect(c).toBeCloseTo((4 * Math.PI * dampingRatio) / response, 9);
         });
 
