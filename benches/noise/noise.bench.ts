@@ -1,15 +1,13 @@
-import { bench, group } from '@pmndrs/labs';
-import * as perlin2d from '../../src/noise/perlin2d';
-import * as perlin3d from '../../src/noise/perlin3d';
-import * as simplex2d from '../../src/noise/simplex2d';
-import * as simplex3d from '../../src/noise/simplex3d';
+import { bench, group } from "@pmndrs/labs";
+import * as perlin2d from "../../src/noise/perlin2d";
+import * as perlin3d from "../../src/noise/perlin3d";
+import * as simplex2d from "../../src/noise/simplex2d";
+import * as simplex3d from "../../src/noise/simplex3d";
 
 const N = 10_000;
 
-let sink = 0;
-
-group('noise sample 10k @noise', () => {
-  bench('perlin2d', function* () {
+group("noise sample 10k @noise", () => {
+  bench("perlin2d", function* () {
     const gen = perlin2d.create(42);
 
     yield () => {
@@ -17,11 +15,11 @@ group('noise sample 10k @noise', () => {
       for (let i = 0; i < N; i++) {
         sum += perlin2d.sample(gen, i * 0.01, i * 0.013);
       }
-      sink = sum;
+      return sum;
     };
-  }).gc('inner');
+  });
 
-  bench('perlin3d', function* () {
+  bench("perlin3d", function* () {
     const gen = perlin3d.create(42);
 
     yield () => {
@@ -29,11 +27,11 @@ group('noise sample 10k @noise', () => {
       for (let i = 0; i < N; i++) {
         sum += perlin3d.sample(gen, i * 0.01, i * 0.013, i * 0.017);
       }
-      sink = sum;
+      return sum;
     };
-  }).gc('inner');
+  });
 
-  bench('simplex2d', function* () {
+  bench("simplex2d", function* () {
     const gen = simplex2d.create(42);
 
     yield () => {
@@ -41,11 +39,11 @@ group('noise sample 10k @noise', () => {
       for (let i = 0; i < N; i++) {
         sum += simplex2d.sample(gen, i * 0.01, i * 0.013);
       }
-      sink = sum;
+      return sum;
     };
-  }).gc('inner');
+  });
 
-  bench('simplex3d', function* () {
+  bench("simplex3d", function* () {
     const gen = simplex3d.create(42);
 
     yield () => {
@@ -53,9 +51,7 @@ group('noise sample 10k @noise', () => {
       for (let i = 0; i < N; i++) {
         sum += simplex3d.sample(gen, i * 0.01, i * 0.013, i * 0.017);
       }
-      sink = sum;
+      return sum;
     };
-  }).gc('inner');
+  });
 });
-
-if (sink === Infinity) throw new Error('unreachable');

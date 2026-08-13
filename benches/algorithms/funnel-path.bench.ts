@@ -1,8 +1,8 @@
-import { bench, group } from '@pmndrs/labs';
-import * as vec2 from '../../src/core/vec2';
-import type { Vec2 } from '../../src/core/vec2';
-import type { Vec3 } from '../../src/core/vec3';
-import * as mulberry32 from '../../src/random/mulberry32';
+import { bench, group } from "@pmndrs/labs";
+import * as vec2 from "../../src/core/vec2";
+import type { Vec2 } from "../../src/core/vec2";
+import type { Vec3 } from "../../src/core/vec3";
+import * as mulberry32 from "../../src/random/mulberry32";
 
 // Simple stupid funnel (string pulling) over navmesh portal edges — the path
 // smoothing step of a navigation pipeline. Composes vec2 subtract/cross/copy/
@@ -29,7 +29,12 @@ const portalApex = vec2.create();
 const portalLeft = vec2.create();
 const portalRight = vec2.create();
 
-function stringPull(left: Vec2[], right: Vec2[], count: number, outCorners: Vec2[]): number {
+function stringPull(
+  left: Vec2[],
+  right: Vec2[],
+  count: number,
+  outCorners: Vec2[],
+): number {
   let n = 0;
   vec2.copy(portalApex, left[0]);
   vec2.copy(portalLeft, left[0]);
@@ -45,7 +50,10 @@ function stringPull(left: Vec2[], right: Vec2[], count: number, outCorners: Vec2
 
     // update right vertex
     if (triarea2(portalApex, portalRight, pr) <= 0) {
-      if (vec2.exactEquals(portalApex, portalRight) || triarea2(portalApex, portalLeft, pr) > 0) {
+      if (
+        vec2.exactEquals(portalApex, portalRight) ||
+        triarea2(portalApex, portalLeft, pr) > 0
+      ) {
         vec2.copy(portalRight, pr);
         rightIndex = i;
       } else {
@@ -64,7 +72,10 @@ function stringPull(left: Vec2[], right: Vec2[], count: number, outCorners: Vec2
 
     // update left vertex
     if (triarea2(portalApex, portalLeft, pl) >= 0) {
-      if (vec2.exactEquals(portalApex, portalLeft) || triarea2(portalApex, portalRight, pl) < 0) {
+      if (
+        vec2.exactEquals(portalApex, portalLeft) ||
+        triarea2(portalApex, portalRight, pl) < 0
+      ) {
         vec2.copy(portalLeft, pl);
         leftIndex = i;
       } else {
@@ -86,10 +97,8 @@ function stringPull(left: Vec2[], right: Vec2[], count: number, outCorners: Vec2
   return n;
 }
 
-let sink = 0;
-
-group('funnel string pull 16x256 @algo @nav', () => {
-  bench('string pull + path length', function* () {
+group("funnel string pull 16x256 @algo @nav", () => {
+  bench("string pull + path length", function* () {
     const rand = mulberry32.create(42);
     const corridors: Corridor[] = [];
     for (let c = 0; c < CORRIDORS; c++) {
@@ -118,21 +127,25 @@ group('funnel string pull 16x256 @algo @nav', () => {
     // sanity: every corridor must pull to a valid multi-corner path
     for (const c of corridors) {
       const n = stringPull(c.left, c.right, c.count, corners);
-      if (n < 2 || !vec2.finite(corners[n - 1])) throw new Error('funnel produced a degenerate path');
+      if (n < 2 || !vec2.finite(corners[n - 1]))
+        throw new Error("funnel produced a degenerate path");
     }
 
     yield () => {
       let totalLength = 0;
       for (let c = 0; c < corridors.length; c++) {
         const corridor = corridors[c];
-        const n = stringPull(corridor.left, corridor.right, corridor.count, corners);
+        const n = stringPull(
+          corridor.left,
+          corridor.right,
+          corridor.count,
+          corners,
+        );
         for (let i = 1; i < n; i++) {
           totalLength += vec2.distance(corners[i - 1], corners[i]);
         }
       }
-      sink = totalLength;
+      return totalLength;
     };
-  }).gc('inner');
+  });
 });
-
-if (sink === Infinity) throw new Error('unreachable');

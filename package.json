@@ -2,7 +2,15 @@
   "name": "maath",
   "version": "1.0.0-alpha.1",
   "description": "a collection of math helpers for graphics and simulations",
-  "keywords": ["math", "vector", "matrix", "quaternion", "euler", "random", "noise"],
+  "keywords": [
+    "math",
+    "vector",
+    "matrix",
+    "quaternion",
+    "euler",
+    "random",
+    "noise"
+  ],
   "license": "MIT",
   "repository": "github:pmndrs/maath",
   "homepage": "https://github.com/pmndrs/maath",

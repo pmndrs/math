@@ -1,21 +1,19 @@
-import { bench, group } from '@pmndrs/labs';
-import * as mat4 from '../../src/core/mat4';
-import type { Mat4 } from '../../src/core/mat4';
-import * as quat from '../../src/core/quat';
-import type { Quat } from '../../src/core/quat';
-import type { Vec3 } from '../../src/core/vec3';
-import * as mulberry32 from '../../src/random/mulberry32';
-import * as box3 from '../../src/shapes/box3';
+import { bench, group } from "@pmndrs/labs";
+import * as mat4 from "../../src/core/mat4";
+import type { Mat4 } from "../../src/core/mat4";
+import * as quat from "../../src/core/quat";
+import type { Quat } from "../../src/core/quat";
+import type { Vec3 } from "../../src/core/vec3";
+import * as mulberry32 from "../../src/random/mulberry32";
+import * as box3 from "../../src/shapes/box3";
 
 // Scene graph update — compose each node's local TRS matrix, propagate world
 // matrices down a 4-ary tree, then accumulate world-space scene bounds.
 
 const N = 4096;
 
-let sink = 0;
-
-group('transform hierarchy 4096 @algo @scene', () => {
-  bench('world matrices + scene bounds', function* () {
+group("transform hierarchy 4096 @algo @scene", () => {
+  bench("world matrices + scene bounds", function* () {
     const rand = mulberry32.create(42);
     const axis: Vec3 = [0.267261, 0.534522, 0.801784];
     const unitScale: Vec3 = [1, 1, 1];
@@ -47,7 +45,12 @@ group('transform hierarchy 4096 @algo @scene', () => {
     yield () => {
       // parent indices precede child indices, so one pass propagates fully
       for (let i = 0; i < N; i++) {
-        mat4.fromRotationTranslationScale(localMats[i], rotations[i], positions[i], unitScale);
+        mat4.fromRotationTranslationScale(
+          localMats[i],
+          rotations[i],
+          positions[i],
+          unitScale,
+        );
         if (i === 0) {
           mat4.copy(worldMats[i], localMats[i]);
         } else {
@@ -61,10 +64,8 @@ group('transform hierarchy 4096 @algo @scene', () => {
         box3.transformMat4(nodeBox, unitBox, worldMats[i]);
         box3.union(sceneBounds, sceneBounds, nodeBox);
       }
-      
-      sink = box3.surfaceArea(sceneBounds);
-    };
-  }).gc('inner');
-});
 
-if (sink === Infinity) throw new Error('unreachable');
+      return box3.surfaceArea(sceneBounds);
+    };
+  });
+});
