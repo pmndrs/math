@@ -1,9 +1,9 @@
-import { bench, group } from '@pmndrs/labs';
-import * as vec3 from '../../src/core/vec3';
-import type { Vec3 } from '../../src/core/vec3';
-import * as mulberry32 from '../../src/random/mulberry32';
-import * as plane3 from '../../src/shapes/plane3';
-import type { Plane3 } from '../../src/shapes/plane3';
+import { bench, group } from "@pmndrs/labs";
+import * as vec3 from "../../src/core/vec3";
+import type { Vec3 } from "../../src/core/vec3";
+import * as mulberry32 from "../../src/random/mulberry32";
+import * as plane3 from "../../src/shapes/plane3";
+import type { Plane3 } from "../../src/shapes/plane3";
 
 // One full step of a minimal sphere physics world: integrate gravity and
 // velocities, bounce off six arena wall planes, then resolve all pairwise
@@ -18,10 +18,8 @@ const RESTITUTION = 0.6;
 
 const GRAVITY: Vec3 = [0, -9.81, 0];
 
-let sink = 0;
-
-group('sphere physics step 512 @algo @physics', () => {
-  bench('integrate + walls + pair resolve', function* () {
+group("sphere physics step 512 @algo @physics", () => {
+  bench("integrate + walls + pair resolve", function* () {
     const rand = mulberry32.create(42);
 
     const positions: Vec3[] = [];
@@ -78,17 +76,26 @@ group('sphere physics step 512 @algo @physics', () => {
               vec3.scaleAndAdd(p, p, wall.normal, RADIUS - distance);
               const speedIntoWall = vec3.dot(v, wall.normal);
               if (speedIntoWall < 0) {
-                vec3.scaleAndAdd(v, v, wall.normal, -(1 + RESTITUTION) * speedIntoWall);
+                vec3.scaleAndAdd(
+                  v,
+                  v,
+                  wall.normal,
+                  -(1 + RESTITUTION) * speedIntoWall,
+                );
               }
             }
           }
         }
 
         // pairwise sphere-sphere contacts
-        const contactDistanceSq = (RADIUS * 2) * (RADIUS * 2);
+        const contactDistanceSq = RADIUS * 2 * (RADIUS * 2);
         for (let i = 0; i < N; i++) {
           for (let j = i + 1; j < N; j++) {
-            if (vec3.squaredDistance(positions[i], positions[j]) >= contactDistanceSq) continue;
+            if (
+              vec3.squaredDistance(positions[i], positions[j]) >=
+              contactDistanceSq
+            )
+              continue;
 
             vec3.subtract(contactNormal, positions[j], positions[i]);
             const distance = vec3.length(contactNormal);
@@ -97,16 +104,36 @@ group('sphere physics step 512 @algo @physics', () => {
 
             // separate positions equally
             const overlap = RADIUS * 2 - distance;
-            vec3.scaleAndAdd(positions[i], positions[i], contactNormal, -overlap / 2);
-            vec3.scaleAndAdd(positions[j], positions[j], contactNormal, overlap / 2);
+            vec3.scaleAndAdd(
+              positions[i],
+              positions[i],
+              contactNormal,
+              -overlap / 2,
+            );
+            vec3.scaleAndAdd(
+              positions[j],
+              positions[j],
+              contactNormal,
+              overlap / 2,
+            );
 
             // equal-mass impulse along the contact normal
             vec3.subtract(relativeVelocity, velocities[j], velocities[i]);
             const approachSpeed = vec3.dot(relativeVelocity, contactNormal);
             if (approachSpeed < 0) {
               const impulse = (-(1 + RESTITUTION) * approachSpeed) / 2;
-              vec3.scaleAndAdd(velocities[i], velocities[i], contactNormal, -impulse);
-              vec3.scaleAndAdd(velocities[j], velocities[j], contactNormal, impulse);
+              vec3.scaleAndAdd(
+                velocities[i],
+                velocities[i],
+                contactNormal,
+                -impulse,
+              );
+              vec3.scaleAndAdd(
+                velocities[j],
+                velocities[j],
+                contactNormal,
+                impulse,
+              );
             }
           }
         }
@@ -115,7 +142,7 @@ group('sphere physics step 512 @algo @physics', () => {
         for (let i = 0; i < N; i++) {
           energy += vec3.squaredLength(velocities[i]);
         }
-        sink = energy;
+        return energy;
       },
       after: () => {
         for (let i = 0; i < N; i++) {
@@ -124,7 +151,5 @@ group('sphere physics step 512 @algo @physics', () => {
         }
       },
     };
-  }).gc('inner');
+  });
 });
-
-if (sink === Infinity) throw new Error('unreachable');
