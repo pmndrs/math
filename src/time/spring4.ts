@@ -14,13 +14,7 @@ export const create = (value: Vec4 = [0, 0, 0, 0]): Spring<Vec4> => ({
  * Springs `state.value` toward `target`, mutating `state` in place. Returns it.
  * @param dampingRatio 1 = critically damped (no overshoot), <1 bouncy, >1 sluggish
  */
-export function update(
-    state: Spring<Vec4>,
-    target: Vec4,
-    smoothTime: number,
-    dampingRatio: number,
-    delta: number,
-): Spring<Vec4> {
+export function update(state: Spring<Vec4>, target: Vec4, smoothTime: number, dampingRatio: number, delta: number): Spring<Vec4> {
     coefficients(smoothTime, dampingRatio, delta);
     const val = state.value;
     const vel = state.velocity;

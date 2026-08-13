@@ -2095,11 +2095,7 @@ export function lookAt(out: Mat4, eye: Vec3, center: Vec3, up: Vec3): Mat4 {
     const centery = center[1];
     const centerz = center[2];
 
-    if (
-        Math.abs(eyex - centerx) < EPSILON &&
-        Math.abs(eyey - centery) < EPSILON &&
-        Math.abs(eyez - centerz) < EPSILON
-    ) {
+    if (Math.abs(eyex - centerx) < EPSILON && Math.abs(eyey - centery) < EPSILON && Math.abs(eyez - centerz) < EPSILON) {
         return identity(out);
     }
 
