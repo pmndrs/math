@@ -6,6 +6,7 @@ website/dist
 *.tsbuildinfo
 tmp
 .DS_Store
+.pnpm-store
 
 # labs bench results
 .labs
