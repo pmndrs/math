@@ -38,6 +38,18 @@ group("mat4 ops 10k @core @mat4", () => {
     };
   });
 
+  bench("multiply3x3", function* () {
+    const a = makeMats(1);
+    const b = makeMats(2);
+    const out = mat4.create();
+
+    yield () => {
+      for (let i = 0; i < N; i++) {
+        mat4.multiply3x3(out, a[i], b[i]);
+      }
+    };
+  });
+
   bench("invert", function* () {
     const a = makeMats(1);
     const out = mat4.create();
