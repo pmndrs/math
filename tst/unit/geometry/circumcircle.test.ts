@@ -1,16 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { type Circle, circumcircle, type Vec2 } from '../../../src/geometry';
+import * as vec2 from '../../../src/core/vec2';
+import { circumcircle, type Vec2 } from '../../../src/geometry';
 import * as mulberry32 from '../../../src/random/mulberry32';
-
-const dist = (p: Vec2, q: Vec2) => Math.hypot(p[0] - q[0], p[1] - q[1]);
-const makeCircle = (): Circle => ({ center: [0, 0], radius: 0 });
+import { circle } from '../../../src/shapes';
 
 describe('circumcircle', () => {
     it('calculates circumcircle for a simple triangle', () => {
         const a: Vec2 = [0, 0];
         const b: Vec2 = [1, 0];
         const c: Vec2 = [0, 1];
-        const result = circumcircle(makeCircle(), a, b, c);
+        const result = circumcircle(circle.create(), a, b, c);
         expect(result.center[0]).toBeCloseTo(0.5);
         expect(result.center[1]).toBeCloseTo(0.5);
         expect(result.radius).toBeCloseTo(Math.sqrt(0.5));
@@ -20,7 +19,7 @@ describe('circumcircle', () => {
         const a: Vec2 = [0, 0];
         const b: Vec2 = [1, 0];
         const c: Vec2 = [0.5, Math.sqrt(3) / 2];
-        const result = circumcircle(makeCircle(), a, b, c);
+        const result = circumcircle(circle.create(), a, b, c);
         expect(result.center[0]).toBeCloseTo(0.5);
         expect(result.center[1]).toBeCloseTo(Math.sqrt(3) / 6);
         expect(result.radius).toBeCloseTo(1 / Math.sqrt(3));
@@ -31,14 +30,14 @@ describe('circumcircle', () => {
         const a: Vec2 = [0, 0];
         const b: Vec2 = [4, 0];
         const c: Vec2 = [0, 3];
-        const result = circumcircle(makeCircle(), a, b, c);
+        const result = circumcircle(circle.create(), a, b, c);
         expect(result.center[0]).toBeCloseTo(2);
         expect(result.center[1]).toBeCloseTo(1.5);
         expect(result.radius).toBeCloseTo(2.5); // half the hypotenuse (5)
     });
 
     it('writes into and returns the provided out circle', () => {
-        const out = makeCircle();
+        const out = circle.create();
         const result = circumcircle(out, [0, 0], [1, 0], [0, 1]);
         expect(result).toBe(out);
     });
@@ -47,11 +46,11 @@ describe('circumcircle', () => {
         const a: Vec2 = [1, 2];
         const b: Vec2 = [4, 1];
         const c: Vec2 = [2, 5];
-        const base = circumcircle(makeCircle(), a, b, c);
+        const base = circumcircle(circle.create(), a, b, c);
 
         const t: Vec2 = [-100, 37];
         const moved = circumcircle(
-            makeCircle(),
+            circle.create(),
             [a[0] + t[0], a[1] + t[1]],
             [b[0] + t[0], b[1] + t[1]],
             [c[0] + t[0], c[1] + t[1]],
@@ -62,7 +61,7 @@ describe('circumcircle', () => {
     });
 
     it('produces a circle passing through all three vertices (random triangles, multiple scales)', () => {
-        const out = makeCircle();
+        const out = circle.create();
         for (const scale of [1, 10, 1000]) {
             const rand = mulberry32.create(1);
             for (let i = 0; i < 2000; i++) {
@@ -73,9 +72,9 @@ describe('circumcircle', () => {
                 if (out.radius === 0) continue; // degenerate/near-collinear
                 // the defining property: the center is equidistant (= radius) from every vertex
                 const tol = out.radius * 1e-9;
-                expect(Math.abs(dist(out.center, a) - out.radius)).toBeLessThanOrEqual(tol);
-                expect(Math.abs(dist(out.center, b) - out.radius)).toBeLessThanOrEqual(tol);
-                expect(Math.abs(dist(out.center, c) - out.radius)).toBeLessThanOrEqual(tol);
+                expect(Math.abs(vec2.distance(out.center, a) - out.radius)).toBeLessThanOrEqual(tol);
+                expect(Math.abs(vec2.distance(out.center, b) - out.radius)).toBeLessThanOrEqual(tol);
+                expect(Math.abs(vec2.distance(out.center, c) - out.radius)).toBeLessThanOrEqual(tol);
             }
         }
     });
@@ -88,7 +87,7 @@ describe('circumcircle', () => {
             ['all points identical', [5, 5], [5, 5], [5, 5]],
             ['two points identical', [0, 0], [0, 0], [1, 0]],
         ] as [string, Vec2, Vec2, Vec2][])('returns radius 0 for %s', (_label, a, b, c) => {
-            const result = circumcircle(makeCircle(), a, b, c);
+            const result = circumcircle(circle.create(), a, b, c);
             expect(result.radius).toBe(0);
             expect(result.center[0]).toBeCloseTo(a[0]);
             expect(result.center[1]).toBeCloseTo(a[1]);
