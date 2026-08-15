@@ -28,11 +28,7 @@ export function create(): Spherical {
  * @returns a new Spherical
  */
 export function fromValues(r: number, theta: number, phi: number): Spherical {
-    const out: Spherical = [0, 0, 0];
-    out[0] = r;
-    out[1] = theta;
-    out[2] = phi;
-    return out;
+    return [r, theta, phi];
 }
 
 /**
@@ -42,11 +38,7 @@ export function fromValues(r: number, theta: number, phi: number): Spherical {
  * @returns a new Spherical
  */
 export function clone(a: Spherical): Spherical {
-    const out: Spherical = [0, 0, 0];
-    out[0] = a[0];
-    out[1] = a[1];
-    out[2] = a[2];
-    return out;
+    return [a[0], a[1], a[2]];
 }
 
 /**
@@ -108,11 +100,12 @@ export function scale(out: Spherical, a: Spherical, s: number): Spherical {
     return out;
 }
 
+const TAU = Math.PI * 2;
+
 /**
  * Wraps an angle (in radians) into the range [-π, π].
  */
 function wrapAngle(a: number): number {
-    const TAU = Math.PI * 2;
     return a - TAU * Math.floor((a + Math.PI) / TAU);
 }
 
@@ -188,10 +181,10 @@ export function toVec3(out: Vec3, a: Spherical): Vec3 {
     const r = a[0];
     const theta = a[1];
     const phi = a[2];
-    const sinPhi = Math.sin(phi);
-    out[0] = r * sinPhi * Math.sin(theta);
+    const rSinPhi = r * Math.sin(phi);
+    out[0] = rSinPhi * Math.sin(theta);
     out[1] = r * Math.cos(phi);
-    out[2] = r * sinPhi * Math.cos(theta);
+    out[2] = rSinPhi * Math.cos(theta);
     return out;
 }
 
@@ -225,9 +218,9 @@ export function toVec2(out: Vec2, a: Spherical): Vec2 {
     const r = a[0];
     const theta = a[1];
     const phi = a[2];
-    const sinPhi = Math.sin(phi);
-    out[0] = r * sinPhi * Math.sin(theta);
-    out[1] = r * sinPhi * Math.cos(theta);
+    const rSinPhi = r * Math.sin(phi);
+    out[0] = rSinPhi * Math.sin(theta);
+    out[1] = rSinPhi * Math.cos(theta);
     return out;
 }
 
@@ -280,6 +273,8 @@ export function angleTo(a: Spherical, b: Spherical): number {
     const phiB = b[2];
     const dTheta = b[1] - a[1];
     // hav(c) = hav(phiB - phiA) + sin(phiA) * sin(phiB) * hav(dTheta)
-    const hav = Math.sin((phiB - phiA) / 2) ** 2 + Math.sin(phiA) * Math.sin(phiB) * Math.sin(dTheta / 2) ** 2;
+    const sHalfPhi = Math.sin((phiB - phiA) / 2);
+    const sHalfTheta = Math.sin(dTheta / 2);
+    const hav = sHalfPhi * sHalfPhi + Math.sin(phiA) * Math.sin(phiB) * sHalfTheta * sHalfTheta;
     return 2 * Math.asin(Math.sqrt(Math.max(0, Math.min(1, hav))));
 }
