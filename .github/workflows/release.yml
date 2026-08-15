@@ -42,7 +42,8 @@ jobs:
         shell: bash
         run: |
           base_version="$(node -p "require('./package.json').version.split('-')[0]")"
-          canary_version="${base_version}-canary.${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.g${GITHUB_SHA::7}"
+          release_date="$(date -u +%Y%m%d)"
+          canary_version="${base_version}-canary-${GITHUB_SHA::8}-${release_date}"
           npm version "${canary_version}" --no-git-tag-version
           echo "version=${canary_version}" >> "${GITHUB_OUTPUT}"
 
