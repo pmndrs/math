@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - next
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and test
+        run: pnpm run release
+
+      - name: Set canary version
+        id: version
+        shell: bash
+        run: |
+          base_version="$(node -p "require('./package.json').version.split('-')[0]")"
+          canary_version="${base_version}-canary.${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}.g${GITHUB_SHA::7}"
+          npm version "${canary_version}" --no-git-tag-version
+          echo "version=${canary_version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Publish canary
+        run: npm publish --tag canary --access public
+
+      - name: Add release summary
+        run: echo "Published maath@${{ steps.version.outputs.version }} with the canary tag." >> "${GITHUB_STEP_SUMMARY}"
