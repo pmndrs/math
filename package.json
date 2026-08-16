@@ -1,6 +1,7 @@
 {
   "name": "math",
   "version": "1.0.0-alpha.1",
+  "author": "Isaac Mason <isaac@isaacmason.com>",
   "description": "a collection of math helpers for graphics and simulations",
   "keywords": [
     "math",
