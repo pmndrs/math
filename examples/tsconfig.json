@@ -16,7 +16,6 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "types": ["@webgpu/types"],
-    "baseUrl": "./",
     "rootDir": "./src",
     "allowSyntheticDefaultImports": true,
     "outDir": "dist"
