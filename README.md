@@ -4,7 +4,7 @@
 
 # math
 
-math is a collection of math helpers for graphics and simulations.
+`math` is a collection of math helpers for graphics and simulations.
 
 **Features:**
 
