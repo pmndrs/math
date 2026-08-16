@@ -282,9 +282,72 @@ function generateApiDocs() {
     }
 }
 
+/* Example galleries read from examples/src/examples.json, screenshots from
+ * examples/public/screenshots/<key>.png, linking to the live examples browser. */
+const EXAMPLES_COLS = 3;
+const EXAMPLE_PAGES_BASE = 'https://pmndrs.github.io/maath/examples/#';
+const examplesJsonPath = path.join(here, '../examples/src/examples.json');
+
+function loadExamples() {
+    if (!fs.existsSync(examplesJsonPath)) {
+        console.warn(`examples.json not found: ${examplesJsonPath}`);
+        return null;
+    }
+    return JSON.parse(fs.readFileSync(examplesJsonPath, 'utf-8'));
+}
+
+function exampleCell(data, key, width = 180, height = 120) {
+    const title = data[key].title || key;
+    const img = `./examples/public/screenshots/${key}.png`;
+    const href = `${EXAMPLE_PAGES_BASE}${key}`;
+    return (
+        `    <td align="center">\n` +
+        `      <a href="${href}">\n` +
+        `        <img src="${img}" width="${width}" height="${height}" style="object-fit:cover;"/><br/>\n` +
+        `        ${title}\n` +
+        `      </a>\n` +
+        `    </td>`
+    );
+}
+
+/* <Examples /> - a full gallery grid of every example in examples.json */
+function renderExamples() {
+    const data = loadExamples();
+    if (!data) return '';
+    const keys = Object.keys(data);
+    let out = '<table>\n';
+    for (let i = 0; i < keys.length; i += EXAMPLES_COLS) {
+        out += '  <tr>\n';
+        for (let j = 0; j < EXAMPLES_COLS && i + j < keys.length; ++j) {
+            out += `${exampleCell(data, keys[i + j])}\n`;
+        }
+        out += '  </tr>\n';
+    }
+    return `${out}</table>`;
+}
+
+/* <ExamplesTable ids="a,b,c" /> - a one-row table of specific examples */
+function renderExamplesTable(idsStr) {
+    const data = loadExamples();
+    if (!data) return '';
+    const ids = idsStr
+        .split(',')
+        .map((s) => s.trim())
+        .filter((id) => data[id] || console.warn(`example '${id}' not in examples.json`));
+    if (ids.length === 0) return '';
+    const cells = ids.map((id) => exampleCell(data, id, 200, 133)).join('\n');
+    return `<table>\n  <tr>\n${cells}\n  </tr>\n</table>`;
+}
+
 const readmeTemplatePath = path.join(here, './README.template.md');
 const readmeOutPath = path.join(here, '../README.md');
 let readmeText = fs.readFileSync(readmeTemplatePath, 'utf-8');
+
+/* <Examples /> - gallery grid of every example */
+readmeText = readmeText.replace(/<Examples\s*\/>/g, () => renderExamples());
+
+/* <ExamplesTable ids="a,b,c" /> - inline one-row table for a section */
+readmeText = readmeText.replace(/<ExamplesTable\s+ids=["'](.+?)["']\s*\/>/g, (_full, ids) => renderExamplesTable(ids));
 
 /* <RenderAPI /> */
 readmeText = readmeText.replace(/<RenderAPI\s*\/>/g, () => generateApiDocs());

@@ -48,6 +48,71 @@ import { easing, spring } from 'maath/time'; // easings & springs
 // also: maath/color, maath/geometry, maath/shapes — import only what you use
 ```
 
+## Examples
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://pmndrs.github.io/maath/examples/#example-convex-hull-3d">
+        <img src="./examples/public/screenshots/example-convex-hull-3d.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Convex Hull 3D
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://pmndrs.github.io/maath/examples/#example-convex-hull-2d">
+        <img src="./examples/public/screenshots/example-convex-hull-2d.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Convex Hull 2D
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://pmndrs.github.io/maath/examples/#example-circumcircle">
+        <img src="./examples/public/screenshots/example-circumcircle.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Circumcircle
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://pmndrs.github.io/maath/examples/#example-flow-field">
+        <img src="./examples/public/screenshots/example-flow-field.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Flow Field
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://pmndrs.github.io/maath/examples/#example-color-wheel">
+        <img src="./examples/public/screenshots/example-color-wheel.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Color Wheel
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://pmndrs.github.io/maath/examples/#example-simplex-2d-noise-terrain">
+        <img src="./examples/public/screenshots/example-simplex-2d-noise-terrain.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Simplex 2D Noise Terrain
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://pmndrs.github.io/maath/examples/#example-quaternion-slerp">
+        <img src="./examples/public/screenshots/example-quaternion-slerp.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Quaternion Slerp
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://pmndrs.github.io/maath/examples/#example-spring">
+        <img src="./examples/public/screenshots/example-spring.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Spring
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://pmndrs.github.io/maath/examples/#example-easing">
+        <img src="./examples/public/screenshots/example-easing.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Easing
+      </a>
+    </td>
+  </tr>
+</table>
+
 ## API Documentation
 
 **`maath`**
@@ -609,13 +674,27 @@ import { easing, spring } from 'maath/time'; // easings & springs
 **`maath/random`**
 
 <table><tr>
-<td><a href="#mulberry32"><code>Mulberry32</code></a></td><td><a href="#randomgenerator"><code>RandomGenerator</code></a></td>
+<td><a href="#isaac32"><code>Isaac32</code></a></td><td><a href="#isaac64"><code>Isaac64</code></a></td><td><a href="#mulberry32"><code>Mulberry32</code></a></td><td><a href="#randomgenerator"><code>RandomGenerator</code></a></td>
+</tr></table>
+
+**isaac32**
+
+<table><tr>
+<td><a href="#isaac32create"><code>isaac32.create</code></a></td><td><a href="#isaac32next"><code>isaac32.next</code></a></td><td><a href="#isaac32sample"><code>isaac32.sample</code></a></td><td><a href="#isaac32seed"><code>isaac32.seed</code></a></td>
+</tr></table>
+
+**isaac64**
+
+<table><tr>
+<td><a href="#isaac64create"><code>isaac64.create</code></a></td><td><a href="#isaac64next"><code>isaac64.next</code></a></td><td><a href="#isaac64sample"><code>isaac64.sample</code></a></td><td><a href="#isaac64seed"><code>isaac64.seed</code></a></td>
 </tr></table>
 
 **mulberry32**
 
 <table><tr>
-<td><a href="#mulberry32create"><code>mulberry32.create</code></a></td><td><a href="#mulberry32sample"><code>mulberry32.sample</code></a></td><td><a href="#mulberry32seed"><code>mulberry32.seed</code></a></td>
+<td><a href="#mulberry32create"><code>mulberry32.create</code></a></td><td><a href="#mulberry32next"><code>mulberry32.next</code></a></td><td><a href="#mulberry32sample"><code>mulberry32.sample</code></a></td>
+</tr><tr>
+<td><a href="#mulberry32seed"><code>mulberry32.seed</code></a></td><td></td><td></td>
 </tr></table>
 
 **random**
@@ -7679,6 +7758,78 @@ export function damp(state: Spring<Vec4>, target: Vec4, smoothTime: number, delt
 
 ### `maath/random`
 
+#### `Isaac32`
+
+```ts
+/**
+ * State of an ISAAC-32 PRNG: two 256-word arrays plus three accumulators and a
+ * cursor into the current batch of results. Create one with {@link create}.
+ *
+ * ISAAC (Indirection, Shift, Accumulate, Add, Count) generates 256 words per
+ * round and hands them out one at a time; {@link next}/{@link sample} refill the
+ * batch automatically when it runs dry.
+ *
+ * The state is a plain object, so it can be inspected,
+ * cloned (to fork a sequence), or serialised. `m`/`r` are typed arrays, so a
+ * structural clone (e.g. `structuredClone`) forks correctly; a shallow `{...}`
+ * copy shares them and does not.
+ */
+export type Isaac32 = {
+    /** internal state ("mem"), 256 words */
+    m: Uint32Array;
+    /** current batch of results, 256 words */
+    r: Uint32Array;
+    /** accumulator */
+    a: number;
+    /** previous result */
+    b: number;
+    /** counter, incremented once per batch */
+    c: number;
+    /** cursor into `r`; a value of 256 means the batch is spent */
+    i: number;
+};
+```
+
+#### `Isaac64`
+
+```ts
+/**
+ * State of an ISAAC64 PRNG. Create one with {@link create}.
+ *
+ * ISAAC64 is the 64-bit variant of ISAAC (Indirection, Shift, Accumulate, Add,
+ * Count): same design as {@link Isaac32} but on 64-bit words, giving a larger
+ * state and 64-bit output. JavaScript has no native 64-bit integers, so each
+ * 64-bit word is split into two 32-bit lanes — `*Hi` (bits 63..32) and `*Lo`
+ * (bits 31..0) — and the hot loop does 64-bit math with explicit carries in
+ * plain `number`s. That keeps the whole generator in fast Word32 arithmetic
+ * (see the note on {@link Isaac32}'s typed arrays); a `bigint` implementation is
+ * ~6x slower. `next` reassembles a `bigint`; `sample` skips `bigint` entirely.
+ *
+ * The state is a plain object, so it can be inspected, cloned (to fork a
+ * sequence), or serialised. The lanes are typed arrays, so a structural clone
+ * (e.g. `structuredClone`) forks correctly; a shallow `{...}` copy shares them.
+ */
+export type Isaac64 = {
+    /** internal state ("mem") high/low lanes, 256 words */
+    mHi: Uint32Array;
+    mLo: Uint32Array;
+    /** current batch of results, high/low lanes, 256 words */
+    rHi: Uint32Array;
+    rLo: Uint32Array;
+    /** accumulator */
+    aHi: number;
+    aLo: number;
+    /** previous result */
+    bHi: number;
+    bLo: number;
+    /** counter, incremented once per batch */
+    cHi: number;
+    cLo: number;
+    /** cursor into `r`; a value of 256 means the batch is spent */
+    i: number;
+};
+```
+
 #### `Mulberry32`
 
 ```ts
@@ -7701,6 +7852,125 @@ export type Mulberry32 = {
 export type RandomGenerator = () => number;
 ```
 
+**isaac32**
+
+#### `isaac32.create`
+
+```ts
+/**
+ * Creates ISAAC-32 PRNG state seeded with `seed`.
+ *
+ * ISAAC is a fast, high-quality generator: its cycle length is at least 2^40 and
+ * ~2^8295 on average, and its output passes stringent statistical tests. Bob
+ * Jenkins designed it to resist prediction, but it is not founded on
+ * cryptographic theory, so **do not rely on it for cryptography** — use the Web
+ * Crypto API for that.
+ *
+ * A `seed` of 0 reproduces the reference implementation's unseeded output. For
+ * the full-strength 64-bit variant see {@link Isaac64}.
+ *
+ * @param seed the seed value (32-bit integer), defaults to 0
+ * @returns state to pass to {@link sample} or {@link next}
+ */
+export function create(seed = 0): Isaac32;
+```
+
+#### `isaac32.next`
+
+```ts
+/**
+ * Advances `state` and returns the next raw 32-bit unsigned integer.
+ *
+ * @param state PRNG state created with {@link create}, mutated in place
+ * @returns an integer in the range [0, 2^32)
+ */
+export function next(state: Isaac32): number;
+```
+
+#### `isaac32.sample`
+
+```ts
+/**
+ * Advances `state` and returns the next number in the range [0, 1).
+ *
+ * @param state PRNG state created with {@link create}, mutated in place
+ * @returns a number in the range [0, 1)
+ */
+export function sample(state: Isaac32): number;
+```
+
+#### `isaac32.seed`
+
+```ts
+/**
+ * Generates a random 32-bit unsigned integer seed, suitable for use with
+ * {@link create}.
+ */
+export function seed(): number;
+```
+
+**isaac64**
+
+#### `isaac64.create`
+
+```ts
+/**
+ * Creates ISAAC64 PRNG state seeded with `seed`.
+ *
+ * ISAAC64 is a fast, high-quality generator with an enormous cycle length
+ * (~2^8295 on average). Bob Jenkins designed it to resist prediction, but it is
+ * not founded on cryptographic theory, so **do not rely on it for
+ * cryptography** — use the Web Crypto API for that.
+ *
+ * A `seed` of 0 reproduces the reference implementation's unseeded output.
+ *
+ * @param seed the seed value (64-bit integer), defaults to 0n
+ * @returns state to pass to {@link sample} or {@link next}
+ */
+export function create(seed: bigint = 0n): Isaac64;
+```
+
+#### `isaac64.next`
+
+```ts
+/**
+ * Advances `state` and returns the next raw 64-bit unsigned integer.
+ *
+ * This reassembles a `bigint` from the two lanes, so it allocates; for a value
+ * in [0, 1) prefer {@link sample}, which stays in `number` arithmetic.
+ *
+ * @param state PRNG state created with {@link create}, mutated in place
+ * @returns an integer in the range [0, 2^64)
+ */
+export function next(state: Isaac64): bigint;
+```
+
+#### `isaac64.sample`
+
+```ts
+/**
+ * Advances `state` and returns the next number in the range [0, 1).
+ *
+ * The result carries 53 bits of randomness (the width of a double's mantissa),
+ * taken from the high bits of a 64-bit word — read straight from the lanes, so
+ * no `bigint` is allocated.
+ *
+ * @param state PRNG state created with {@link create}, mutated in place
+ * @returns a number in the range [0, 1)
+ */
+export function sample(state: Isaac64): number;
+```
+
+#### `isaac64.seed`
+
+```ts
+/**
+ * Generates a random 64-bit unsigned integer seed, suitable for use with
+ * {@link create}.
+ */
+export function seed(): bigint;
+```
+
 **mulberry32**
 
 #### `mulberry32.create`
@@ -7716,6 +7986,22 @@ export type RandomGenerator = () => number;
  * @returns state to pass to {@link sample}
  */
 export function create(seed: number): Mulberry32;
+```
+
+#### `mulberry32.next`
+
+```ts
+/**
+ * Advances `state` and returns the next raw 32-bit unsigned integer.
+ *
+ * The accumulator is kept to 32 bits with `| 0`; without it, `state.a` would grow
+ * as an unbounded float and lose integer precision past 2^53 (~5M draws),
+ * corrupting the sequence.
+ *
+ * @param state PRNG state created with {@link create}, mutated in place
+ * @returns an integer in the range [0, 2^32)
+ */
+export function next(state: Mulberry32): number;
 ```
 
 #### `mulberry32.sample`
