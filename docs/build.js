@@ -442,7 +442,9 @@ function getType(typeName, file = null) {
             if (sig) {
                 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
                 const sigNode = ts.factory.createFunctionDeclaration(
-                    node.modifiers,
+                    // fresh modifier (not node.modifiers) so the printer doesn't re-emit the
+                    // JSDoc already prepended above via the original modifier's source position
+                    [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
                     node.asteriskToken,
                     node.name,
                     node.typeParameters,
