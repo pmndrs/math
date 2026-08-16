@@ -3,6 +3,7 @@ dist
 dist-*
 examples/dist
 website/dist
+website/build
 *.tsbuildinfo
 tmp
 .DS_Store
