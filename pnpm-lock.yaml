@@ -47,7 +47,7 @@ importers:
     dependencies:
       gpucat:
         specifier: github:isaac-mason/gpucat
-        version: https://codeload.github.com/isaac-mason/gpucat/tar.gz/19af76c1780fcafe39fda1a0232243d1d5d9a8d1
+        version: https://codeload.github.com/isaac-mason/gpucat/tar.gz/17fdd24630322bfb3a3f01719de0d3bea47909c4
       lil-gui:
         specifier: ^0.20.0
         version: 0.20.0
@@ -702,8 +702,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  gpucat@https://codeload.github.com/isaac-mason/gpucat/tar.gz/19af76c1780fcafe39fda1a0232243d1d5d9a8d1:
-    resolution: {tarball: https://codeload.github.com/isaac-mason/gpucat/tar.gz/19af76c1780fcafe39fda1a0232243d1d5d9a8d1}
+  gpucat@https://codeload.github.com/isaac-mason/gpucat/tar.gz/17fdd24630322bfb3a3f01719de0d3bea47909c4:
+    resolution: {tarball: https://codeload.github.com/isaac-mason/gpucat/tar.gz/17fdd24630322bfb3a3f01719de0d3bea47909c4}
     version: 0.0.0-alpha.1
 
   js-tokens@9.0.1:
@@ -728,9 +728,8 @@ packages:
     resolution: {integrity: sha512-RCEsPjR+sr0x+AuYp601tKTkgFG4YEPLCzHST3cQ/fhlJkqAkz1L2/Qbp1j9qw5SBwQHFBoW8+hoN5xssOF0Tw==}
     hasBin: true
 
-  mathcat@https://codeload.github.com/isaac-mason/mathcat/tar.gz/fe42b67f84b85efbce1f8aee6b2df30e349e55e2:
-    resolution: {tarball: https://codeload.github.com/isaac-mason/mathcat/tar.gz/fe42b67f84b85efbce1f8aee6b2df30e349e55e2}
-    version: 0.0.14
+  math@1.0.0-canary-4d9ad9eb-20260816:
+    resolution: {integrity: sha512-SuSnoqp1QuDAgQoyeaglg+POWCoJzNGSbG7H2mQ0qg4jydCwIIW77CyKjho0Sd214Hd/xKTsXtBvNRtzDZe4Rw==}
 
   mdurl@2.1.0:
     resolution: {integrity: sha512-1+HBaOx0zi/dQWht8rNv9MYf9qqpqL/kxI0hXImU6Y547zM6Sni8BQibt7ifgMcYtQg41ao3Ivd6cnSM86inpg==}
@@ -1412,9 +1411,9 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  gpucat@https://codeload.github.com/isaac-mason/gpucat/tar.gz/19af76c1780fcafe39fda1a0232243d1d5d9a8d1:
+  gpucat@https://codeload.github.com/isaac-mason/gpucat/tar.gz/17fdd24630322bfb3a3f01719de0d3bea47909c4:
     dependencies:
-      mathcat: https://codeload.github.com/isaac-mason/mathcat/tar.gz/fe42b67f84b85efbce1f8aee6b2df30e349e55e2
+      math: 1.0.0-canary-4d9ad9eb-20260816
 
   js-tokens@9.0.1: {}
 
@@ -1441,7 +1440,7 @@ snapshots:
       punycode.js: 2.3.1
       uc.micro: 2.1.0
 
-  mathcat@https://codeload.github.com/isaac-mason/mathcat/tar.gz/fe42b67f84b85efbce1f8aee6b2df30e349e55e2: {}
+  math@1.0.0-canary-4d9ad9eb-20260816: {}
 
   mdurl@2.1.0: {}
 
