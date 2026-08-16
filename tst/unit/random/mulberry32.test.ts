@@ -50,6 +50,32 @@ describe('mulberry32', () => {
         });
     });
 
+    describe('next', () => {
+        it('should return unsigned 32-bit integers', () => {
+            const state = mulberry32.create(1);
+            for (let i = 0; i < 1000; i++) {
+                const v = mulberry32.next(state);
+                expect(Number.isInteger(v)).toBe(true);
+                expect(v).toBeGreaterThanOrEqual(0);
+                expect(v).toBeLessThan(2 ** 32);
+            }
+        });
+
+        it('should relate to sample as next / 2^32', () => {
+            const a = mulberry32.create(2024);
+            const b = mulberry32.create(2024);
+            for (let i = 0; i < 100; i++) {
+                expect(mulberry32.sample(a)).toBe(mulberry32.next(b) / 4294967296);
+            }
+        });
+
+        it('should keep the accumulator a 32-bit integer', () => {
+            const state = mulberry32.create(0x1234);
+            for (let i = 0; i < 10000; i++) mulberry32.next(state);
+            expect(state.a).toBe(state.a | 0); // never drifts into a large float
+        });
+    });
+
     describe('cloning state forks the stream', () => {
         it('should let a shallow copy continue an identical sequence', () => {
             const state = mulberry32.create(7);
