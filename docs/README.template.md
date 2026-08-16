@@ -31,6 +31,10 @@ The library is grouped by domain behind subpath entrypoints. All APIs are highly
 
 <Snippet source="./modules.ts" select="modules" />
 
+## Examples
+
+<Examples />
+
 ## API Documentation
 
 <RenderAPI />
