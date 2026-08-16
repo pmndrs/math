@@ -4,6 +4,7 @@ import { mat4, vec4 } from 'math';
 import { quickhull2 } from 'math/geometry';
 import { mulberry32 } from 'math/random';
 import { rainbowLineColor, rainbowRGB, time } from './common/rainbow';
+import { createRenderer } from './common/renderer';
 
 // A drifting 2D point cloud with its convex hull (math's quickhull2)
 // recomputed every frame. As points wander in and out of the boundary the hull
@@ -17,7 +18,7 @@ import { rainbowLineColor, rainbowRGB, time } from './common/rainbow';
 const POINT_COUNT = 16;
 const CONTROLLED = 0; // this point follows the pointer while you interact
 
-/* ------------------------------------------------------------------ drifters */
+/* drifters */
 
 // each point = base position + a slow sinusoidal wobble (seeded for determinism)
 type Drifter = { bx: number; by: number; ax: number; ay: number; fx: number; fy: number; px: number; py: number };
@@ -38,10 +39,9 @@ for (let i = 0; i < POINT_COUNT; i++) {
     });
 }
 
-/* ------------------------------------------------------------------ renderer */
+/* renderer */
 
-const renderer = new g.WebGPURenderer({ antialias: true });
-await renderer.init();
+const renderer = await createRenderer({ antialias: true });
 
 const canvas = renderer.domElement as HTMLCanvasElement;
 document.body.appendChild(canvas);
@@ -71,7 +71,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* ------------------------------------------------------------------ objects */
+/* objects */
 
 // hull outline (rainbow, closed) — allocated for the worst case (all points on hull)
 const hullPoints = new Float32Array(POINT_COUNT * 3);
@@ -109,7 +109,7 @@ for (let i = 0; i < POINT_COUNT; i++) {
     hullMarkers.push(marker);
 }
 
-/* -------------------------------------------------------------- pointer input */
+/* pointer input */
 
 // where the steered point wants to be (world x, y on the z=0 plane)
 const steerTarget: [number, number] = [0, 0];
@@ -175,7 +175,7 @@ canvas.addEventListener('pointerleave', () => {
     steering = false; // mouse left the canvas — ease the point back into its drift
 });
 
-/* ------------------------------------------------------------------ readout */
+/* readout */
 
 const readout = document.createElement('div');
 readout.className = 'mc-info';
@@ -183,7 +183,7 @@ readout.style.left = '16px';
 readout.style.top = '14px';
 document.body.appendChild(readout);
 
-/* ------------------------------------------------------------------ render */
+/* render */
 
 const points: number[] = new Array(POINT_COUNT * 2).fill(0);
 

@@ -5,28 +5,63 @@ import { circumcircle } from 'math/geometry';
 import { circle } from 'math/shapes';
 import { easing } from 'math/time';
 import { rainbowLineColor, time } from './common/rainbow';
+import { createRenderer } from './common/renderer';
 
 // A triangle that morphs between shapes, with its circumcircle (math's
 // circumcircle) recomputed every frame. As the triangle flattens toward
 // degenerate the circumcircle balloons — watch the circumradius readout. The
 // ring is drawn with the flowing brand rainbow (see common/rainbow).
 
-/* ------------------------------------------------------------------ shapes */
+/* shapes */
 
 type Tri = [Vec2, Vec2, Vec2];
 const SHAPES: { name: string; tri: Tri }[] = [
-    { name: 'equilateral', tri: [[0, 1.15], [-1, -0.58], [1, -0.58]] },
-    { name: 'right', tri: [[-1, -0.7], [1, -0.7], [1, 1]] },
-    { name: 'obtuse', tri: [[-1.2, -0.35], [1.2, -0.35], [0.35, 0.15]] },
-    { name: 'sliver', tri: [[-1.25, -0.12], [1.25, -0.16], [0.1, 0.06]] },
-    { name: 'scalene', tri: [[-0.95, -0.75], [1.05, -0.45], [0.05, 1.05]] },
+    {
+        name: 'equilateral',
+        tri: [
+            [0, 1.15],
+            [-1, -0.58],
+            [1, -0.58],
+        ],
+    },
+    {
+        name: 'right',
+        tri: [
+            [-1, -0.7],
+            [1, -0.7],
+            [1, 1],
+        ],
+    },
+    {
+        name: 'obtuse',
+        tri: [
+            [-1.2, -0.35],
+            [1.2, -0.35],
+            [0.35, 0.15],
+        ],
+    },
+    {
+        name: 'sliver',
+        tri: [
+            [-1.25, -0.12],
+            [1.25, -0.16],
+            [0.1, 0.06],
+        ],
+    },
+    {
+        name: 'scalene',
+        tri: [
+            [-0.95, -0.75],
+            [1.05, -0.45],
+            [0.05, 1.05],
+        ],
+    },
 ];
 const SHAPE_DURATION = 2.6; // seconds per morph
 
-/* ------------------------------------------------------------------ renderer */
+/* renderer */
 
-const renderer = new g.WebGPURenderer({ antialias: true });
-await renderer.init();
+const renderer = await createRenderer({ antialias: true });
 
 const canvas = renderer.domElement as HTMLCanvasElement;
 document.body.appendChild(canvas);
@@ -51,7 +86,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* ------------------------------------------------------------------ objects */
+/* objects */
 
 // morphing triangle outline (neutral) and its circumcircle (rainbow ring)
 const triPoints = new Float32Array(9);
@@ -78,7 +113,7 @@ function makeDot(rgb: [number, number, number]): g.Mesh {
 const vertexDots = [makeDot([0.95, 0.96, 1]), makeDot([0.95, 0.96, 1]), makeDot([0.95, 0.96, 1])];
 const centerDot = makeDot([1.0, 0.243, 0.647]);
 
-/* ------------------------------------------------------------------ name wheel + readout */
+/* name wheel + readout */
 
 // a picker-style column of the shape names (DOM overlay). the column scrolls so
 // the active shape sits at the vertical centre, dimming and shrinking with
@@ -121,7 +156,7 @@ readout.style.left = '40px';
 readout.style.bottom = '24px';
 document.body.appendChild(readout);
 
-/* ------------------------------------------------------------------ render */
+/* render */
 
 const a = vec2.create();
 const b = vec2.create();
@@ -155,9 +190,12 @@ function frame(tms: number) {
     circumcircle(circ, a, b, c);
 
     // triangle outline
-    triPoints[0] = a[0]; triPoints[1] = a[1];
-    triPoints[3] = b[0]; triPoints[4] = b[1];
-    triPoints[6] = c[0]; triPoints[7] = c[1];
+    triPoints[0] = a[0];
+    triPoints[1] = a[1];
+    triPoints[3] = b[0];
+    triPoints[4] = b[1];
+    triPoints[6] = c[0];
+    triPoints[7] = c[1];
     triGeometry.update(triPoints, true);
 
     // circumcircle ring

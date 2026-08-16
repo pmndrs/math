@@ -2,6 +2,7 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { type Euler, euler, type Quat, quat } from 'math';
 import { mulberry32 } from 'math/random';
+import { createRenderer } from './common/renderer';
 
 // One orientation, two ways to interpolate it between random keyframes. The solid
 // colour-cube uses math's quat.slerp (constant-speed shortest arc). The
@@ -30,10 +31,9 @@ for (let i = 0; i < KEYFRAMES; i++) {
     keyframes.push(q);
 }
 
-/* ------------------------------------------------------------------ renderer */
+/* renderer */
 
-const renderer = new g.WebGPURenderer({ antialias: true });
-await renderer.init();
+const renderer = await createRenderer({ antialias: true });
 
 const canvas = renderer.domElement as HTMLCanvasElement;
 document.body.appendChild(canvas);
@@ -59,7 +59,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* ------------------------------------------------------------------ boxes */
+/* boxes */
 
 // solid colour-cube (slerp): local position -> rgb, lit for depth
 const boxGeometry = g.createBoxGeometry(1, 1, 1);
@@ -79,7 +79,10 @@ scene.add(slerpBox);
 // translucent white ghost (euler lerp): a slightly larger shell around the cube
 const ghostGeometry = g.createBoxGeometry(1.22, 1.22, 1.22);
 const ghostPos = g.attribute('position', d.vec3f);
-const ghostClip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.mul(g.modelWorldMatrix, g.vec4(ghostPos, g.f32(1)))));
+const ghostClip = g.mul(
+    g.cameraProjectionMatrix,
+    g.mul(g.cameraViewMatrix, g.mul(g.modelWorldMatrix, g.vec4(ghostPos, g.f32(1)))),
+);
 const ghostMaterial = new g.Material({
     vertex: ghostClip,
     fragment: g.vec4f(0.95, 0.96, 1, 0.22),
@@ -94,7 +97,7 @@ const ghostMaterial = new g.Material({
 const eulerBox = new g.Mesh(ghostGeometry, ghostMaterial);
 scene.add(eulerBox);
 
-/* ------------------------------------------------------------------ readout */
+/* readout */
 
 const readout = document.createElement('div');
 readout.className = 'mc-info';
@@ -102,7 +105,7 @@ readout.style.left = '16px';
 readout.style.top = '16px';
 document.body.appendChild(readout);
 
-/* ------------------------------------------------------------------ render */
+/* render */
 
 const eA = euler.create();
 const eB = euler.create();

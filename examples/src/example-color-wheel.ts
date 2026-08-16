@@ -1,6 +1,7 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { color, hsl } from 'math/color';
+import { createRenderer } from './common/renderer';
 
 // An HSL colour wheel: hue around the circle, saturation from the grey centre to
 // the vivid rim (lightness fixed at 0.5). Every vertex colour is computed with
@@ -12,10 +13,9 @@ const RINGS = 24;
 const SEGMENTS = 120;
 const LIGHTNESS = 0.5;
 
-/* ------------------------------------------------------------------ renderer */
+/* renderer */
 
-const renderer = new g.WebGPURenderer({ antialias: true });
-await renderer.init();
+const renderer = await createRenderer({ antialias: true });
 
 const canvas = renderer.domElement as HTMLCanvasElement;
 document.body.appendChild(canvas);
@@ -49,7 +49,7 @@ function unproject(clientX: number, clientY: number): [number, number] {
     return [ndcX * halfW, ndcY * halfH];
 }
 
-/* ------------------------------------------------------------------ wheel mesh */
+/* wheel mesh */
 
 // build a triangulated disk; each vertex is coloured by math/color
 const positions: number[] = [];
@@ -105,7 +105,7 @@ const vColor = g.varying(wCol, 'v_color');
 const wheelMaterial = new g.Material({ vertex: wClip, fragment: g.vec4(vColor, g.f32(1)), cullMode: 'none' });
 scene.add(new g.Mesh(wheelGeometry, wheelMaterial));
 
-/* ------------------------------------------------------------------ picker (DOM) */
+/* picker (DOM) */
 
 const marker = document.createElement('div');
 marker.style.cssText =
@@ -163,7 +163,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* ------------------------------------------------------------------ render */
+/* render */
 
 scene.updateWorldMatrix();
 camera.updateViewMatrix();

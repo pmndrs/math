@@ -5,6 +5,7 @@ import { mat4, quat, vec3 as v3 } from 'math';
 import { quickhull3 } from 'math/geometry';
 import { mulberry32 } from 'math/random';
 import { rainbowRGB, time } from './common/rainbow';
+import { createRenderer } from './common/renderer';
 
 // A point cloud and its convex hull (math's quickhull3), rendered with gpucat:
 // a translucent hull shell + instanced spheres, coloured by a flowing "brand
@@ -13,7 +14,7 @@ import { rainbowRGB, time } from './common/rainbow';
 // On-hull points glow rainbow; interior points stay grey. Pick a point set from
 // the dropdown (the Stanford bunny, primitives, or random).
 
-/* ------------------------------------------------------------------ point sets */
+/* point sets */
 
 // minimal .glb reader — pulls just the POSITION accessors (all we need for a hull)
 async function loadGlbPositions(url: string): Promise<number[]> {
@@ -96,14 +97,23 @@ const VARIATIONS: Record<string, () => number[] | Promise<number[]>> = {
 // so every variation frames the same regardless of its native size
 function normalize(pts: number[]): number[] {
     const n = pts.length / 3;
-    let minx = Infinity, miny = Infinity, minz = Infinity;
-    let maxx = -Infinity, maxy = -Infinity, maxz = -Infinity;
+    let minx = Infinity,
+        miny = Infinity,
+        minz = Infinity;
+    let maxx = -Infinity,
+        maxy = -Infinity,
+        maxz = -Infinity;
     for (let i = 0; i < n; i++) {
-        minx = Math.min(minx, pts[i * 3]); maxx = Math.max(maxx, pts[i * 3]);
-        miny = Math.min(miny, pts[i * 3 + 1]); maxy = Math.max(maxy, pts[i * 3 + 1]);
-        minz = Math.min(minz, pts[i * 3 + 2]); maxz = Math.max(maxz, pts[i * 3 + 2]);
+        minx = Math.min(minx, pts[i * 3]);
+        maxx = Math.max(maxx, pts[i * 3]);
+        miny = Math.min(miny, pts[i * 3 + 1]);
+        maxy = Math.max(maxy, pts[i * 3 + 1]);
+        minz = Math.min(minz, pts[i * 3 + 2]);
+        maxz = Math.max(maxz, pts[i * 3 + 2]);
     }
-    const cx = (minx + maxx) / 2, cy = (miny + maxy) / 2, cz = (minz + maxz) / 2;
+    const cx = (minx + maxx) / 2,
+        cy = (miny + maxy) / 2,
+        cz = (minz + maxz) / 2;
     const scale = 3 / (Math.max(maxx - minx, maxy - miny, maxz - minz) || 1);
     const out = new Array<number>(pts.length);
     for (let i = 0; i < n; i++) {
@@ -114,10 +124,9 @@ function normalize(pts: number[]): number[] {
     return out;
 }
 
-/* ------------------------------------------------------------------ renderer */
+/* renderer */
 
-const renderer = new g.WebGPURenderer({ antialias: true });
-await renderer.init();
+const renderer = await createRenderer({ antialias: true });
 
 const canvas = renderer.domElement as HTMLCanvasElement;
 document.body.appendChild(canvas);
@@ -149,7 +158,7 @@ const HULL_MARKER_RADIUS = 0.03;
 const INNER_MARKER_RADIUS = 0.009;
 const HULL_OPACITY = 0.16;
 
-/* ------------------------------------------------------------------ (re)build */
+/* (re)build */
 
 let pointsMesh: g.Mesh | null = null;
 let hullMesh: g.Mesh | null = null;
@@ -247,7 +256,7 @@ function rebuild(rawPoints: number[]) {
     updateStats(numPoints, hullSet.size, hullMs);
 }
 
-/* ------------------------------------------------------------------ ui + stats */
+/* ui + stats */
 
 const stats = document.createElement('div');
 stats.className = 'mc-info';
@@ -264,13 +273,15 @@ async function select(name: string) {
 }
 
 const gui = new GUI();
-gui.add(settings, 'variation', Object.keys(VARIATIONS)).name('Point set').onChange((v: string) => select(v));
+gui.add(settings, 'variation', Object.keys(VARIATIONS))
+    .name('Point set')
+    .onChange((v: string) => select(v));
 gui.add({ regenerate: () => select(settings.variation) }, 'regenerate').name('↻ Regenerate');
 
 await select(settings.variation);
 camera.updateViewMatrix();
 
-/* ------------------------------------------------------------------ render loop */
+/* render loop */
 
 const scenePass = g.pass(scene, camera);
 const outputNode = g.fxaa(scenePass.getTextureNode());

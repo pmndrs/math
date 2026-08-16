@@ -2,6 +2,7 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { simplex2d } from 'math/noise';
 import { rainbowRGB, time } from './common/rainbow';
+import { createRenderer } from './common/renderer';
 
 // A rolling terrain: a grid mesh whose vertex heights come from math's
 // simplex2d noise (two octaves), scrolling over time like a fly-over. Normals are
@@ -17,10 +18,9 @@ const SCROLL = 0.35; // world units/second the terrain drifts in z
 const SPACING = (2 * HALF) / (GRID - 1);
 const V = GRID * GRID;
 
-/* ------------------------------------------------------------------ renderer */
+/* renderer */
 
-const renderer = new g.WebGPURenderer({ antialias: true });
-await renderer.init();
+const renderer = await createRenderer({ antialias: true });
 
 const canvas = renderer.domElement as HTMLCanvasElement;
 document.body.appendChild(canvas);
@@ -47,7 +47,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* ------------------------------------------------------------------ terrain mesh */
+/* terrain mesh */
 
 const posArray = new Float32Array(V * 3);
 const normArray = new Float32Array(V * 3);
@@ -141,7 +141,7 @@ const lit = g.Var('lit', rainbowRGB(vWorld, 3).mul(light).mul(heightLight));
 const material = new g.Material({ vertex: clip, fragment: g.vec4(lit, g.f32(1)), cullMode: 'none' });
 scene.add(new g.Mesh(geometry, material));
 
-/* ------------------------------------------------------------------ readout */
+/* readout */
 
 const readout = document.createElement('div');
 readout.className = 'mc-info';
@@ -150,7 +150,7 @@ readout.style.top = '16px';
 readout.textContent = `${GRID} × ${GRID} grid · simplex2d`;
 document.body.appendChild(readout);
 
-/* ------------------------------------------------------------------ render */
+/* render */
 
 const scenePass = g.pass(scene, camera);
 const outputNode = g.fxaa(scenePass.getTextureNode());

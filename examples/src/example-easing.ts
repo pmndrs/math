@@ -2,6 +2,7 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { easing } from 'math/time';
 import { rainbowRGB, time } from './common/rainbow';
+import { createRenderer } from './common/renderer';
 
 // An easing gallery: one track per math easing function. All dots start
 // together and race across, spreading apart as each follows its own pacing, then
@@ -36,11 +37,10 @@ const PLAYHEAD_BOTTOM = BOTTOM - 0.28;
 const rowY = (i: number) => TOP + (BOTTOM - TOP) * (i / (N - 1));
 const PERIOD = 2.2; // seconds for one out-and-back
 
-/* ------------------------------------------------------------------ renderer */
+/* renderer */
 
 // alpha:true + a zero clear colour => transparent canvas, so the DOM shows through
-const renderer = new g.WebGPURenderer({ antialias: true, alpha: true });
-await renderer.init();
+const renderer = await createRenderer({ antialias: true, alpha: true });
 renderer.clearColor = [0, 0, 0, 0];
 
 const canvas = renderer.domElement as HTMLCanvasElement;
@@ -70,7 +70,7 @@ function project(wx: number, wy: number): [number, number] {
     return [((wx / halfW) * 0.5 + 0.5) * w, (0.5 - (wy / halfH) * 0.5) * h];
 }
 
-/* ------------------------------------------------------------------ dots (canvas) */
+/* dots (canvas) */
 
 // racing dots — a single instanced mesh (one instance per easing). Each dot's
 // position lives in a storage buffer we rewrite each frame; colour is the
@@ -90,7 +90,7 @@ const dots = new g.Mesh(dotGeometry, dotMaterial);
 dots.count = N;
 scene.add(dots);
 
-/* ------------------------------------------------------------------ tracks + labels (DOM) */
+/* tracks + labels (DOM) */
 
 // under-canvas layer: one hairline track per row + the sweeping playhead
 const overlay = document.createElement('div');
@@ -158,7 +158,7 @@ window.addEventListener('resize', () => {
     layout();
 });
 
-/* ------------------------------------------------------------------ render */
+/* render */
 
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
