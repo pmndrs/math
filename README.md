@@ -4,7 +4,7 @@
 
 # math
 
-`math` is a collection of math helpers for graphics and simulations.
+math is a collection of math helpers for graphics and simulations.
 
 **Features:**
 
@@ -22,8 +22,6 @@
 
 
 ## Quick Start
-
-math types are plain arrays and objects — no classes, no typed arrays — and functions write into an output argument, so hot paths allocate nothing. Because it's all plain data, results drop straight into three.js, JSON, or a Web Worker:
 
 ```ts
 import { type Vec3, vec3 } from 'math';
