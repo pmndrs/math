@@ -1,8 +1,9 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { type Spring, spring2 } from 'math/time';
 import type { Vec2 } from 'math';
+import { type Spring, spring2 } from 'math/time';
 import { rainbowRGB, time } from './common/rainbow';
+import { createRenderer } from './common/renderer';
 
 // A springy tail that chases the pointer. The head springs toward the cursor and
 // each following bead springs toward the one ahead (math's spring2, under-
@@ -21,10 +22,9 @@ for (let i = 0; i < N; i++) chain.push(spring2.create([0, 0]));
 const target: Vec2 = [0, 0];
 const radius = (i: number) => R_HEAD + (R_TAIL - R_HEAD) * (i / (N - 1));
 
-/* ------------------------------------------------------------------ renderer */
+/* renderer */
 
-const renderer = new g.WebGPURenderer({ antialias: true });
-await renderer.init();
+const renderer = await createRenderer({ antialias: true });
 
 const canvas = renderer.domElement as HTMLCanvasElement;
 document.body.appendChild(canvas);
@@ -56,7 +56,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* ------------------------------------------------------------------ pointer */
+/* pointer */
 
 let pointerDown = false;
 let everMoved = false; // until the pointer takes over, the head orbits on its own
@@ -80,7 +80,7 @@ const release = () => {
 canvas.addEventListener('pointerup', release);
 canvas.addEventListener('pointercancel', release);
 
-/* ------------------------------------------------------------------ beads */
+/* beads */
 
 // instanced spheres: per-bead vec4 = (x, y, z, radius), rewritten each frame
 const beadData = new Float32Array(N * 4);
@@ -102,7 +102,7 @@ const beads = new g.Mesh(sphere, material);
 beads.count = N;
 scene.add(beads);
 
-/* ------------------------------------------------------------------ hint */
+/* hint */
 
 const hint = document.createElement('div');
 hint.className = 'mc-info';
@@ -111,7 +111,7 @@ hint.style.top = '16px';
 hint.textContent = 'move the pointer to lead the tail';
 document.body.appendChild(hint);
 
-/* ------------------------------------------------------------------ render */
+/* render */
 
 scene.updateWorldMatrix();
 camera.updateViewMatrix();

@@ -2,6 +2,7 @@ import * as g from 'gpucat';
 import { simplex2d } from 'math/noise';
 import { mulberry32 } from 'math/random';
 import { rainbowLineColor, time } from './common/rainbow';
+import { createRenderer } from './common/renderer';
 
 // A flow field: hundreds of particles advected along an angle field derived from
 // math's simplex2d noise, leaving fading rainbow trails. Each particle reads
@@ -44,10 +45,9 @@ function respawn(p: number) {
 }
 for (let p = 0; p < PARTICLES; p++) respawn(p);
 
-/* ------------------------------------------------------------------ renderer */
+/* renderer */
 
-const renderer = new g.WebGPURenderer({ antialias: true });
-await renderer.init();
+const renderer = await createRenderer({ antialias: true });
 
 const canvas = renderer.domElement as HTMLCanvasElement;
 document.body.appendChild(canvas);
@@ -72,7 +72,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* ------------------------------------------------------------------ trails */
+/* trails */
 
 // one line segment per consecutive pair of trail positions, across all particles
 const SEGMENTS = PARTICLES * (TRAIL - 1);
@@ -81,7 +81,7 @@ const trailsGeometry = new g.LineSegmentsGeometry(segmentPoints, SEGMENTS * 2);
 const trails = new g.LineSegments(trailsGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2.5), lineWidth: 2.5 }));
 scene.add(trails);
 
-/* ------------------------------------------------------------------ render */
+/* render */
 
 const scenePass = g.pass(scene, camera);
 const outputNode = g.fxaa(scenePass.getTextureNode());
