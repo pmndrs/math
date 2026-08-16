@@ -39,6 +39,15 @@ group('random sample 10k @random', () => {
 // Draw N raw integer words — isolates the ISAAC64 bigint tax from the
 // bigint→double conversion that `sample` adds on top.
 group('random next 10k @random', () => {
+    bench('mulberry32', function* () {
+        const state = mulberry32.create(1);
+        yield () => {
+            let sink = 0;
+            for (let i = 0; i < N; i++) sink += mulberry32.next(state);
+            return sink;
+        };
+    });
+
     bench('isaac32', function* () {
         const state = isaac32.create(1);
         yield () => {
