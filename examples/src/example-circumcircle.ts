@@ -1,12 +1,12 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { type Vec2, vec2 } from 'maath';
-import { circumcircle } from 'maath/geometry';
-import { circle } from 'maath/shapes';
-import { easing } from 'maath/time';
+import { type Vec2, vec2 } from 'math';
+import { circumcircle } from 'math/geometry';
+import { circle } from 'math/shapes';
+import { easing } from 'math/time';
 import { rainbowLineColor, time } from './common/rainbow';
 
-// A triangle that morphs between shapes, with its circumcircle (maath's
+// A triangle that morphs between shapes, with its circumcircle (math's
 // circumcircle) recomputed every frame. As the triangle flattens toward
 // degenerate the circumcircle balloons — watch the circumradius readout. The
 // ring is drawn with the flowing brand rainbow (see common/rainbow).
@@ -151,7 +151,7 @@ function frame(tms: number) {
     vec2.lerp(b, SHAPES[idx].tri[1], SHAPES[next].tri[1], local);
     vec2.lerp(c, SHAPES[idx].tri[2], SHAPES[next].tri[2], local);
 
-    // maath: circumcircle of the current triangle
+    // math: circumcircle of the current triangle
     circumcircle(circ, a, b, c);
 
     // triangle outline

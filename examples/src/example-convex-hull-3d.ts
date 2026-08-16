@@ -1,12 +1,12 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
 import GUI from 'lil-gui';
-import { mat4, quat, vec3 as v3 } from 'maath';
-import { quickhull3 } from 'maath/geometry';
-import { mulberry32 } from 'maath/random';
+import { mat4, quat, vec3 as v3 } from 'math';
+import { quickhull3 } from 'math/geometry';
+import { mulberry32 } from 'math/random';
 import { rainbowRGB, time } from './common/rainbow';
 
-// A point cloud and its convex hull (maath's quickhull3), rendered with gpucat:
+// A point cloud and its convex hull (math's quickhull3), rendered with gpucat:
 // a translucent hull shell + instanced spheres, coloured by a flowing "brand
 // rainbow" (see common/rainbow) — a palette sampled by world position and
 // animated over time, so the bands anchor to the geometry as the camera orbits.

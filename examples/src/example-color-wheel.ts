@@ -1,11 +1,11 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { color, hsl } from 'maath/color';
+import { color, hsl } from 'math/color';
 
 // An HSL colour wheel: hue around the circle, saturation from the grey centre to
 // the vivid rim (lightness fixed at 0.5). Every vertex colour is computed with
-// maath/color (hsl.toColor -> color.toSRGB). Move the pointer to pick a colour;
-// the readout shows its HSL / RGB / hex, all via maath/color.
+// math/color (hsl.toColor -> color.toSRGB). Move the pointer to pick a colour;
+// the readout shows its HSL / RGB / hex, all via math/color.
 
 const RADIUS = 1.4;
 const RINGS = 24;
@@ -51,7 +51,7 @@ function unproject(clientX: number, clientY: number): [number, number] {
 
 /* ------------------------------------------------------------------ wheel mesh */
 
-// build a triangulated disk; each vertex is coloured by maath/color
+// build a triangulated disk; each vertex is coloured by math/color
 const positions: number[] = [];
 const colors: number[] = [];
 const indices: number[] = [];

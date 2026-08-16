@@ -1,5 +1,5 @@
 // shape primitives and the spatial queries that operate on them.
-// computational-geometry algorithms (hull, circumcircle) live in maath/geometry.
+// computational-geometry algorithms (hull, circumcircle) live in math/geometry.
 export type * from '../core';
 
 export * as box3 from './box3';

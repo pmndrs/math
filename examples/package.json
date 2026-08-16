@@ -1,5 +1,5 @@
 {
-    "name": "maath-examples",
+    "name": "math-examples",
     "private": true,
     "version": "0.0.0",
     "type": "module",
@@ -11,7 +11,7 @@
         "screenshot:build": "pnpm run build && node scripts/screenshot.js"
     },
     "dependencies": {
-        "maath": "workspace:*",
+        "math": "workspace:*",
         "gpucat": "github:isaac-mason/gpucat",
         "lil-gui": "^0.20.0"
     },

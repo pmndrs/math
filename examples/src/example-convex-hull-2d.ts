@@ -1,18 +1,18 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { mat4, vec4 } from 'maath';
-import { quickhull2 } from 'maath/geometry';
-import { mulberry32 } from 'maath/random';
+import { mat4, vec4 } from 'math';
+import { quickhull2 } from 'math/geometry';
+import { mulberry32 } from 'math/random';
 import { rainbowLineColor, rainbowRGB, time } from './common/rainbow';
 
-// A drifting 2D point cloud with its convex hull (maath's quickhull2)
+// A drifting 2D point cloud with its convex hull (math's quickhull2)
 // recomputed every frame. As points wander in and out of the boundary the hull
 // polygon morphs and points light up (rainbow markers) when they join it.
 // One point is yours: move the mouse (or drag a finger) and it steers to the
 // pointer, so you can push it onto the hull and watch quickhull2 re-solve live.
 // Nothing special about that point's look — it's driven by data, so it goes grey
 // like the rest when off the hull and lights up like the rest when on it. The
-// screen point is unprojected onto the z=0 plane with maath (inverse view·proj).
+// screen point is unprojected onto the z=0 plane with math (inverse view·proj).
 
 const POINT_COUNT = 16;
 const CONTROLLED = 0; // this point follows the pointer while you interact
@@ -116,7 +116,7 @@ const steerTarget: [number, number] = [0, 0];
 let steering = false; // is the pointer currently driving the point?
 let touchDown = false; // a finger is held (touch has no hover to steer with)
 
-// unproject a screen point onto the z=0 plane using maath (inverse of proj·view)
+// unproject a screen point onto the z=0 plane using math (inverse of proj·view)
 const invVP = mat4.create();
 const rayNear = vec4.create();
 const rayFar = vec4.create();
@@ -213,7 +213,7 @@ function frame(tms: number) {
         pointDots[i].position[1] = y;
     }
 
-    // maath: convex hull, indices in ccw order
+    // math: convex hull, indices in ccw order
     const t0 = performance.now();
     const hull = quickhull2(points);
     const hullMs = performance.now() - t0;

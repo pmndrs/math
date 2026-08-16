@@ -39,7 +39,7 @@ importers:
 
   docs:
     dependencies:
-      maath:
+      math:
         specifier: workspace:^
         version: link:..
 
@@ -51,7 +51,7 @@ importers:
       lil-gui:
         specifier: ^0.20.0
         version: 0.20.0
-      maath:
+      math:
         specifier: workspace:*
         version: link:..
     devDependencies:
