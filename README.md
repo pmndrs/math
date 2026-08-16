@@ -1,20 +1,20 @@
 ```sh
-> npm install maath
+> npm install math
 ```
 
-# maath
+# math
 
-maath is a collection of math helpers for graphics and simulations.
+math is a collection of math helpers for graphics and simulations.
 
 **Features:**
 
-- Vector, Quaternion, Euler, and Matrix math (`maath`)
-- Shape primitives and spatial queries (`maath/shapes`)
-- Computational geometry - convex hulls, circumcircle (`maath/geometry`)
-- Easing and spring functions (`maath/time`)
-- Seeded randomness utilities (`maath/random`)
-- Perlin and simplex noise utilities (`maath/noise`)
-- Color and colorspace utilities (`maath/color`)
+- Vector, Quaternion, Euler, and Matrix math (`math`)
+- Shape primitives and spatial queries (`math/shapes`)
+- Computational geometry - convex hulls, circumcircle (`math/geometry`)
+- Easing and spring functions (`math/time`)
+- Seeded randomness utilities (`math/random`)
+- Perlin and simplex noise utilities (`math/noise`)
+- Color and colorspace utilities (`math/color`)
 - Simple JSON-serializable data structures (no classes or typed arrays)
 - Consistent output-argument-first API for allocation-free usage
 - TypeScript-first, great DX for both JavaScript and TypeScript projects
@@ -23,12 +23,12 @@ maath is a collection of math helpers for graphics and simulations.
 
 ## Quick Start
 
-maath types are plain arrays and objects — no classes, no typed arrays — and functions write into an output argument, so hot paths allocate nothing. Because it's all plain data, results drop straight into three.js, JSON, or a Web Worker:
+math types are plain arrays and objects — no classes, no typed arrays — and functions write into an output argument, so hot paths allocate nothing. Because it's all plain data, results drop straight into three.js, JSON, or a Web Worker:
 
 ```ts
-import { type Vec3, vec3 } from 'maath';
+import { type Vec3, vec3 } from 'math';
 
-// maath types are plain arrays — the constructors just return literals:
+// math types are plain arrays — the constructors just return literals:
 const a: Vec3 = [1, 2, 3]; // a plain-array literal
 const b = vec3.fromValues(1, 2, 3); // …exactly the same as `a`
 const out = vec3.create(); // …and create() is just [0, 0, 0]
@@ -41,11 +41,11 @@ vec3.normalize(out, out); // aliasing an argument is fine
 The library is grouped by domain behind subpath entrypoints. All APIs are highly tree-shakeable, only pay for what you use:
 
 ```ts
-import { mat4, quat, vec3 } from 'maath'; // core: vectors, quats, matrices
-import { simplex3d } from 'maath/noise'; // perlin / simplex noise
-import { mulberry32 } from 'maath/random'; // seeded rng
-import { easing, spring } from 'maath/time'; // easings & springs
-// also: maath/color, maath/geometry, maath/shapes — import only what you use
+import { mat4, quat, vec3 } from 'math'; // core: vectors, quats, matrices
+import { simplex3d } from 'math/noise'; // perlin / simplex noise
+import { mulberry32 } from 'math/random'; // seeded rng
+import { easing, spring } from 'math/time'; // easings & springs
+// also: math/color, math/geometry, math/shapes — import only what you use
 ```
 
 ## Examples
@@ -53,19 +53,19 @@ import { easing, spring } from 'maath/time'; // easings & springs
 <table>
   <tr>
     <td align="center">
-      <a href="https://pmndrs.github.io/maath/examples/#example-convex-hull-3d">
+      <a href="https://pmndrs.github.io/math/examples/#example-convex-hull-3d">
         <img src="./examples/public/screenshots/example-convex-hull-3d.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Convex Hull 3D
       </a>
     </td>
     <td align="center">
-      <a href="https://pmndrs.github.io/maath/examples/#example-convex-hull-2d">
+      <a href="https://pmndrs.github.io/math/examples/#example-convex-hull-2d">
         <img src="./examples/public/screenshots/example-convex-hull-2d.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Convex Hull 2D
       </a>
     </td>
     <td align="center">
-      <a href="https://pmndrs.github.io/maath/examples/#example-circumcircle">
+      <a href="https://pmndrs.github.io/math/examples/#example-circumcircle">
         <img src="./examples/public/screenshots/example-circumcircle.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Circumcircle
       </a>
@@ -73,19 +73,19 @@ import { easing, spring } from 'maath/time'; // easings & springs
   </tr>
   <tr>
     <td align="center">
-      <a href="https://pmndrs.github.io/maath/examples/#example-flow-field">
+      <a href="https://pmndrs.github.io/math/examples/#example-flow-field">
         <img src="./examples/public/screenshots/example-flow-field.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Flow Field
       </a>
     </td>
     <td align="center">
-      <a href="https://pmndrs.github.io/maath/examples/#example-color-wheel">
+      <a href="https://pmndrs.github.io/math/examples/#example-color-wheel">
         <img src="./examples/public/screenshots/example-color-wheel.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Color Wheel
       </a>
     </td>
     <td align="center">
-      <a href="https://pmndrs.github.io/maath/examples/#example-simplex-2d-noise-terrain">
+      <a href="https://pmndrs.github.io/math/examples/#example-simplex-2d-noise-terrain">
         <img src="./examples/public/screenshots/example-simplex-2d-noise-terrain.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Simplex 2D Noise Terrain
       </a>
@@ -93,19 +93,19 @@ import { easing, spring } from 'maath/time'; // easings & springs
   </tr>
   <tr>
     <td align="center">
-      <a href="https://pmndrs.github.io/maath/examples/#example-quaternion-slerp">
+      <a href="https://pmndrs.github.io/math/examples/#example-quaternion-slerp">
         <img src="./examples/public/screenshots/example-quaternion-slerp.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Quaternion Slerp
       </a>
     </td>
     <td align="center">
-      <a href="https://pmndrs.github.io/maath/examples/#example-spring">
+      <a href="https://pmndrs.github.io/math/examples/#example-spring">
         <img src="./examples/public/screenshots/example-spring.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Spring
       </a>
     </td>
     <td align="center">
-      <a href="https://pmndrs.github.io/maath/examples/#example-easing">
+      <a href="https://pmndrs.github.io/math/examples/#example-easing">
         <img src="./examples/public/screenshots/example-easing.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Easing
       </a>
@@ -115,7 +115,7 @@ import { easing, spring } from 'maath/time'; // easings & springs
 
 ## API Documentation
 
-**`maath`**
+**`math`**
 
 <table><tr>
 <td><a href="#epsilon"><code>EPSILON</code></a></td><td><a href="#round"><code>round</code></a></td><td><a href="#degreestoradians"><code>degreesToRadians</code></a></td><td><a href="#radianstodegrees"><code>radiansToDegrees</code></a></td>
@@ -507,7 +507,7 @@ import { easing, spring } from 'maath/time'; // easings & springs
 <td><a href="#sphericalexactequals"><code>spherical.exactEquals</code></a></td><td><a href="#sphericalstr"><code>spherical.str</code></a></td><td><a href="#sphericalangleto"><code>spherical.angleTo</code></a></td>
 </tr></table>
 
-**`maath/shapes`**
+**`math/shapes`**
 
 <table><tr>
 <td><a href="#box3"><code>Box3</code></a></td><td><a href="#obb3"><code>OBB3</code></a></td><td><a href="#plane3"><code>Plane3</code></a></td><td><a href="#sphere"><code>Sphere</code></a></td>
@@ -615,13 +615,13 @@ import { easing, spring } from 'maath/time'; // easings & springs
 <td><a href="#raycast3intersectstriangle"><code>raycast3.intersectsTriangle</code></a></td><td><a href="#raycast3intersectsbox3"><code>raycast3.intersectsBox3</code></a></td>
 </tr></table>
 
-**`maath/geometry`**
+**`math/geometry`**
 
 <table><tr>
 <td><a href="#circumcircle"><code>circumcircle</code></a></td><td><a href="#quickhull2"><code>quickhull2</code></a></td><td><a href="#quickhull3"><code>quickhull3</code></a></td>
 </tr></table>
 
-**`maath/time`**
+**`math/time`**
 
 <table><tr>
 <td><a href="#spring"><code>Spring</code></a></td>
@@ -671,7 +671,7 @@ import { easing, spring } from 'maath/time'; // easings & springs
 <td><a href="#spring4create"><code>spring4.create</code></a></td><td><a href="#spring4update"><code>spring4.update</code></a></td><td><a href="#spring4damp"><code>spring4.damp</code></a></td>
 </tr></table>
 
-**`maath/random`**
+**`math/random`**
 
 <table><tr>
 <td><a href="#isaac32"><code>Isaac32</code></a></td><td><a href="#isaac64"><code>Isaac64</code></a></td><td><a href="#mulberry32"><code>Mulberry32</code></a></td><td><a href="#randomgenerator"><code>RandomGenerator</code></a></td>
@@ -707,7 +707,7 @@ import { easing, spring } from 'maath/time'; // easings & springs
 <td><a href="#randomquat"><code>random.quat</code></a></td><td></td><td></td><td></td>
 </tr></table>
 
-**`maath/noise`**
+**`math/noise`**
 
 <table><tr>
 <td><a href="#permutation"><code>Permutation</code></a></td>
@@ -745,7 +745,7 @@ import { easing, spring } from 'maath/time'; // easings & springs
 <td><a href="#simplex3dsample"><code>simplex3d.sample</code></a></td><td></td>
 </tr></table>
 
-**`maath/color`**
+**`math/color`**
 
 <table><tr>
 <td><a href="#color"><code>Color</code></a></td><td><a href="#colorinput"><code>ColorInput</code></a></td><td><a href="#hsl"><code>HSL</code></a></td>
@@ -792,7 +792,7 @@ import { easing, spring } from 'maath/time'; // easings & springs
 
 ## Reference
 
-### `maath`
+### `math`
 
 #### `EPSILON`
 
@@ -6576,7 +6576,7 @@ export function str(a: Spherical): string;
 export function angleTo(a: Spherical, b: Spherical): number;
 ```
 
-### `maath/shapes`
+### `math/shapes`
 
 #### `Box3`
 
@@ -7428,7 +7428,7 @@ export function intersectsTriangle(out: IntersectsTriangleResult, origin: Vec3, 
 export function intersectsBox3(origin: Vec3, direction: Vec3, length: number, aabb: Box3): boolean;
 ```
 
-### `maath/geometry`
+### `math/geometry`
 
 #### `circumcircle`
 
@@ -7469,7 +7469,7 @@ export function quickhull2(points: number[]): number[];
 export function quickhull3(points: number[]): number[];
 ```
 
-### `maath/time`
+### `math/time`
 
 #### `Spring`
 
@@ -7756,7 +7756,7 @@ export function update(state: Spring<Vec4>, target: Vec4, smoothTime: number, da
 export function damp(state: Spring<Vec4>, target: Vec4, smoothTime: number, delta: number): Spring<Vec4>;
 ```
 
-### `maath/random`
+### `math/random`
 
 #### `Isaac32`
 
@@ -8134,7 +8134,7 @@ export function vec4(out: Vec4, random: RandomGenerator): Vec4;
 export function quat(out: Quat, random: RandomGenerator): Quat;
 ```
 
-### `maath/noise`
+### `math/noise`
 
 #### `Permutation`
 
@@ -8309,7 +8309,7 @@ export function create(seed: number): Simplex3DGenerator;
 export function sample({ perm, gradP }: Simplex3DGenerator, x: number, y: number, z: number): number;
 ```
 
-### `maath/color`
+### `math/color`
 
 #### `Color`
 

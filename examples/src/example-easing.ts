@@ -1,9 +1,9 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { easing } from 'maath/time';
+import { easing } from 'math/time';
 import { rainbowRGB, time } from './common/rainbow';
 
-// An easing gallery: one track per maath easing function. All dots start
+// An easing gallery: one track per math easing function. All dots start
 // together and race across, spreading apart as each follows its own pacing, then
 // ease back — the clearest way to feel the difference between the curves. A
 // playhead marks the linear time t; each dot leads or lags it by its easing.

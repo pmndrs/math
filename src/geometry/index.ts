@@ -1,5 +1,5 @@
 // computational-geometry algorithms. the shape primitives they consume and
-// produce (e.g. Circle) live in maath/shapes and are re-exported here as types.
+// produce (e.g. Circle) live in math/shapes and are re-exported here as types.
 export type * from '../core';
 export type * from '../shapes';
 

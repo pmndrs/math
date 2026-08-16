@@ -1,4 +1,4 @@
-# maath benches
+# math benches
 
 Performance benchmarks powered by [`@pmndrs/labs`](https://github.com/pmndrs/labs) — statistically rigorous benchmarking (Mann-Whitney U, Cliff's delta, adaptive sampling) with baseline comparison.
 
@@ -21,7 +21,7 @@ pnpm bench run            # run without saving
 
 - `core/`, `noise/` — micro benches of individual functions in tight loops (`@core`, `@noise`)
 - `algorithms/` — composite benches (`@algo`) that implement a complete minimal feature from
-  navigation/collision-style libraries, exercising many maath functions together: funnel string
+  navigation/collision-style libraries, exercising many math functions together: funnel string
   pulling (`@nav`), frustum culling (`@culling`), closest-hit raycasting (`@raycast`), transform
   hierarchy propagation (`@scene`), and a full sphere physics step (`@physics`)
 

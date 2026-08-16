@@ -1,10 +1,10 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { type Euler, euler, type Quat, quat } from 'maath';
-import { mulberry32 } from 'maath/random';
+import { type Euler, euler, type Quat, quat } from 'math';
+import { mulberry32 } from 'math/random';
 
 // One orientation, two ways to interpolate it between random keyframes. The solid
-// colour-cube uses maath's quat.slerp (constant-speed shortest arc). The
+// colour-cube uses math's quat.slerp (constant-speed shortest arc). The
 // translucent white ghost around it lerps euler angles instead
 // (euler.fromQuat -> lerp -> quat.fromEuler) — the naive approach. They coincide
 // at every keyframe, but between them the ghost twists off-axis: that gap is the
@@ -122,7 +122,7 @@ function frame(tms: number) {
     const kn = (k + 1) % KEYFRAMES;
     const local = seg - Math.floor(seg); // linear 0..1 so speed differences show
 
-    // maath: slerp — constant angular velocity along the shortest arc
+    // math: slerp — constant angular velocity along the shortest arc
     quat.slerp(slerpBox.quaternion, keyframes[k], keyframes[kn], local);
 
     // naive: interpolate euler angles instead

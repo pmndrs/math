@@ -1,9 +1,9 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { simplex2d } from 'maath/noise';
+import { simplex2d } from 'math/noise';
 import { rainbowRGB, time } from './common/rainbow';
 
-// A rolling terrain: a grid mesh whose vertex heights come from maath's
+// A rolling terrain: a grid mesh whose vertex heights come from math's
 // simplex2d noise (two octaves), scrolling over time like a fly-over. Normals are
 // rebuilt from the height field each frame for shading, and the surface is lit ×
 // the flowing brand rainbow (coloured by world position).
@@ -94,7 +94,7 @@ function updateTerrain(t: number) {
             const idx = j * GRID + i;
             const x = posArray[idx * 3];
             const z = posArray[idx * 3 + 2] + scroll;
-            // maath: two octaves of simplex noise
+            // math: two octaves of simplex noise
             const n1 = simplex2d.sample(noise, x * FREQ, z * FREQ);
             const n2 = simplex2d.sample(noise, x * FREQ * 2.3, z * FREQ * 2.3);
             const y = (n1 + n2 * 0.4) * AMP;

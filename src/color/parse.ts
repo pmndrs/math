@@ -212,7 +212,7 @@ function parse(input: ColorInput): Color | null {
         return parseHex6(`#${hex.toString(16).padStart(6, '0')}`);
     }
 
-    console.warn(`[maath] color: unrecognised color input: "${input}"`);
+    console.warn(`[math] color: unrecognised color input: "${input}"`);
     return null;
 }
 

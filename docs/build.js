@@ -9,8 +9,8 @@ import ts from 'typescript';
 //   <TOC />                                          - table of contents from ## headings
 //   <Snippet source="./file.ts" select="group" />   - a marked snippet from a doc source file
 //   <Snippet source="./file.ts" />                   - the entire doc source file
-//   <RenderType type="import('maath').Name" />     - a type/function signature, from source
-//   <RenderSource type="import('maath').Name" />   - the full source of a type/function
+//   <RenderType type="import('math').Name" />     - a type/function signature, from source
+//   <RenderSource type="import('math').Name" />   - the full source of a type/function
 
 const here = path.dirname(new URL(import.meta.url).pathname);
 const projectRoot = path.join(here, '..');
@@ -45,7 +45,7 @@ const tsProgram = ts.createProgram(sourceFiles, {
 const checker = tsProgram.getTypeChecker();
 
 // resolve a package import specifier to its source directory, using package.json exports.
-// e.g. "maath" -> src, "maath/shapes" -> src/shapes (types: ./dist/src/shapes/index.d.ts)
+// e.g. "math" -> src, "math/shapes" -> src/shapes (types: ./dist/src/shapes/index.d.ts)
 function resolveModuleToSourceDir(modulePath) {
     if (modulePath === packageName) return srcDir;
     const subpath = modulePath.replace(`${packageName}/`, '');
@@ -285,7 +285,7 @@ function generateApiDocs() {
 /* Example galleries read from examples/src/examples.json, screenshots from
  * examples/public/screenshots/<key>.png, linking to the live examples browser. */
 const EXAMPLES_COLS = 3;
-const EXAMPLE_PAGES_BASE = 'https://pmndrs.github.io/maath/examples/#';
+const EXAMPLE_PAGES_BASE = 'https://pmndrs.github.io/math/examples/#';
 const examplesJsonPath = path.join(here, '../examples/src/examples.json');
 
 function loadExamples() {
@@ -363,7 +363,7 @@ for (const match of readmeText.matchAll(/^(#{2,2})\s+(.*)$/gm)) {
 }
 readmeText = readmeText.replace(/<TOC\s*\/>/g, tocLines.join('\n'));
 
-/* <RenderType type="import('maath/x').TypeName" /> */
+/* <RenderType type="import('math/x').TypeName" /> */
 readmeText = readmeText.replace(
     /<RenderType\s+type=["']import\(['"]([^'"]+)['"]\)\.(\w+)["']\s*\/>/g,
     (fullMatch, modulePath, typeName) => {
@@ -376,7 +376,7 @@ readmeText = readmeText.replace(
     },
 );
 
-/* <RenderSource type="import('maath/x').TypeName" /> */
+/* <RenderSource type="import('math/x').TypeName" /> */
 readmeText = readmeText.replace(
     /<RenderSource\s+type=["']import\(['"]([^'"]+)['"]\)\.(\w+)["']\s*\/>/g,
     (fullMatch, modulePath, typeName) => {

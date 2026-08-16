@@ -2,7 +2,7 @@ import type { Color } from './color';
 
 // Color-space conversions (pure functions — no global working-space state).
 //
-// maath's Color is stored in linear sRGB. Two kinds of conversion live here:
+// math's Color is stored in linear sRGB. Two kinds of conversion live here:
 //   - transfer functions: encode/decode a channel's gamma (sRGB <-> linear)
 //   - gamut conversions:   move between primaries (linear sRGB <-> linear Display-P3)
 // Display-P3 uses the same sRGB transfer curve, so only the primaries differ.

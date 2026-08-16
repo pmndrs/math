@@ -1,11 +1,11 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { type Spring, spring2 } from 'maath/time';
-import type { Vec2 } from 'maath';
+import { type Spring, spring2 } from 'math/time';
+import type { Vec2 } from 'math';
 import { rainbowRGB, time } from './common/rainbow';
 
 // A springy tail that chases the pointer. The head springs toward the cursor and
-// each following bead springs toward the one ahead (maath's spring2, under-
+// each following bead springs toward the one ahead (math's spring2, under-
 // damped so it overshoots and settles). Move the pointer (or drag on touch) to
 // whip it around. Beads are instanced spheres, tapering and rainbow-coloured.
 

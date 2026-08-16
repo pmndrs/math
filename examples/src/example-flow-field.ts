@@ -1,10 +1,10 @@
 import * as g from 'gpucat';
-import { simplex2d } from 'maath/noise';
-import { mulberry32 } from 'maath/random';
+import { simplex2d } from 'math/noise';
+import { mulberry32 } from 'math/random';
 import { rainbowLineColor, time } from './common/rainbow';
 
 // A flow field: hundreds of particles advected along an angle field derived from
-// maath's simplex2d noise, leaving fading rainbow trails. Each particle reads
+// math's simplex2d noise, leaving fading rainbow trails. Each particle reads
 // the noise at its position to pick a heading, drifts along it, and respawns when
 // it wanders off or ages out — so the field is continuously traced by streams.
 
