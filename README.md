@@ -730,23 +730,12 @@ export const EPSILON = 0.000001;
  *
  * @param a value to round
  */
-/**
- * Symmetric round
- * see https://www.npmjs.com/package/round-half-up-symmetric#user-content-detailed-background
- *
- * @param a value to round
- */
 export function round(a: number): number;
 ```
 
 #### `degreesToRadians`
 
 ```ts
-/**
- * Converts Degrees To Radians
- *
- * @param a Angle in Degrees
- */
 /**
  * Converts Degrees To Radians
  *
@@ -763,26 +752,12 @@ export function degreesToRadians(degrees: number): number;
  *
  * @param a Angle in Radians
  */
-/**
- * Converts Radians To Degrees
- *
- * @param a Angle in Radians
- */
 export function radiansToDegrees(radians: number): number;
 ```
 
 #### `equals`
 
 ```ts
-/**
- * Tests whether or not the arguments have approximately the same value, within an absolute
- * or relative tolerance of glMatrix.EPSILON (an absolute tolerance is used for values less
- * than or equal to 1.0, and a relative tolerance is used for larger values)
- *
- * @param a The first number to test.
- * @param b The second number to test.
- * @returns True if the numbers are approximately equal, false otherwise.
- */
 /**
  * Tests whether or not the arguments have approximately the same value, within an absolute
  * or relative tolerance of glMatrix.EPSILON (an absolute tolerance is used for values less
@@ -806,29 +781,12 @@ export function equals(a: number, b: number, epsilon = EPSILON): boolean;
  * @param t
  * @returns
  */
-/**
- * Ease-in-out, goes to -Infinite before 0 and Infinite after 1
- *
- * https://www.desmos.com/calculator/vsnmlaljdu
- *
- * @param t
- * @returns
- */
 export function fade(t: number);
 ```
 
 #### `lerp`
 
 ```ts
-/**
- *
- * Returns the result of linearly interpolating between input A and input B by input T.
- *
- * @param v0
- * @param v1
- * @param t
- * @returns
- */
 /**
  *
  * Returns the result of linearly interpolating between input A and input B by input T.
@@ -856,18 +814,12 @@ export function clamp(value: number, min: number, max: number): number;
 /**
  * Loops `t` so that it is never larger than `length` and never smaller than 0.
  */
-/**
- * Loops `t` so that it is never larger than `length` and never smaller than 0.
- */
 export function repeat(t: number, length: number): number;
 ```
 
 #### `deltaAngle`
 
 ```ts
-/**
- * Calculates the shortest signed difference between two angles (in radians).
- */
 /**
  * Calculates the shortest signed difference between two angles (in radians).
  */
@@ -880,18 +832,12 @@ export function deltaAngle(current: number, target: number): number;
 /**
  * Remaps a number from one range to another.
  */
-/**
- * Remaps a number from one range to another.
- */
 export function remap(number: number, inLow: number, inHigh: number, outLow: number, outHigh: number): number;
 ```
 
 #### `remapClamp`
 
 ```ts
-/**
- * Remaps a number from one range to another, clamping the result to the output range.
- */
 /**
  * Remaps a number from one range to another, clamping the result to the output range.
  */
@@ -1080,23 +1026,12 @@ export type Spherical = [
  *
  * @returns a new 2D vector
  */
-/**
- * Creates a new, empty vec2
- *
- * @returns a new 2D vector
- */
 export function create(): Vec2;
 ```
 
 #### `vec2.clone`
 
 ```ts
-/**
- * Creates a new vec2 initialized with values from an existing vector
- *
- * @param a vector to clone
- * @returns a new 2D vector
- */
 /**
  * Creates a new vec2 initialized with values from an existing vector
  *
@@ -1116,26 +1051,12 @@ export function clone(a: Vec2): Vec2;
  * @param y Y component
  * @returns a new 2D vector
  */
-/**
- * Creates a new vec2 initialized with the given values
- *
- * @param x X component
- * @param y Y component
- * @returns a new 2D vector
- */
 export function fromValues(x: number, y: number): Vec2;
 ```
 
 #### `vec2.copy`
 
 ```ts
-/**
- * Copy the values from one vec2 to another
- *
- * @param out the receiving vector
- * @param a the source vector
- * @returns out
- */
 /**
  * Copy the values from one vec2 to another
  *
@@ -1157,27 +1078,12 @@ export function copy(out: Vec2, a: Vec2): Vec2;
  * @param y Y component
  * @returns out
  */
-/**
- * Set the components of a vec2 to the given values
- *
- * @param out the receiving vector
- * @param x X component
- * @param y Y component
- * @returns out
- */
 export function set(out: Vec2, x: number, y: number): Vec2;
 ```
 
 #### `vec2.fromBuffer`
 
 ```ts
-/**
- * Sets the components of a vec2 from a buffer
- * @param out the receiving vector
- * @param buffer the source buffer
- * @param startIndex the starting index in the buffer
- * @returns out
- */
 /**
  * Sets the components of a vec2 from a buffer
  * @param out the receiving vector
@@ -1198,27 +1104,12 @@ export function fromBuffer(out: Vec2, buffer: ArrayLike<number>, startIndex: num
  * @param startIndex The starting index in the buffer
  * @returns The output buffer
  */
-/**
- * Writes the components of a vec2 to a buffer
- * @param outBuffer The output buffer
- * @param vec The source vector
- * @param startIndex The starting index in the buffer
- * @returns The output buffer
- */
 export function toBuffer(outBuffer: MutableArrayLike<number>, vec: Vec2, startIndex: number): MutableArrayLike<number>;
 ```
 
 #### `vec2.add`
 
 ```ts
-/**
- * Adds two vec2's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Adds two vec2's
  *
@@ -1241,28 +1132,12 @@ export function add(out: Vec2, a: Vec2, b: Vec2): Vec2;
  * @param b the scalar value to add
  * @returns out
  */
-/**
- * Adds a scalar value to all components of a vec2
- *
- * @param out the receiving vector
- * @param a the source vector
- * @param b the scalar value to add
- * @returns out
- */
 export function addScalar(out: Vec2, a: Vec2, b: number): Vec2;
 ```
 
 #### `vec2.subtract`
 
 ```ts
-/**
- * Subtracts vector b from vector a
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Subtracts vector b from vector a
  *
@@ -1285,28 +1160,12 @@ export function subtract(out: Vec2, a: Vec2, b: Vec2): Vec2;
  * @param b the scalar value to subtract
  * @returns out
  */
-/**
- * Subtracts a scalar value from all components of a vec2
- *
- * @param out the receiving vector
- * @param a the source vector
- * @param b the scalar value to subtract
- * @returns out
- */
 export function subtractScalar(out: Vec2, a: Vec2, b: number): Vec2;
 ```
 
 #### `vec2.multiply`
 
 ```ts
-/**
- * Multiplies two vec2's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Multiplies two vec2's
  *
@@ -1329,27 +1188,12 @@ export function multiply(out: Vec2, a: Vec2, b: Vec2): Vec2;
  * @param b the second operand
  * @returns out
  */
-/**
- * Divides two vec2's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function divide(out: Vec2, a: Vec2, b: Vec2): Vec2;
 ```
 
 #### `vec2.ceil`
 
 ```ts
-/**
- * Math.ceil the components of a vec2
- *
- * @param out the receiving vector
- * @param a vector to ceil
- * @returns out
- */
 /**
  * Math.ceil the components of a vec2
  *
@@ -1370,27 +1214,12 @@ export function ceil(out: Vec2, a: Vec2): Vec2;
  * @param a vector to floor
  * @returns out
  */
-/**
- * Math.floor the components of a vec2
- *
- * @param out the receiving vector
- * @param a vector to floor
- * @returns out
- */
 export function floor(out: Vec2, a: Vec2): Vec2;
 ```
 
 #### `vec2.min`
 
 ```ts
-/**
- * Returns the minimum of two vec2's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Returns the minimum of two vec2's
  *
@@ -1413,14 +1242,6 @@ export function min(out: Vec2, a: Vec2, b: Vec2): Vec2;
  * @param b the second operand
  * @returns out
  */
-/**
- * Returns the maximum of two vec2's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function max(out: Vec2, a: Vec2, b: Vec2): Vec2;
 ```
 
@@ -1434,27 +1255,12 @@ export function max(out: Vec2, a: Vec2, b: Vec2): Vec2;
  * @param a vector to round
  * @returns out
  */
-/**
- * symmetric round the components of a vec2
- *
- * @param out the receiving vector
- * @param a vector to round
- * @returns out
- */
 export function round(out: Vec2, a: Vec2): Vec2;
 ```
 
 #### `vec2.scale`
 
 ```ts
-/**
- * Scales a vec2 by a scalar number
- *
- * @param out the receiving vector
- * @param a the vector to scale
- * @param b amount to scale the vector by
- * @returns out
- */
 /**
  * Scales a vec2 by a scalar number
  *
@@ -1478,28 +1284,12 @@ export function scale(out: Vec2, a: Vec2, b: number): Vec2;
  * @param scale the amount to scale b by before adding
  * @returns out
  */
-/**
- * Adds two vec2's after scaling the second operand by a scalar value
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param scale the amount to scale b by before adding
- * @returns out
- */
 export function scaleAndAdd(out: Vec2, a: Vec2, b: Vec2, scale: number): Vec2;
 ```
 
 #### `vec2.distance`
 
 ```ts
-/**
- * Calculates the euclidian distance between two vec2's
- *
- * @param a the first operand
- * @param b the second operand
- * @returns distance between a and b
- */
 /**
  * Calculates the euclidian distance between two vec2's
  *
@@ -1520,25 +1310,12 @@ export function distance(a: Vec2, b: Vec2): number;
  * @param b the second operand
  * @returns squared distance between a and b
  */
-/**
- * Calculates the squared euclidian distance between two vec2's
- *
- * @param a the first operand
- * @param b the second operand
- * @returns squared distance between a and b
- */
 export function squaredDistance(a: Vec2, b: Vec2): number;
 ```
 
 #### `vec2.length`
 
 ```ts
-/**
- * Calculates the length of a vec2
- *
- * @param a vector to calculate length of
- * @returns length of a
- */
 /**
  * Calculates the length of a vec2
  *
@@ -1557,25 +1334,12 @@ export function length(a: Vec2): number;
  * @param a vector to calculate squared length of
  * @returns squared length of a
  */
-/**
- * Calculates the squared length of a vec2
- *
- * @param a vector to calculate squared length of
- * @returns squared length of a
- */
 export function squaredLength(a: Vec2): number;
 ```
 
 #### `vec2.negate`
 
 ```ts
-/**
- * Negates the components of a vec2
- *
- * @param out the receiving vector
- * @param a vector to negate
- * @returns out
- */
 /**
  * Negates the components of a vec2
  *
@@ -1596,26 +1360,12 @@ export function negate(out: Vec2, a: Vec2): Vec2;
  * @param a vector to invert
  * @returns out
  */
-/**
- * Returns the inverse of the components of a vec2
- *
- * @param out the receiving vector
- * @param a vector to invert
- * @returns out
- */
 export function inverse(out: Vec2, a: Vec2): Vec2;
 ```
 
 #### `vec2.normalize`
 
 ```ts
-/**
- * Normalize a vec2
- *
- * @param out the receiving vector
- * @param a vector to normalize
- * @returns out
- */
 /**
  * Normalize a vec2
  *
@@ -1636,28 +1386,12 @@ export function normalize(out: Vec2, a: Vec2): Vec2;
  * @param b the second operand
  * @returns dot product of a and b
  */
-/**
- * Calculates the dot product of two vec2's
- *
- * @param a the first operand
- * @param b the second operand
- * @returns dot product of a and b
- */
 export function dot(a: Vec2, b: Vec2): number;
 ```
 
 #### `vec2.cross`
 
 ```ts
-/**
- * Computes the cross product of two vec2's
- * Note that the cross product must by definition produce a 3D vector
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Computes the cross product of two vec2's
  * Note that the cross product must by definition produce a 3D vector
@@ -1682,29 +1416,12 @@ export function cross(out: Vec3, a: Vec2, b: Vec2): Vec3;
  * @param t interpolation amount, in the range [0-1], between the two inputs
  * @returns out
  */
-/**
- * Performs a linear interpolation between two vec2's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param t interpolation amount, in the range [0-1], between the two inputs
- * @returns out
- */
 export function lerp(out: Vec2, a: Vec2, b: Vec2, t: number): Vec2;
 ```
 
 #### `vec2.transformMat2`
 
 ```ts
-/**
- * Transforms the vec2 with a mat2
- *
- * @param out the receiving vector
- * @param a the vector to transform
- * @param m matrix to transform with
- * @returns out
- */
 /**
  * Transforms the vec2 with a mat2
  *
@@ -1727,29 +1444,12 @@ export function transformMat2(out: Vec2, a: Vec2, m: Mat2): Vec2;
  * @param m matrix to transform with
  * @returns out
  */
-/**
- * Transforms the vec2 with a mat2d
- *
- * @param out the receiving vector
- * @param a the vector to transform
- * @param m matrix to transform with
- * @returns out
- */
 export function transformMat2d(out: Vec2, a: Vec2, m: Mat2d): Vec2;
 ```
 
 #### `vec2.transformMat3`
 
 ```ts
-/**
- * Transforms the vec2 with a mat3
- * 3rd vector component is implicitly '1'
- *
- * @param out the receiving vector
- * @param a the vector to transform
- * @param m matrix to transform with
- * @returns out
- */
 /**
  * Transforms the vec2 with a mat3
  * 3rd vector component is implicitly '1'
@@ -1775,30 +1475,12 @@ export function transformMat3(out: Vec2, a: Vec2, m: Mat3): Vec2;
  * @param m matrix to transform with
  * @returns out
  */
-/**
- * Transforms the vec2 with a mat4
- * 3rd vector component is implicitly '0'
- * 4th vector component is implicitly '1'
- *
- * @param out the receiving vector
- * @param a the vector to transform
- * @param m matrix to transform with
- * @returns out
- */
 export function transformMat4(out: Vec2, a: Vec2, m: Mat4): Vec2;
 ```
 
 #### `vec2.rotate`
 
 ```ts
-/**
- * Rotate a 2D vector
- * @param out The receiving vec2
- * @param a The vec2 point to rotate
- * @param b The origin of the rotation
- * @param rad The angle of rotation in radians
- * @returns out
- */
 /**
  * Rotate a 2D vector
  * @param out The receiving vec2
@@ -1819,24 +1501,12 @@ export function rotate(out: Vec2, a: Vec2, b: Vec2, rad: number): Vec2;
  * @param b The second operand
  * @returns The angle in radians
  */
-/**
- * Get the angle between two 2D vectors
- * @param a The first operand
- * @param b The second operand
- * @returns The angle in radians
- */
 export function angle(a: Vec2, b: Vec2): number;
 ```
 
 #### `vec2.zero`
 
 ```ts
-/**
- * Set the components of a vec2 to zero
- *
- * @param out the receiving vector
- * @returns out
- */
 /**
  * Set the components of a vec2 to zero
  *
@@ -1855,25 +1525,12 @@ export function zero(out: Vec2): Vec2;
  * @param a vector to represent as a string
  * @returns string representation of the vector
  */
-/**
- * Returns a string representation of a vector
- *
- * @param a vector to represent as a string
- * @returns string representation of the vector
- */
 export function str(a: Vec2): string;
 ```
 
 #### `vec2.exactEquals`
 
 ```ts
-/**
- * Returns whether or not the vectors exactly have the same elements in the same position (when compared with ===)
- *
- * @param a The first vector.
- * @param b The second vector.
- * @returns True if the vectors are equal, false otherwise.
- */
 /**
  * Returns whether or not the vectors exactly have the same elements in the same position (when compared with ===)
  *
@@ -1894,24 +1551,12 @@ export function exactEquals(a: Vec2, b: Vec2): boolean;
  * @param b The second vector.
  * @returns True if the vectors are equal, false otherwise.
  */
-/**
- * Returns whether or not the vectors have approximately the same elements in the same position.
- *
- * @param a The first vector.
- * @param b The second vector.
- * @returns True if the vectors are equal, false otherwise.
- */
 export function equals(a: Vec2, b: Vec2): boolean;
 ```
 
 #### `vec2.finite`
 
 ```ts
-/**
- * Returns whether or not the vector is finite
- * @param a vector to test
- * @returns whether or not the vector is finite
- */
 /**
  * Returns whether or not the vector is finite
  * @param a vector to test
@@ -1993,11 +1638,6 @@ export const sqrLen = squaredLength;
  *
  * @returns a new 3D vector
  */
-/**
- * Creates a new, empty vec3
- *
- * @returns a new 3D vector
- */
 export function create(): Vec3;
 ```
 
@@ -2010,24 +1650,12 @@ export function create(): Vec3;
  * @param a vector to clone
  * @returns a new 3D vector
  */
-/**
- * Creates a new vec3 initialized with values from an existing vector
- *
- * @param a vector to clone
- * @returns a new 3D vector
- */
 export function clone(a: Vec3): Vec3;
 ```
 
 #### `vec3.length`
 
 ```ts
-/**
- * Calculates the length of a vec3
- *
- * @param a vector to calculate length of
- * @returns length of a
- */
 /**
  * Calculates the length of a vec3
  *
@@ -2048,27 +1676,12 @@ export function length(a: Vec3): number;
  * @param z Z component
  * @returns a new 3D vector
  */
-/**
- * Creates a new vec3 initialized with the given values
- *
- * @param x X component
- * @param y Y component
- * @param z Z component
- * @returns a new 3D vector
- */
 export function fromValues(x: number, y: number, z: number): Vec3;
 ```
 
 #### `vec3.copy`
 
 ```ts
-/**
- * Copy the values from one vec3 to another
- *
- * @param out the receiving vector
- * @param a the source vector
- * @returns out
- */
 /**
  * Copy the values from one vec3 to another
  *
@@ -2091,28 +1704,12 @@ export function copy(out: Vec3, a: Vec3): Vec3;
  * @param z Z component
  * @returns out
  */
-/**
- * Set the components of a vec3 to the given values
- *
- * @param out the receiving vector
- * @param x X component
- * @param y Y component
- * @param z Z component
- * @returns out
- */
 export function set(out: Vec3, x: number, y: number, z: number): Vec3;
 ```
 
 #### `vec3.setScalar`
 
 ```ts
-/**
- * Sets all components of a vec3 to the given scalar value
- *
- * @param out the receiving vector
- * @param s scalar value to set
- * @returns out
- */
 /**
  * Sets all components of a vec3 to the given scalar value
  *
@@ -2133,13 +1730,6 @@ export function setScalar(out: Vec3, s: number): Vec3;
  * @param startIndex the starting index in the buffer
  * @returns out
  */
-/**
- * Sets the components of a vec3 from a buffer
- * @param out the receiving vector
- * @param buffer the source buffer
- * @param startIndex the starting index in the buffer
- * @returns out
- */
 export function fromBuffer(out: Vec3, buffer: ArrayLike<number>, startIndex: number): Vec3;
 ```
 
@@ -2153,27 +1743,12 @@ export function fromBuffer(out: Vec3, buffer: ArrayLike<number>, startIndex: num
  * @param startIndex The starting index in the buffer
  * @returns The output buffer
  */
-/**
- * Writes the components of a vec3 to a buffer
- * @param outBuffer The output buffer
- * @param vec The source vector
- * @param startIndex The starting index in the buffer
- * @returns The output buffer
- */
 export function toBuffer(outBuffer: MutableArrayLike<number>, vec: Vec3, startIndex: number): MutableArrayLike<number>;
 ```
 
 #### `vec3.add`
 
 ```ts
-/**
- * Adds two vec3's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Adds two vec3's
  *
@@ -2196,28 +1771,12 @@ export function add(out: Vec3, a: Vec3, b: Vec3): Vec3;
  * @param b the scalar value to add
  * @returns out
  */
-/**
- * Adds a scalar value to all components of a vec3
- *
- * @param out the receiving vector
- * @param a the source vector
- * @param b the scalar value to add
- * @returns out
- */
 export function addScalar(out: Vec3, a: Vec3, b: number): Vec3;
 ```
 
 #### `vec3.subtract`
 
 ```ts
-/**
- * Subtracts vector b from vector a
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Subtracts vector b from vector a
  *
@@ -2240,28 +1799,12 @@ export function subtract(out: Vec3, a: Vec3, b: Vec3): Vec3;
  * @param b the scalar value to subtract
  * @returns out
  */
-/**
- * Subtracts a scalar value from all components of a vec3
- *
- * @param out the receiving vector
- * @param a the source vector
- * @param b the scalar value to subtract
- * @returns out
- */
 export function subtractScalar(out: Vec3, a: Vec3, b: number): Vec3;
 ```
 
 #### `vec3.multiply`
 
 ```ts
-/**
- * Multiplies two vec3's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Multiplies two vec3's
  *
@@ -2284,27 +1827,12 @@ export function multiply(out: Vec3, a: Vec3, b: Vec3): Vec3;
  * @param b the second operand
  * @returns out
  */
-/**
- * Divides two vec3's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function divide(out: Vec3, a: Vec3, b: Vec3): Vec3;
 ```
 
 #### `vec3.ceil`
 
 ```ts
-/**
- * Math.ceil the components of a vec3
- *
- * @param out the receiving vector
- * @param a vector to ceil
- * @returns out
- */
 /**
  * Math.ceil the components of a vec3
  *
@@ -2325,27 +1853,12 @@ export function ceil(out: Vec3, a: Vec3): Vec3;
  * @param a vector to floor
  * @returns out
  */
-/**
- * Math.floor the components of a vec3
- *
- * @param out the receiving vector
- * @param a vector to floor
- * @returns out
- */
 export function floor(out: Vec3, a: Vec3): Vec3;
 ```
 
 #### `vec3.min`
 
 ```ts
-/**
- * Returns the minimum of two vec3's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Returns the minimum of two vec3's
  *
@@ -2368,14 +1881,6 @@ export function min(out: Vec3, a: Vec3, b: Vec3): Vec3;
  * @param b the second operand
  * @returns out
  */
-/**
- * Returns the maximum of two vec3's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function max(out: Vec3, a: Vec3, b: Vec3): Vec3;
 ```
 
@@ -2389,27 +1894,12 @@ export function max(out: Vec3, a: Vec3, b: Vec3): Vec3;
  * @param a vector to round
  * @returns out
  */
-/**
- * symmetric round the components of a vec3
- *
- * @param out the receiving vector
- * @param a vector to round
- * @returns out
- */
 export function round(out: Vec3, a: Vec3): Vec3;
 ```
 
 #### `vec3.scale`
 
 ```ts
-/**
- * Scales a vec3 by a scalar number
- *
- * @param out the receiving vector
- * @param a the vector to scale
- * @param b amount to scale the vector by
- * @returns out
- */
 /**
  * Scales a vec3 by a scalar number
  *
@@ -2433,28 +1923,12 @@ export function scale(out: Vec3, a: Vec3, b: number): Vec3;
  * @param scale the amount to scale b by before adding
  * @returns out
  */
-/**
- * Adds two vec3's after scaling the second operand by a scalar value
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param scale the amount to scale b by before adding
- * @returns out
- */
 export function scaleAndAdd(out: Vec3, a: Vec3, b: Vec3, scale: number): Vec3;
 ```
 
 #### `vec3.distance`
 
 ```ts
-/**
- * Calculates the euclidian distance between two vec3's
- *
- * @param a the first operand
- * @param b the second operand
- * @returns distance between a and b
- */
 /**
  * Calculates the euclidian distance between two vec3's
  *
@@ -2475,13 +1949,6 @@ export function distance(a: Vec3, b: Vec3): number;
  * @param b the second operand
  * @returns squared distance between a and b
  */
-/**
- * Calculates the squared euclidian distance between two vec3's
- *
- * @param a the first operand
- * @param b the second operand
- * @returns squared distance between a and b
- */
 export function squaredDistance(a: Vec3, b: Vec3): number;
 ```
 
@@ -2494,25 +1961,12 @@ export function squaredDistance(a: Vec3, b: Vec3): number;
  * @param a vector to calculate squared length of
  * @returns squared length of a
  */
-/**
- * Calculates the squared length of a vec3
- *
- * @param a vector to calculate squared length of
- * @returns squared length of a
- */
 export function squaredLength(a: Vec3): number;
 ```
 
 #### `vec3.negate`
 
 ```ts
-/**
- * Negates the components of a vec3
- *
- * @param out the receiving vector
- * @param a vector to negate
- * @returns out
- */
 /**
  * Negates the components of a vec3
  *
@@ -2533,26 +1987,12 @@ export function negate(out: Vec3, a: Vec3): Vec3;
  * @param a vector to invert
  * @returns out
  */
-/**
- * Returns the inverse of the components of a vec3
- *
- * @param out the receiving vector
- * @param a vector to invert
- * @returns out
- */
 export function inverse(out: Vec3, a: Vec3): Vec3;
 ```
 
 #### `vec3.normalize`
 
 ```ts
-/**
- * Normalize a vec3
- *
- * @param out the receiving vector
- * @param a vector to normalize
- * @returns out
- */
 /**
  * Normalize a vec3
  *
@@ -2573,27 +2013,12 @@ export function normalize(out: Vec3, a: Vec3): Vec3;
  * @param b the second operand
  * @returns dot product of a and b
  */
-/**
- * Calculates the dot product of two vec3's
- *
- * @param a the first operand
- * @param b the second operand
- * @returns dot product of a and b
- */
 export function dot(a: Vec3, b: Vec3): number;
 ```
 
 #### `vec3.cross`
 
 ```ts
-/**
- * Computes the cross product of two vec3's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Computes the cross product of two vec3's
  *
@@ -2616,29 +2041,12 @@ export function cross(out: Vec3, a: Vec3, b: Vec3): Vec3;
  * @param a the source vector
  * @returns the out vector
  */
-/**
- * Calculates a normalized perpendicular vector to the given vector.
- * Useful for finding an arbitrary orthogonal basis vector.
- *
- * @param out the receiving vector
- * @param a the source vector
- * @returns the out vector
- */
 export function perpendicular(out: Vec3, a: Vec3): Vec3;
 ```
 
 #### `vec3.lerp`
 
 ```ts
-/**
- * Performs a linear interpolation between two vec3's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param t interpolation amount, in the range [0-1], between the two inputs
- * @returns out
- */
 /**
  * Performs a linear interpolation between two vec3's
  *
@@ -2663,32 +2071,12 @@ export function lerp(out: Vec3, a: Vec3, b: Vec3, t: number): Vec3;
  * @param t interpolation amount, in the range [0-1], between the two inputs
  * @returns out
  */
-/**
- * Performs a spherical linear interpolation between two vec3's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param t interpolation amount, in the range [0-1], between the two inputs
- * @returns out
- */
 export function slerp(out: Vec3, a: Vec3, b: Vec3, t: number): Vec3;
 ```
 
 #### `vec3.hermite`
 
 ```ts
-/**
- * Performs a hermite interpolation with two control points
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param c the third operand
- * @param d the fourth operand
- * @param t interpolation amount, in the range [0-1], between the two inputs
- * @returns out
- */
 /**
  * Performs a hermite interpolation with two control points
  *
@@ -2717,32 +2105,12 @@ export function hermite(out: Vec3, a: Vec3, b: Vec3, c: Vec3, d: Vec3, t: number
  * @param t interpolation amount, in the range [0-1], between the two inputs
  * @returns out
  */
-/**
- * Performs a bezier interpolation with two control points
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param c the third operand
- * @param d the fourth operand
- * @param t interpolation amount, in the range [0-1], between the two inputs
- * @returns out
- */
 export function bezier(out: Vec3, a: Vec3, b: Vec3, c: Vec3, d: Vec3, t: number): Vec3;
 ```
 
 #### `vec3.transformMat4`
 
 ```ts
-/**
- * Transforms the vec3 with a mat4.
- * 4th vector component is implicitly '1'
- *
- * @param out the receiving vector
- * @param a the vector to transform
- * @param m matrix to transform with
- * @returns out
- */
 /**
  * Transforms the vec3 with a mat4.
  * 4th vector component is implicitly '1'
@@ -2766,29 +2134,12 @@ export function transformMat4(out: Vec3, a: Vec3, m: Mat4): Vec3;
  * @param m the 3x3 matrix to transform with
  * @returns out
  */
-/**
- * Transforms the vec3 with a mat3.
- *
- * @param out the receiving vector
- * @param a the vector to transform
- * @param m the 3x3 matrix to transform with
- * @returns out
- */
 export function transformMat3(out: Vec3, a: Vec3, m: Mat3): Vec3;
 ```
 
 #### `vec3.transformQuat`
 
 ```ts
-/**
- * Transforms the vec3 with a quat
- * Can also be used for dual quaternions. (Multiply it with the real part)
- *
- * @param out the receiving vector
- * @param a the vector to transform
- * @param q quaternion to transform with
- * @returns out
- */
 /**
  * Transforms the vec3 with a quat
  * Can also be used for dual quaternions. (Multiply it with the real part)
@@ -2812,28 +2163,12 @@ export function transformQuat(out: Vec3, a: Vec3, q: Quat): Vec3;
  * @param rad The angle of rotation in radians
  * @returns out
  */
-/**
- * Rotate a 3D vector around the x-axis
- * @param out The receiving vec3
- * @param a The vec3 point to rotate
- * @param b The origin of the rotation
- * @param rad The angle of rotation in radians
- * @returns out
- */
 export function rotateX(out: Vec3, a: Vec3, b: Vec3, rad: number): Vec3;
 ```
 
 #### `vec3.rotateY`
 
 ```ts
-/**
- * Rotate a 3D vector around the y-axis
- * @param out The receiving vec3
- * @param a The vec3 point to rotate
- * @param b The origin of the rotation
- * @param rad The angle of rotation in radians
- * @returns out
- */
 /**
  * Rotate a 3D vector around the y-axis
  * @param out The receiving vec3
@@ -2856,26 +2191,12 @@ export function rotateY(out: Vec3, a: Vec3, b: Vec3, rad: number): Vec3;
  * @param rad The angle of rotation in radians
  * @returns out
  */
-/**
- * Rotate a 3D vector around the z-axis
- * @param out The receiving vec3
- * @param a The vec3 point to rotate
- * @param b The origin of the rotation
- * @param rad The angle of rotation in radians
- * @returns out
- */
 export function rotateZ(out: Vec3, a: Vec3, b: Vec3, rad: number): Vec3;
 ```
 
 #### `vec3.angle`
 
 ```ts
-/**
- * Get the angle between two 3D vectors
- * @param a The first operand
- * @param b The second operand
- * @returns The angle in radians
- */
 /**
  * Get the angle between two 3D vectors
  * @param a The first operand
@@ -2894,12 +2215,6 @@ export function angle(a: Vec3, b: Vec3): number;
  * @param out the receiving vector
  * @returns out
  */
-/**
- * Set the components of a vec3 to zero
- *
- * @param out the receiving vector
- * @returns out
- */
 export function zero(out: Vec3): Vec3;
 ```
 
@@ -2912,25 +2227,12 @@ export function zero(out: Vec3): Vec3;
  * @param a vector to represent as a string
  * @returns string representation of the vector
  */
-/**
- * Returns a string representation of a vector
- *
- * @param a vector to represent as a string
- * @returns string representation of the vector
- */
 export function str(a: Vec3): string;
 ```
 
 #### `vec3.exactEquals`
 
 ```ts
-/**
- * Returns whether or not the vectors have exactly the same elements in the same position (when compared with ===)
- *
- * @param a The first vector.
- * @param b The second vector.
- * @returns True if the vectors are equal, false otherwise.
- */
 /**
  * Returns whether or not the vectors have exactly the same elements in the same position (when compared with ===)
  *
@@ -2951,13 +2253,6 @@ export function exactEquals(a: Vec3, b: Vec3): boolean;
  * @param b The second vector.
  * @returns True if the vectors are equal, false otherwise.
  */
-/**
- * Returns whether or not the vectors have approximately the same elements in the same position.
- *
- * @param a The first vector.
- * @param b The second vector.
- * @returns True if the vectors are equal, false otherwise.
- */
 export function equals(a: Vec3, b: Vec3): boolean;
 ```
 
@@ -2969,24 +2264,12 @@ export function equals(a: Vec3, b: Vec3): boolean;
  * @param a vector to test
  * @returns whether or not the vector is finite
  */
-/**
- * Returns whether or not the vector is finite
- * @param a vector to test
- * @returns whether or not the vector is finite
- */
 export function finite(a: Vec3): boolean;
 ```
 
 #### `vec3.isScaleInsideOut`
 
 ```ts
-/**
- * Determines if a scale vector represents an inside-out transformation (reflection)
- * Returns true if an odd number of scale components are negative
- *
- * @param scale The scale vector to test
- * @returns true if the scale represents a reflection (odd number of negative components)
- */
 /**
  * Determines if a scale vector represents an inside-out transformation (reflection)
  * Returns true if an odd number of scale components are negative
@@ -3070,23 +2353,12 @@ export const sqrLen = squaredLength;
  *
  * @returns a new 4D vector
  */
-/**
- * Creates a new, empty vec4
- *
- * @returns a new 4D vector
- */
 export function create(): Vec4;
 ```
 
 #### `vec4.clone`
 
 ```ts
-/**
- * Creates a new vec4 initialized with values from an existing vector
- *
- * @param a vector to clone
- * @returns a new 4D vector
- */
 /**
  * Creates a new vec4 initialized with values from an existing vector
  *
@@ -3108,28 +2380,12 @@ export function clone(a: Vec4): Vec4;
  * @param w W component
  * @returns a new 4D vector
  */
-/**
- * Creates a new vec4 initialized with the given values
- *
- * @param x X component
- * @param y Y component
- * @param z Z component
- * @param w W component
- * @returns a new 4D vector
- */
 export function fromValues(x: number, y: number, z: number, w: number): Vec4;
 ```
 
 #### `vec4.copy`
 
 ```ts
-/**
- * Copy the values from one vec4 to another
- *
- * @param out the receiving vector
- * @param a the source vector
- * @returns out
- */
 /**
  * Copy the values from one vec4 to another
  *
@@ -3153,29 +2409,12 @@ export function copy(out: Vec4, a: Vec4): Vec4;
  * @param w W component
  * @returns out
  */
-/**
- * Set the components of a vec4 to the given values
- *
- * @param out the receiving vector
- * @param x X component
- * @param y Y component
- * @param z Z component
- * @param w W component
- * @returns out
- */
 export function set(out: Vec4, x: number, y: number, z: number, w: number): Vec4;
 ```
 
 #### `vec4.fromBuffer`
 
 ```ts
-/**
- * Sets the components of a vec4 from a buffer
- * @param out the receiving vector
- * @param buffer the source buffer
- * @param startIndex the starting index in the buffer
- * @returns out
- */
 /**
  * Sets the components of a vec4 from a buffer
  * @param out the receiving vector
@@ -3196,27 +2435,12 @@ export function fromBuffer(out: Vec4, buffer: ArrayLike<number>, startIndex: num
  * @param startIndex The starting index in the buffer
  * @returns The output buffer
  */
-/**
- * Writes the components of a vec4 to a buffer
- * @param outBuffer The output buffer
- * @param vec The source vector
- * @param startIndex The starting index in the buffer
- * @returns The output buffer
- */
 export function toBuffer(outBuffer: MutableArrayLike<number>, vec: Vec4, startIndex: number): MutableArrayLike<number>;
 ```
 
 #### `vec4.add`
 
 ```ts
-/**
- * Adds two vec4's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Adds two vec4's
  *
@@ -3239,28 +2463,12 @@ export function add(out: Vec4, a: Vec4, b: Vec4): Vec4;
  * @param b the second operand
  * @returns out
  */
-/**
- * Subtracts vector b from vector a
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function subtract(out: Vec4, a: Vec4, b: Vec4): Vec4;
 ```
 
 #### `vec4.multiply`
 
 ```ts
-/**
- * Multiplies two vec4's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Multiplies two vec4's
  *
@@ -3283,27 +2491,12 @@ export function multiply(out: Vec4, a: Vec4, b: Vec4): Vec4;
  * @param b the second operand
  * @returns out
  */
-/**
- * Divides two vec4's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function divide(out: Vec4, a: Vec4, b: Vec4): Vec4;
 ```
 
 #### `vec4.ceil`
 
 ```ts
-/**
- * Math.ceil the components of a vec4
- *
- * @param out the receiving vector
- * @param a vector to ceil
- * @returns out
- */
 /**
  * Math.ceil the components of a vec4
  *
@@ -3324,27 +2517,12 @@ export function ceil(out: Vec4, a: Vec4): Vec4;
  * @param a vector to floor
  * @returns out
  */
-/**
- * Math.floor the components of a vec4
- *
- * @param out the receiving vector
- * @param a vector to floor
- * @returns out
- */
 export function floor(out: Vec4, a: Vec4): Vec4;
 ```
 
 #### `vec4.min`
 
 ```ts
-/**
- * Returns the minimum of two vec4's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Returns the minimum of two vec4's
  *
@@ -3367,14 +2545,6 @@ export function min(out: Vec4, a: Vec4, b: Vec4): Vec4;
  * @param b the second operand
  * @returns out
  */
-/**
- * Returns the maximum of two vec4's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function max(out: Vec4, a: Vec4, b: Vec4): Vec4;
 ```
 
@@ -3388,27 +2558,12 @@ export function max(out: Vec4, a: Vec4, b: Vec4): Vec4;
  * @param a vector to round
  * @returns out
  */
-/**
- * symmetric round the components of a vec4
- *
- * @param out the receiving vector
- * @param a vector to round
- * @returns out
- */
 export function round(out: Vec4, a: Vec4): Vec4;
 ```
 
 #### `vec4.scale`
 
 ```ts
-/**
- * Scales a vec4 by a scalar number
- *
- * @param out the receiving vector
- * @param a the vector to scale
- * @param b amount to scale the vector by
- * @returns out
- */
 /**
  * Scales a vec4 by a scalar number
  *
@@ -3432,28 +2587,12 @@ export function scale(out: Vec4, a: Vec4, b: number): Vec4;
  * @param scale the amount to scale b by before adding
  * @returns out
  */
-/**
- * Adds two vec4's after scaling the second operand by a scalar value
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param scale the amount to scale b by before adding
- * @returns out
- */
 export function scaleAndAdd(out: Vec4, a: Vec4, b: Vec4, scale: number): Vec4;
 ```
 
 #### `vec4.distance`
 
 ```ts
-/**
- * Calculates the euclidian distance between two vec4's
- *
- * @param a the first operand
- * @param b the second operand
- * @returns distance between a and b
- */
 /**
  * Calculates the euclidian distance between two vec4's
  *
@@ -3474,25 +2613,12 @@ export function distance(a: Vec4, b: Vec4): number;
  * @param b the second operand
  * @returns squared distance between a and b
  */
-/**
- * Calculates the squared euclidian distance between two vec4's
- *
- * @param a the first operand
- * @param b the second operand
- * @returns squared distance between a and b
- */
 export function squaredDistance(a: Vec4, b: Vec4): number;
 ```
 
 #### `vec4.length`
 
 ```ts
-/**
- * Calculates the length of a vec4
- *
- * @param a vector to calculate length of
- * @returns length of a
- */
 /**
  * Calculates the length of a vec4
  *
@@ -3511,25 +2637,12 @@ export function length(a: Vec4): number;
  * @param a vector to calculate squared length of
  * @returns squared length of a
  */
-/**
- * Calculates the squared length of a vec4
- *
- * @param a vector to calculate squared length of
- * @returns squared length of a
- */
 export function squaredLength(a: Vec4): number;
 ```
 
 #### `vec4.negate`
 
 ```ts
-/**
- * Negates the components of a vec4
- *
- * @param out the receiving vector
- * @param a vector to negate
- * @returns out
- */
 /**
  * Negates the components of a vec4
  *
@@ -3550,26 +2663,12 @@ export function negate(out: Vec4, a: Vec4): Vec4;
  * @param a vector to invert
  * @returns out
  */
-/**
- * Returns the inverse of the components of a vec4
- *
- * @param out the receiving vector
- * @param a vector to invert
- * @returns out
- */
 export function inverse(out: Vec4, a: Vec4): Vec4;
 ```
 
 #### `vec4.normalize`
 
 ```ts
-/**
- * Normalize a vec4
- *
- * @param out the receiving vector
- * @param a vector to normalize
- * @returns out
- */
 /**
  * Normalize a vec4
  *
@@ -3590,28 +2689,12 @@ export function normalize(out: Vec4, a: Vec4): Vec4;
  * @param b the second operand
  * @returns dot product of a and b
  */
-/**
- * Calculates the dot product of two vec4's
- *
- * @param a the first operand
- * @param b the second operand
- * @returns dot product of a and b
- */
 export function dot(a: Vec4, b: Vec4): number;
 ```
 
 #### `vec4.cross`
 
 ```ts
-/**
- * Returns the cross-product of three vectors in a 4-dimensional space
- *
- * @param out the receiving vector
- * @param u the first vector
- * @param v the second vector
- * @param w the third vector
- * @returns result
- */
 /**
  * Returns the cross-product of three vectors in a 4-dimensional space
  *
@@ -3636,29 +2719,12 @@ export function cross(out: Vec4, u: Vec4, v: Vec4, w: Vec4): Vec4;
  * @param t interpolation amount, in the range [0-1], between the two inputs
  * @returns out
  */
-/**
- * Performs a linear interpolation between two vec4's
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param t interpolation amount, in the range [0-1], between the two inputs
- * @returns out
- */
 export function lerp(out: Vec4, a: Vec4, b: Vec4, t: number): Vec4;
 ```
 
 #### `vec4.transformMat4`
 
 ```ts
-/**
- * Transforms the vec4 with a mat4.
- *
- * @param out the receiving vector
- * @param a the vector to transform
- * @param m matrix to transform with
- * @returns out
- */
 /**
  * Transforms the vec4 with a mat4.
  *
@@ -3681,26 +2747,12 @@ export function transformMat4(out: Vec4, a: Vec4, m: Mat4): Vec4;
  * @param q quaternion to transform with
  * @returns out
  */
-/**
- * Transforms the vec4 with a quat
- *
- * @param out the receiving vector
- * @param a the vector to transform
- * @param q quaternion to transform with
- * @returns out
- */
 export function transformQuat(out: Vec4, a: Vec4, q: Quat): Vec4;
 ```
 
 #### `vec4.zero`
 
 ```ts
-/**
- * Set the components of a vec4 to zero
- *
- * @param out the receiving vector
- * @returns out
- */
 /**
  * Set the components of a vec4 to zero
  *
@@ -3719,25 +2771,12 @@ export function zero(out: Vec4): Vec4;
  * @param a vector to represent as a string
  * @returns string representation of the vector
  */
-/**
- * Returns a string representation of a vector
- *
- * @param a vector to represent as a string
- * @returns string representation of the vector
- */
 export function str(a: Vec4): string;
 ```
 
 #### `vec4.exactEquals`
 
 ```ts
-/**
- * Returns whether or not the vectors have exactly the same elements in the same position (when compared with ===)
- *
- * @param a The first vector.
- * @param b The second vector.
- * @returns True if the vectors are equal, false otherwise.
- */
 /**
  * Returns whether or not the vectors have exactly the same elements in the same position (when compared with ===)
  *
@@ -3758,24 +2797,12 @@ export function exactEquals(a: Vec4, b: Vec4): boolean;
  * @param b The second vector.
  * @returns True if the vectors are equal, false otherwise.
  */
-/**
- * Returns whether or not the vectors have approximately the same elements in the same position.
- *
- * @param a The first vector.
- * @param b The second vector.
- * @returns True if the vectors are equal, false otherwise.
- */
 export function equals(a: Vec4, b: Vec4): boolean;
 ```
 
 #### `vec4.finite`
 
 ```ts
-/**
- * Returns whether or not the vector is finite
- * @param a vector to test
- * @returns whether or not the vector is finite
- */
 /**
  * Returns whether or not the vector is finite
  * @param a vector to test
@@ -3855,9 +2882,6 @@ export const sqrLen = squaredLength;
 /**
  * Creates a new Euler with default values (0, 0, 0, 'xyz').
  */
-/**
- * Creates a new Euler with default values (0, 0, 0, 'xyz').
- */
 export function create(): Euler;
 ```
 
@@ -3872,28 +2896,12 @@ export function create(): Euler;
  * @param order The order of rotation.
  * @returns A new Euler.
  */
-/**
- * Creates a new Euler from the given values.
- * @param x The x rotation in radians.
- * @param y The y rotation in radians.
- * @param z The z rotation in radians.
- * @param order The order of rotation.
- * @returns A new Euler.
- */
 export function fromValues(x: number, y: number, z: number, order: EulerOrder): Euler;
 ```
 
 #### `euler.set`
 
 ```ts
-/**
- * Sets a given Euler from the given values.
- * @param x The x rotation in radians.
- * @param y The y rotation in radians.
- * @param z The z rotation in radians.
- * @param order The order of rotation.
- * @returns The output Euler.
- */
 /**
  * Sets a given Euler from the given values.
  * @param x The x rotation in radians.
@@ -3917,28 +2925,12 @@ export function set(out: Euler, x: number, y: number, z: number, order: EulerOrd
  * @param order The order of rotation.
  * @returns The output Euler.
  */
-/**
- * Sets Euler angle radians from given degrees
- * @param out The output Euler.
- * @param x The x rotation in degrees.
- * @param y The y rotation in degrees.
- * @param z The z rotation in degrees.
- * @param order The order of rotation.
- * @returns The output Euler.
- */
 export function fromDegrees(out: Euler, x: number, y: number, z: number, order: EulerOrder): Euler;
 ```
 
 #### `euler.fromRotationMat4`
 
 ```ts
-/**
- * Sets the Euler angles from a rotation matrix.
- * @param out The output Euler.
- * @param rotationMatrix The input rotation matrix.
- * @param order The order of the Euler angles.
- * @returns The output Euler.
- */
 /**
  * Sets the Euler angles from a rotation matrix.
  * @param out The output Euler.
@@ -3959,26 +2951,12 @@ export function fromRotationMat4(out: Euler, rotationMatrix: Mat4, order: EulerO
  * @param b The second euler.
  * @returns True if the euler angles are equal, false otherwise.
  */
-/**
- * Returns whether or not the euler angles have exactly the same elements in the same position (when compared with ===)
- *
- * @param a The first euler.
- * @param b The second euler.
- * @returns True if the euler angles are equal, false otherwise.
- */
 export function exactEquals(a: Euler, b: Euler): boolean;
 ```
 
 #### `euler.equals`
 
 ```ts
-/**
- * Returns whether or not the euler angles have approximately the same elements in the same position.
- *
- * @param a The first euler.
- * @param b The second euler.
- * @returns True if the euler angles are equal, false otherwise.
- */
 /**
  * Returns whether or not the euler angles have approximately the same elements in the same position.
  *
@@ -3999,26 +2977,12 @@ export function equals(a: Euler, b: Euler): boolean;
  * @param order The order of the Euler.
  * @returns The output Euler
  */
-/**
- * Sets the Euler angles from a quaternion.
- * @param out The output Euler.
- * @param q The input quaternion.
- * @param order The order of the Euler.
- * @returns The output Euler
- */
 export function fromQuat(out: Euler, q: Quat, order: EulerOrder): Euler;
 ```
 
 #### `euler.reorder`
 
 ```ts
-/**
- * Reorders the Euler based on the specified order.
- * @param out The output Euler.
- * @param a The input Euler.
- * @param order The order of the Euler.
- * @returns The output Euler.
- */
 /**
  * Reorders the Euler based on the specified order.
  * @param out The output Euler.
@@ -4039,24 +3003,12 @@ export function reorder(out: Euler, a: Euler, order: EulerOrder): Euler;
  *
  * @returns a new quaternion
  */
-/**
- * Creates a new identity quat
- *
- * @returns a new quaternion
- */
 export function create(): Quat;
 ```
 
 #### `quat.fromBuffer`
 
 ```ts
-/**
- * Sets the components of a quat from a buffer
- * @param out the receiving quaternion
- * @param buffer the source buffer
- * @param startIndex the starting index in the buffer
- * @returns out
- */
 /**
  * Sets the components of a quat from a buffer
  * @param out the receiving quaternion
@@ -4077,13 +3029,6 @@ export function fromBuffer(out: Quat, buffer: ArrayLike<number>, startIndex: num
  * @param startIndex The starting index in the buffer
  * @returns The output buffer
  */
-/**
- * Writes the components of a quat to a buffer
- * @param outBuffer The output buffer
- * @param q The source quaternion
- * @param startIndex The starting index in the buffer
- * @returns The output buffer
- */
 export function toBuffer(outBuffer: MutableArrayLike<number>, q: Quat, startIndex: number): MutableArrayLike<number>;
 ```
 
@@ -4096,27 +3041,12 @@ export function toBuffer(outBuffer: MutableArrayLike<number>, q: Quat, startInde
  * @param out the receiving quaternion
  * @returns out
  */
-/**
- * Set a quat to the identity quaternion
- *
- * @param out the receiving quaternion
- * @returns out
- */
 export function identity(out: Quat): Quat;
 ```
 
 #### `quat.setAxisAngle`
 
 ```ts
-/**
- * Sets a quat from the given angle and rotation axis,
- * then returns it.
- *
- * @param out the receiving quaternion
- * @param axis the axis around which to rotate
- * @param rad the angle in radians
- * @returns out
- **/
 /**
  * Sets a quat from the given angle and rotation axis,
  * then returns it.
@@ -4145,19 +3075,6 @@ export function setAxisAngle(out: Quat, axis: Vec3, rad: number): Quat;
  * @param  q     Quaternion to be decomposed
  * @return     Angle, in radians, of the rotation
  */
-/**
- * Gets the rotation axis and angle for a given
- *  quaternion. If a quaternion is created with
- *  setAxisAngle, this method will return the same
- *  values as providied in the original parameter list
- *  OR functionally equivalent values.
- * Example: The quaternion formed by axis [0, 0, 1] and
- *  angle -90 is the same as the quaternion formed by
- *  [0, 0, 1] and 270. This method favors the latter.
- * @param  out_axis  Vector receiving the axis of rotation
- * @param  q     Quaternion to be decomposed
- * @return     Angle, in radians, of the rotation
- */
 export function getAxisAngle(out_axis: Vec3, q: Quat): number;
 ```
 
@@ -4171,27 +3088,12 @@ export function getAxisAngle(out_axis: Vec3, q: Quat): number;
  * @param  b     Destination unit quaternion
  * @return     Angle, in radians, between the two quaternions
  */
-/**
- * Gets the angular distance between two unit quaternions
- *
- * @param  a     Origin unit quaternion
- * @param  b     Destination unit quaternion
- * @return     Angle, in radians, between the two quaternions
- */
 export function getAngle(a: Quat, b: Quat): number;
 ```
 
 #### `quat.multiply`
 
 ```ts
-/**
- * Multiplies two quat's
- *
- * @param out the receiving quaternion
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Multiplies two quat's
  *
@@ -4214,14 +3116,6 @@ export function multiply(out: Quat, a: Quat, b: Quat): Quat;
  * @param rad angle (in radians) to rotate
  * @returns out
  */
-/**
- * Rotates a quaternion by the given angle about the X axis
- *
- * @param out quat receiving operation result
- * @param a quat to rotate
- * @param rad angle (in radians) to rotate
- * @returns out
- */
 export function rotateX(out: Quat, a: Quat, rad: number): Quat;
 ```
 
@@ -4236,28 +3130,12 @@ export function rotateX(out: Quat, a: Quat, rad: number): Quat;
  * @param rad angle (in radians) to rotate
  * @returns out
  */
-/**
- * Rotates a quaternion by the given angle about the Y axis
- *
- * @param out quat receiving operation result
- * @param a quat to rotate
- * @param rad angle (in radians) to rotate
- * @returns out
- */
 export function rotateY(out: Quat, a: Quat, rad: number): Quat;
 ```
 
 #### `quat.rotateZ`
 
 ```ts
-/**
- * Rotates a quaternion by the given angle about the Z axis
- *
- * @param out quat receiving operation result
- * @param a quat to rotate
- * @param rad angle (in radians) to rotate
- * @returns out
- */
 /**
  * Rotates a quaternion by the given angle about the Z axis
  *
@@ -4281,28 +3159,12 @@ export function rotateZ(out: Quat, a: Quat, rad: number): Quat;
  * @param a quat to calculate W component of
  * @returns out
  */
-/**
- * Calculates the W component of a quat from the X, Y, and Z components.
- * Assumes that quaternion is 1 unit in length.
- * Any existing W component will be ignored.
- *
- * @param out the receiving quaternion
- * @param a quat to calculate W component of
- * @returns out
- */
 export function calculateW(out: Quat, a: Quat): Quat;
 ```
 
 #### `quat.exp`
 
 ```ts
-/**
- * Calculate the exponential of a unit quaternion.
- *
- * @param out the receiving quaternion
- * @param a quat to calculate the exponential of
- * @returns out
- */
 /**
  * Calculate the exponential of a unit quaternion.
  *
@@ -4323,27 +3185,12 @@ export function exp(out: Quat, a: Quat): Quat;
  * @param a quat to calculate the exponential of
  * @returns out
  */
-/**
- * Calculate the natural logarithm of a unit quaternion.
- *
- * @param out the receiving quaternion
- * @param a quat to calculate the exponential of
- * @returns out
- */
 export function ln(out: Quat, a: Quat): Quat;
 ```
 
 #### `quat.pow`
 
 ```ts
-/**
- * Calculate the scalar power of a unit quaternion.
- *
- * @param out the receiving quaternion
- * @param a quat to calculate the exponential of
- * @param b amount to scale the quaternion by
- * @returns out
- */
 /**
  * Calculate the scalar power of a unit quaternion.
  *
@@ -4367,15 +3214,6 @@ export function pow(out: Quat, a: Quat, b: number): Quat;
  * @param t interpolation amount, in the range [0-1], between the two inputs
  * @returns out
  */
-/**
- * Performs a spherical linear interpolation between two quat
- *
- * @param out the receiving quaternion
- * @param a the first operand
- * @param b the second operand
- * @param t interpolation amount, in the range [0-1], between the two inputs
- * @returns out
- */
 export function slerp(out: Quat, a: Quat, b: Quat, t: number): Quat;
 ```
 
@@ -4389,27 +3227,12 @@ export function slerp(out: Quat, a: Quat, b: Quat, t: number): Quat;
  * @param a quat to calculate inverse of
  * @returns out
  */
-/**
- * Calculates the inverse of a quat
- *
- * @param out the receiving quaternion
- * @param a quat to calculate inverse of
- * @returns out
- */
 export function invert(out: Quat, a: Quat): Quat;
 ```
 
 #### `quat.conjugate`
 
 ```ts
-/**
- * Calculates the conjugate of a quat
- * If the quaternion is normalized, this function is faster than quat.inverse and produces the same result.
- *
- * @param out the receiving quaternion
- * @param a quat to calculate conjugate of
- * @returns out
- */
 /**
  * Calculates the conjugate of a quat
  * If the quaternion is normalized, this function is faster than quat.inverse and produces the same result.
@@ -4434,16 +3257,6 @@ export function conjugate(out: Quat, a: Quat): Quat;
  * @param m rotation matrix
  * @returns out
  */
-/**
- * Creates a quaternion from the given 3x3 rotation matrix.
- *
- * NOTE: The resultant quaternion is not normalized, so you should be sure
- * to renormalize the quaternion yourself where necessary.
- *
- * @param out the receiving quaternion
- * @param m rotation matrix
- * @returns out
- */
 export function fromMat3(out: Quat, m: Mat3): Quat;
 ```
 
@@ -4458,26 +3271,12 @@ export function fromMat3(out: Quat, m: Mat3): Quat;
  * @param m rotation matrix
  * @returns out
  */
-/**
- * Calculates a quaternion from a 4x4 rotation matrix
- * Extracts the 3x3 rotation part and calls fromMat3
- *
- * @param out the receiving quaternion
- * @param m rotation matrix
- * @returns out
- */
 export function fromMat4(out: Quat, m: Mat4): Quat;
 ```
 
 #### `quat.fromEuler`
 
 ```ts
-/**
- * Creates a quaternion from the given euler
- * @param out the receiving quaternion
- * @param euler the euler to create the quaternion from
- * @returns out
- */
 /**
  * Creates a quaternion from the given euler
  * @param out the receiving quaternion
@@ -4501,29 +3300,12 @@ export function fromEuler(out: Quat, euler: Euler): Quat;
  * @param order The order of rotation
  * @returns out
  */
-/**
- * Creates a quaternion from euler angles specified in degrees.
- * Shorthand for converting degrees to radians and then creating a quaternion from euler.
- *
- * @param out the receiving quaternion
- * @param x The x euler rotation in degrees
- * @param y The y euler rotation in degrees
- * @param z The z euler rotation in degrees
- * @param order The order of rotation
- * @returns out
- */
 export function fromDegrees(out: Quat, x: number, y: number, z: number, order: EulerOrder): Quat;
 ```
 
 #### `quat.str`
 
 ```ts
-/**
- * Returns a string representation of a quaternion
- *
- * @param a vector to represent as a string
- * @returns string representation of the vector
- */
 /**
  * Returns a string representation of a quaternion
  *
@@ -4732,13 +3514,6 @@ export const exactEquals = vec4.exactEquals;
  * @param b The second quaternion.
  * @returns True if the quaternions are equal, false otherwise.
  */
-/**
- * Returns whether or not the quaternions have approximately the same elements in the same position.
- *
- * @param a The first quaternion.
- * @param b The second quaternion.
- * @returns True if the quaternions are equal, false otherwise.
- */
 export function equals(a: Quat, b: Quat): boolean;
 ```
 
@@ -4853,11 +3628,6 @@ export const setAxes = (() => {
  *
  * @returns a new dual quaternion [real -> rotation, dual -> translation]
  */
-/**
- * Creates a new identity dual quat
- *
- * @returns a new dual quaternion [real -> rotation, dual -> translation]
- */
 export function create(): Quat2;
 ```
 
@@ -4871,33 +3641,12 @@ export function create(): Quat2;
  * @returns new dual quaternion
  * @function
  */
-/**
- * Creates a new quat initialized with values from an existing quaternion
- *
- * @param a dual quaternion to clone
- * @returns new dual quaternion
- * @function
- */
 export function clone(a: Quat2): Quat2;
 ```
 
 #### `quat2.fromValues`
 
 ```ts
-/**
- * Creates a new dual quat initialized with the given values
- *
- * @param x1 X component
- * @param y1 Y component
- * @param z1 Z component
- * @param w1 W component
- * @param x2 X component
- * @param y2 Y component
- * @param z2 Z component
- * @param w2 W component
- * @returns new dual quaternion
- * @function
- */
 /**
  * Creates a new dual quat initialized with the given values
  *
@@ -4931,34 +3680,12 @@ export function fromValues(x1: number, y1: number, z1: number, w1: number, x2: n
  * @returns new dual quaternion
  * @function
  */
-/**
- * Creates a new dual quat from the given values (quat and translation)
- *
- * @param x1 X component
- * @param y1 Y component
- * @param z1 Z component
- * @param w1 W component
- * @param x2 X component (translation)
- * @param y2 Y component (translation)
- * @param z2 Z component (translation)
- * @returns new dual quaternion
- * @function
- */
 export function fromRotationTranslationValues(x1: number, y1: number, z1: number, w1: number, x2: number, y2: number, z2: number): Quat2;
 ```
 
 #### `quat2.fromRotationTranslation`
 
 ```ts
-/**
- * Creates a dual quat from a quaternion and a translation
- *
- * @param out dual quaternion receiving operation result
- * @param q a normalized quaternion
- * @param t translation vector
- * @returns dual quaternion receiving operation result
- * @function
- */
 /**
  * Creates a dual quat from a quaternion and a translation
  *
@@ -4982,28 +3709,12 @@ export function fromRotationTranslation(out: Quat2, q: Quat, t: Vec3): Quat2;
  * @returns dual quaternion receiving operation result
  * @function
  */
-/**
- * Creates a dual quat from a translation
- *
- * @param out dual quaternion receiving operation result
- * @param t translation vector
- * @returns dual quaternion receiving operation result
- * @function
- */
 export function fromTranslation(out: Quat2, t: Vec3): Quat2;
 ```
 
 #### `quat2.fromRotation`
 
 ```ts
-/**
- * Creates a dual quat from a quaternion
- *
- * @param out dual quaternion receiving operation result
- * @param q the quaternion
- * @returns dual quaternion receiving operation result
- * @function
- */
 /**
  * Creates a dual quat from a quaternion
  *
@@ -5026,28 +3737,12 @@ export function fromRotation(out: Quat2, q: Quat): Quat2;
  * @returns dual quat receiving operation result
  * @function
  */
-/**
- * Creates a new dual quat from a matrix (4x4)
- *
- * @param out the dual quaternion
- * @param a the matrix
- * @returns dual quat receiving operation result
- * @function
- */
 export function fromMat4(out: Quat2, a: Mat4): Quat2;
 ```
 
 #### `quat2.copy`
 
 ```ts
-/**
- * Copy the values from one dual quat to another
- *
- * @param out the receiving dual quaternion
- * @param a the source dual quaternion
- * @returns out
- * @function
- */
 /**
  * Copy the values from one dual quat to another
  *
@@ -5068,33 +3763,12 @@ export function copy(out: Quat2, a: Quat2): Quat2;
  * @param out the receiving quaternion
  * @returns out
  */
-/**
- * Set a dual quat to the identity dual quaternion
- *
- * @param out the receiving quaternion
- * @returns out
- */
 export function identity(out: Quat2): Quat2;
 ```
 
 #### `quat2.set`
 
 ```ts
-/**
- * Set the components of a dual quat to the given values
- *
- * @param out the receiving quaternion
- * @param x1 X component
- * @param y1 Y component
- * @param z1 Z component
- * @param w1 W component
- * @param x2 X component
- * @param y2 Y component
- * @param z2 Z component
- * @param w2 W component
- * @returns out
- * @function
- */
 /**
  * Set the components of a dual quat to the given values
  *
@@ -5134,12 +3808,6 @@ export const getReal = quat.copy;
  * @param  a Dual Quaternion
  * @return dual part
  */
-/**
- * Gets the dual part of a dual quat
- * @param  out dual part
- * @param  a Dual Quaternion
- * @return dual part
- */
 export function getDual(out: Quat, a: Quat2): Quat;
 ```
 
@@ -5168,14 +3836,6 @@ export const setReal = quat.copy;
  * @returns out
  * @function
  */
-/**
- * Set the dual component of a dual quat to the given quaternion
- *
- * @param out the receiving quaternion
- * @param q a quaternion representing the dual part
- * @returns out
- * @function
- */
 export function setDual(out: Quat2, q: Quat): Quat2;
 ```
 
@@ -5188,26 +3848,12 @@ export function setDual(out: Quat2, q: Quat): Quat2;
  * @param  a Dual Quaternion to be decomposed
  * @return translation
  */
-/**
- * Gets the translation of a normalized dual quat
- * @param  out translation
- * @param  a Dual Quaternion to be decomposed
- * @return translation
- */
 export function getTranslation(out: Vec3, a: Quat2): Vec3;
 ```
 
 #### `quat2.translate`
 
 ```ts
-/**
- * Translates a dual quat by the given vector
- *
- * @param out the receiving dual quaternion
- * @param a the dual quaternion to translate
- * @param v vector to translate by
- * @returns out
- */
 /**
  * Translates a dual quat by the given vector
  *
@@ -5230,28 +3876,12 @@ export function translate(out: Quat2, a: Quat2, v: Vec3): Quat2;
  * @param rad how far should the rotation be
  * @returns out
  */
-/**
- * Rotates a dual quat around the X axis
- *
- * @param out the receiving dual quaternion
- * @param a the dual quaternion to rotate
- * @param rad how far should the rotation be
- * @returns out
- */
 export function rotateX(out: Quat2, a: Quat2, rad: number): Quat2;
 ```
 
 #### `quat2.rotateY`
 
 ```ts
-/**
- * Rotates a dual quat around the Y axis
- *
- * @param out the receiving dual quaternion
- * @param a the dual quaternion to rotate
- * @param rad how far should the rotation be
- * @returns out
- */
 /**
  * Rotates a dual quat around the Y axis
  *
@@ -5274,28 +3904,12 @@ export function rotateY(out: Quat2, a: Quat2, rad: number): Quat2;
  * @param rad how far should the rotation be
  * @returns out
  */
-/**
- * Rotates a dual quat around the Z axis
- *
- * @param out the receiving dual quaternion
- * @param a the dual quaternion to rotate
- * @param rad how far should the rotation be
- * @returns out
- */
 export function rotateZ(out: Quat2, a: Quat2, rad: number): Quat2;
 ```
 
 #### `quat2.rotateByQuatAppend`
 
 ```ts
-/**
- * Rotates a dual quat by a given quaternion (a * q)
- *
- * @param out the receiving dual quaternion
- * @param a the dual quaternion to rotate
- * @param q quaternion to rotate by
- * @returns out
- */
 /**
  * Rotates a dual quat by a given quaternion (a * q)
  *
@@ -5318,29 +3932,12 @@ export function rotateByQuatAppend(out: Quat2, a: Quat2, q: Quat): Quat2;
  * @param a the dual quaternion to rotate
  * @returns out
  */
-/**
- * Rotates a dual quat by a given quaternion (q * a)
- *
- * @param out the receiving dual quaternion
- * @param q quaternion to rotate by
- * @param a the dual quaternion to rotate
- * @returns out
- */
 export function rotateByQuatPrepend(out: Quat2, q: Quat, a: Quat2): Quat2;
 ```
 
 #### `quat2.rotateAroundAxis`
 
 ```ts
-/**
- * Rotates a dual quat around a given axis. Does the normalisation automatically
- *
- * @param out the receiving dual quaternion
- * @param a the dual quaternion to rotate
- * @param axis the axis to rotate around
- * @param rad how far the rotation should be
- * @returns out
- */
 /**
  * Rotates a dual quat around a given axis. Does the normalisation automatically
  *
@@ -5365,29 +3962,12 @@ export function rotateAroundAxis(out: Quat2, a: Quat2, axis: Vec3, rad: number):
  * @returns out
  * @function
  */
-/**
- * Adds two dual quat's
- *
- * @param out the receiving dual quaternion
- * @param a the first operand
- * @param b the second operand
- * @returns out
- * @function
- */
 export function add(out: Quat2, a: Quat2, b: Quat2): Quat2;
 ```
 
 #### `quat2.multiply`
 
 ```ts
-/**
- * Multiplies two dual quat's
- *
- * @param out the receiving dual quaternion
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Multiplies two dual quat's
  *
@@ -5412,15 +3992,6 @@ export const mul = multiply;
 #### `quat2.scale`
 
 ```ts
-/**
- * Scales a dual quat by a scalar number
- *
- * @param out the receiving dual quat
- * @param a the dual quat to scale
- * @param b amount to scale the dual quat by
- * @returns out
- * @function
- */
 /**
  * Scales a dual quat by a scalar number
  *
@@ -5460,16 +4031,6 @@ export const dot = quat.dot;
  * @param t interpolation amount, in the range [0-1], between the two inputs
  * @returns out
  */
-/**
- * Performs a linear interpolation between two dual quats's
- * NOTE: The resulting dual quaternions won't always be normalized (The error is most noticeable when t = 0.5)
- *
- * @param out the receiving dual quat
- * @param a the first operand
- * @param b the second operand
- * @param t interpolation amount, in the range [0-1], between the two inputs
- * @returns out
- */
 export function lerp(out: Quat2, a: Quat2, b: Quat2, t: number): Quat2;
 ```
 
@@ -5483,27 +4044,12 @@ export function lerp(out: Quat2, a: Quat2, b: Quat2, t: number): Quat2;
  * @param a dual quat to calculate inverse of
  * @returns out
  */
-/**
- * Calculates the inverse of a dual quat. If they are normalized, conjugate is cheaper
- *
- * @param out the receiving dual quaternion
- * @param a dual quat to calculate inverse of
- * @returns out
- */
 export function invert(out: Quat2, a: Quat2): Quat2;
 ```
 
 #### `quat2.conjugate`
 
 ```ts
-/**
- * Calculates the conjugate of a dual quat
- * If the dual quaternion is normalized, this function is faster than quat2.inverse and produces the same result.
- *
- * @param out the receiving quaternion
- * @param a quat to calculate conjugate of
- * @returns out
- */
 /**
  * Calculates the conjugate of a dual quat
  * If the dual quaternion is normalized, this function is faster than quat2.inverse and produces the same result.
@@ -5572,14 +4118,6 @@ export const sqrLen = squaredLength;
  * @returns out
  * @function
  */
-/**
- * Normalize a dual quat
- *
- * @param out the receiving dual quaternion
- * @param a dual quaternion to normalize
- * @returns out
- * @function
- */
 export function normalize(out: Quat2, a: Quat2): Quat2;
 ```
 
@@ -5592,25 +4130,12 @@ export function normalize(out: Quat2, a: Quat2): Quat2;
  * @param a dual quaternion to represent as a string
  * @returns string representation of the dual quat
  */
-/**
- * Returns a string representation of a dual quaternion
- *
- * @param a dual quaternion to represent as a string
- * @returns string representation of the dual quat
- */
 export function str(a: Quat2): string;
 ```
 
 #### `quat2.exactEquals`
 
 ```ts
-/**
- * Returns whether or not the dual quaternions have exactly the same elements in the same position (when compared with ===)
- *
- * @param a the first dual quaternion.
- * @param b the second dual quaternion.
- * @returns true if the dual quaternions are equal, false otherwise.
- */
 /**
  * Returns whether or not the dual quaternions have exactly the same elements in the same position (when compared with ===)
  *
@@ -5631,13 +4156,6 @@ export function exactEquals(a: Quat2, b: Quat2): boolean;
  * @param b the second dual quat.
  * @returns true if the dual quats are equal, false otherwise.
  */
-/**
- * Returns whether or not the dual quaternions have approximately the same elements in the same position.
- *
- * @param a the first dual quat.
- * @param b the second dual quat.
- * @returns true if the dual quats are equal, false otherwise.
- */
 export function equals(a: Quat2, b: Quat2): boolean;
 ```
 
@@ -5651,23 +4169,12 @@ export function equals(a: Quat2, b: Quat2): boolean;
  *
  * @returns a new 2x2 matrix
  */
-/**
- * Creates a new identity mat2
- *
- * @returns a new 2x2 matrix
- */
 export function create(): Mat2;
 ```
 
 #### `mat2.clone`
 
 ```ts
-/**
- * Creates a new mat2 initialized with values from an existing matrix
- *
- * @param a matrix to clone
- * @returns a new 2x2 matrix
- */
 /**
  * Creates a new mat2 initialized with values from an existing matrix
  *
@@ -5687,13 +4194,6 @@ export function clone(a: Mat2): Mat2;
  * @param a the source matrix
  * @returns out
  */
-/**
- * Copy the values from one mat2 to another
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 export function copy(out: Mat2, a: Mat2): Mat2;
 ```
 
@@ -5706,27 +4206,12 @@ export function copy(out: Mat2, a: Mat2): Mat2;
  * @param out the receiving matrix
  * @returns out
  */
-/**
- * Set a mat2 to the identity matrix
- *
- * @param out the receiving matrix
- * @returns out
- */
 export function identity(out: Mat2): Mat2;
 ```
 
 #### `mat2.fromValues`
 
 ```ts
-/**
- * Create a new mat2 with the given values
- *
- * @param m00 Component in column 0, row 0 position (index 0)
- * @param m01 Component in column 0, row 1 position (index 1)
- * @param m10 Component in column 1, row 0 position (index 2)
- * @param m11 Component in column 1, row 1 position (index 3)
- * @returns out A new 2x2 matrix
- */
 /**
  * Create a new mat2 with the given values
  *
@@ -5752,29 +4237,12 @@ export function fromValues(m00: number, m01: number, m10: number, m11: number): 
  * @param m11 Component in column 1, row 1 position (index 3)
  * @returns out
  */
-/**
- * Set the components of a mat2 to the given values
- *
- * @param out the receiving matrix
- * @param m00 Component in column 0, row 0 position (index 0)
- * @param m01 Component in column 0, row 1 position (index 1)
- * @param m10 Component in column 1, row 0 position (index 2)
- * @param m11 Component in column 1, row 1 position (index 3)
- * @returns out
- */
 export function set(out: Mat2, m00: number, m01: number, m10: number, m11: number): Mat2;
 ```
 
 #### `mat2.transpose`
 
 ```ts
-/**
- * Transpose the values of a mat2
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 /**
  * Transpose the values of a mat2
  *
@@ -5795,26 +4263,12 @@ export function transpose(out: Mat2, a: Mat2): Mat2;
  * @param a the source matrix
  * @returns out, or null if source matrix is not invertible
  */
-/**
- * Inverts a mat2
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out, or null if source matrix is not invertible
- */
 export function invert(out: Mat2, a: Mat2): Mat2 | null;
 ```
 
 #### `mat2.adjoint`
 
 ```ts
-/**
- * Calculates the adjugate of a mat2
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 /**
  * Calculates the adjugate of a mat2
  *
@@ -5834,26 +4288,12 @@ export function adjoint(out: Mat2, a: Mat2): Mat2;
  * @param a the source matrix
  * @returns determinant of a
  */
-/**
- * Calculates the determinant of a mat2
- *
- * @param a the source matrix
- * @returns determinant of a
- */
 export function determinant(a: Mat2): number;
 ```
 
 #### `mat2.multiply`
 
 ```ts
-/**
- * Multiplies two mat2's
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Multiplies two mat2's
  *
@@ -5876,14 +4316,6 @@ export function multiply(out: Mat2, a: Mat2, b: Mat2): Mat2;
  * @param rad the angle to rotate the matrix by
  * @returns out
  */
-/**
- * Rotates a mat2 by the given angle
- *
- * @param out the receiving matrix
- * @param a the matrix to rotate
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 export function rotate(out: Mat2, a: Mat2, rad: number): Mat2;
 ```
 
@@ -5898,31 +4330,12 @@ export function rotate(out: Mat2, a: Mat2, rad: number): Mat2;
  * @param v the vec2 to scale the matrix by
  * @returns out
  **/
-/**
- * Scales the mat2 by the dimensions in the given vec2
- *
- * @param out the receiving matrix
- * @param a the matrix to rotate
- * @param v the vec2 to scale the matrix by
- * @returns out
- **/
 export function scale(out: Mat2, a: Mat2, v: Vec2): Mat2;
 ```
 
 #### `mat2.fromRotation`
 
 ```ts
-/**
- * Creates a matrix from a given angle
- * This is equivalent to (but much faster than):
- *
- *     mat2.identity(dest);
- *     mat2.rotate(dest, dest, rad);
- *
- * @param out mat2 receiving operation result
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 /**
  * Creates a matrix from a given angle
  * This is equivalent to (but much faster than):
@@ -5951,29 +4364,12 @@ export function fromRotation(out: Mat2, rad: number): Mat2;
  * @param v Scaling vector
  * @returns out
  */
-/**
- * Creates a matrix from a vector scaling
- * This is equivalent to (but much faster than):
- *
- *     mat2.identity(dest);
- *     mat2.scale(dest, dest, vec);
- *
- * @param out mat2 receiving operation result
- * @param v Scaling vector
- * @returns out
- */
 export function fromScaling(out: Mat2, v: Vec2): Mat2;
 ```
 
 #### `mat2.str`
 
 ```ts
-/**
- * Returns a string representation of a mat2
- *
- * @param a matrix to represent as a string
- * @returns string representation of the matrix
- */
 /**
  * Returns a string representation of a mat2
  *
@@ -5992,25 +4388,12 @@ export function str(a: Mat2): string;
  * @param a the matrix to calculate Frobenius norm of
  * @returns Frobenius norm
  */
-/**
- * Returns Frobenius norm of a mat2
- *
- * @param a the matrix to calculate Frobenius norm of
- * @returns Frobenius norm
- */
 export function frob(a: Mat2): number;
 ```
 
 #### `mat2.LDU`
 
 ```ts
-/**
- * Returns L, D and U matrices (Lower triangular, Diagonal and Upper triangular) by factorizing the input matrix
- * @param L the lower triangular matrix
- * @param D the diagonal matrix
- * @param U the upper triangular matrix
- * @param a the input matrix to factorize
- */
 /**
  * Returns L, D and U matrices (Lower triangular, Diagonal and Upper triangular) by factorizing the input matrix
  * @param L the lower triangular matrix
@@ -6036,28 +4419,12 @@ export function LDU(L: Mat2, D: Mat2, U: Mat2, a: Mat2): [
  * @param b the second operand
  * @returns out
  */
-/**
- * Adds two mat2's
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function add(out: Mat2, a: Mat2, b: Mat2): Mat2;
 ```
 
 #### `mat2.subtract`
 
 ```ts
-/**
- * Subtracts matrix b from matrix a
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Subtracts matrix b from matrix a
  *
@@ -6079,26 +4446,12 @@ export function subtract(out: Mat2, a: Mat2, b: Mat2): Mat2;
  * @param b The second matrix.
  * @returns True if the matrices are equal, false otherwise.
  */
-/**
- * Returns whether or not the matrices have exactly the same elements in the same position (when compared with ===)
- *
- * @param a The first matrix.
- * @param b The second matrix.
- * @returns True if the matrices are equal, false otherwise.
- */
 export function exactEquals(a: Mat2, b: Mat2): boolean;
 ```
 
 #### `mat2.equals`
 
 ```ts
-/**
- * Returns whether or not the matrices have approximately the same elements in the same position.
- *
- * @param a The first matrix.
- * @param b The second matrix.
- * @returns True if the matrices are equal, false otherwise.
- */
 /**
  * Returns whether or not the matrices have approximately the same elements in the same position.
  *
@@ -6120,29 +4473,12 @@ export function equals(a: Mat2, b: Mat2): boolean;
  * @param b amount to scale the matrix's elements by
  * @returns out
  */
-/**
- * Multiply each element of the matrix by a scalar.
- *
- * @param out the receiving matrix
- * @param a the matrix to scale
- * @param b amount to scale the matrix's elements by
- * @returns out
- */
 export function multiplyScalar(out: Mat2, a: Mat2, b: number): Mat2;
 ```
 
 #### `mat2.multiplyScalarAndAdd`
 
 ```ts
-/**
- * Adds two mat2's after multiplying each element of the second operand by a scalar value.
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param scale the amount to scale b's elements by before adding
- * @returns out
- */
 /**
  * Adds two mat2's after multiplying each element of the second operand by a scalar value.
  *
@@ -6183,23 +4519,12 @@ export const sub = subtract;
  *
  * @returns a new 2x3 matrix
  */
-/**
- * Creates a new identity mat2d
- *
- * @returns a new 2x3 matrix
- */
 export function create(): Mat2d;
 ```
 
 #### `mat2d.clone`
 
 ```ts
-/**
- * Creates a new mat2d initialized with values from an existing matrix
- *
- * @param a matrix to clone
- * @returns a new 2x3 matrix
- */
 /**
  * Creates a new mat2d initialized with values from an existing matrix
  *
@@ -6219,13 +4544,6 @@ export function clone(a: Mat2d): Mat2d;
  * @param a the source matrix
  * @returns out
  */
-/**
- * Copy the values from one mat2d to another
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 export function copy(out: Mat2d, a: Mat2d): Mat2d;
 ```
 
@@ -6238,29 +4556,12 @@ export function copy(out: Mat2d, a: Mat2d): Mat2d;
  * @param out the receiving matrix
  * @returns out
  */
-/**
- * Set a mat2d to the identity matrix
- *
- * @param out the receiving matrix
- * @returns out
- */
 export function identity(out: Mat2d): Mat2d;
 ```
 
 #### `mat2d.fromValues`
 
 ```ts
-/**
- * Create a new mat2d with the given values
- *
- * @param a Component A (index 0)
- * @param b Component B (index 1)
- * @param c Component C (index 2)
- * @param d Component D (index 3)
- * @param tx Component TX (index 4)
- * @param ty Component TY (index 5)
- * @returns A new mat2d
- */
 /**
  * Create a new mat2d with the given values
  *
@@ -6290,31 +4591,12 @@ export function fromValues(a: number, b: number, c: number, d: number, tx: numbe
  * @param ty Component TY (index 5)
  * @returns out
  */
-/**
- * Set the components of a mat2d to the given values
- *
- * @param out the receiving matrix
- * @param a Component A (index 0)
- * @param b Component B (index 1)
- * @param c Component C (index 2)
- * @param d Component D (index 3)
- * @param tx Component TX (index 4)
- * @param ty Component TY (index 5)
- * @returns out
- */
 export function set(out: Mat2d, a: number, b: number, c: number, d: number, tx: number, ty: number): Mat2d;
 ```
 
 #### `mat2d.invert`
 
 ```ts
-/**
- * Inverts a mat2d
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out, or null if source matrix is not invertible
- */
 /**
  * Inverts a mat2d
  *
@@ -6334,26 +4616,12 @@ export function invert(out: Mat2d, a: Mat2d): Mat2d | null;
  * @param a the source matrix
  * @returns determinant of a
  */
-/**
- * Calculates the determinant of a mat2d
- *
- * @param a the source matrix
- * @returns determinant of a
- */
 export function determinant(a: Mat2d): number;
 ```
 
 #### `mat2d.multiply`
 
 ```ts
-/**
- * Multiplies two mat2d's
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Multiplies two mat2d's
  *
@@ -6376,28 +4644,12 @@ export function multiply(out: Mat2d, a: Mat2d, b: Mat2d): Mat2d;
  * @param rad the angle to rotate the matrix by
  * @returns out
  */
-/**
- * Rotates a mat2d by the given angle
- *
- * @param out the receiving matrix
- * @param a the matrix to rotate
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 export function rotate(out: Mat2d, a: Mat2d, rad: number): Mat2d;
 ```
 
 #### `mat2d.scale`
 
 ```ts
-/**
- * Scales the mat2d by the dimensions in the given vec2
- *
- * @param out the receiving matrix
- * @param a the matrix to translate
- * @param v the vec2 to scale the matrix by
- * @returns out
- **/
 /**
  * Scales the mat2d by the dimensions in the given vec2
  *
@@ -6420,31 +4672,12 @@ export function scale(out: Mat2d, a: Mat2d, v: Vec2): Mat2d;
  * @param v the vec2 to translate the matrix by
  * @returns out
  **/
-/**
- * Translates the mat2d by the dimensions in the given vec2
- *
- * @param out the receiving matrix
- * @param a the matrix to translate
- * @param v the vec2 to translate the matrix by
- * @returns out
- **/
 export function translate(out: Mat2d, a: Mat2d, v: Vec2): Mat2d;
 ```
 
 #### `mat2d.fromRotation`
 
 ```ts
-/**
- * Creates a matrix from a given angle
- * This is equivalent to (but much faster than):
- *
- *     mat2d.identity(dest);
- *     mat2d.rotate(dest, dest, rad);
- *
- * @param out mat2d receiving operation result
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 /**
  * Creates a matrix from a given angle
  * This is equivalent to (but much faster than):
@@ -6473,34 +4706,12 @@ export function fromRotation(out: Mat2d, rad: number): Mat2d;
  * @param v Scaling vector
  * @returns out
  */
-/**
- * Creates a matrix from a vector scaling
- * This is equivalent to (but much faster than):
- *
- *     mat2d.identity(dest);
- *     mat2d.scale(dest, dest, vec);
- *
- * @param out mat2d receiving operation result
- * @param v Scaling vector
- * @returns out
- */
 export function fromScaling(out: Mat2d, v: Vec2): Mat2d;
 ```
 
 #### `mat2d.fromTranslation`
 
 ```ts
-/**
- * Creates a matrix from a vector translation
- * This is equivalent to (but much faster than):
- *
- *     mat2d.identity(dest);
- *     mat2d.translate(dest, dest, vec);
- *
- * @param out mat2d receiving operation result
- * @param v Translation vector
- * @returns out
- */
 /**
  * Creates a matrix from a vector translation
  * This is equivalent to (but much faster than):
@@ -6524,12 +4735,6 @@ export function fromTranslation(out: Mat2d, v: Vec2): Mat2d;
  * @param a matrix to represent as a string
  * @returns string representation of the matrix
  */
-/**
- * Returns a string representation of a mat2d
- *
- * @param a matrix to represent as a string
- * @returns string representation of the matrix
- */
 export function str(a: Mat2d): string;
 ```
 
@@ -6542,26 +4747,12 @@ export function str(a: Mat2d): string;
  * @param a the matrix to calculate Frobenius norm of
  * @returns Frobenius norm
  */
-/**
- * Returns Frobenius norm of a mat2d
- *
- * @param a the matrix to calculate Frobenius norm of
- * @returns Frobenius norm
- */
 export function frob(a: Mat2d): number;
 ```
 
 #### `mat2d.add`
 
 ```ts
-/**
- * Adds two mat2d's
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Adds two mat2d's
  *
@@ -6584,28 +4775,12 @@ export function add(out: Mat2d, a: Mat2d, b: Mat2d): Mat2d;
  * @param b the second operand
  * @returns out
  */
-/**
- * Subtracts matrix b from matrix a
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function subtract(out: Mat2d, a: Mat2d, b: Mat2d): Mat2d;
 ```
 
 #### `mat2d.multiplyScalar`
 
 ```ts
-/**
- * Multiply each element of the matrix by a scalar.
- *
- * @param out the receiving matrix
- * @param a the matrix to scale
- * @param b amount to scale the matrix's elements by
- * @returns out
- */
 /**
  * Multiply each element of the matrix by a scalar.
  *
@@ -6629,15 +4804,6 @@ export function multiplyScalar(out: Mat2d, a: Mat2d, b: number): Mat2d;
  * @param scale the amount to scale b's elements by before adding
  * @returns out
  */
-/**
- * Adds two mat2d's after multiplying each element of the second operand by a scalar value.
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param scale the amount to scale b's elements by before adding
- * @returns out
- */
 export function multiplyScalarAndAdd(out: Mat2d, a: Mat2d, b: Mat2d, scale: number): Mat2d;
 ```
 
@@ -6651,26 +4817,12 @@ export function multiplyScalarAndAdd(out: Mat2d, a: Mat2d, b: Mat2d, scale: numb
  * @param b The second matrix.
  * @returns True if the matrices are equal, false otherwise.
  */
-/**
- * Returns whether or not the matrices have exactly the same elements in the same position (when compared with ===)
- *
- * @param a The first matrix.
- * @param b The second matrix.
- * @returns True if the matrices are equal, false otherwise.
- */
 export function exactEquals(a: Mat2d, b: Mat2d): boolean;
 ```
 
 #### `mat2d.equals`
 
 ```ts
-/**
- * Returns whether or not the matrices have approximately the same elements in the same position.
- *
- * @param a The first matrix.
- * @param b The second matrix.
- * @returns True if the matrices are equal, false otherwise.
- */
 /**
  * Returns whether or not the matrices have approximately the same elements in the same position.
  *
@@ -6709,24 +4861,12 @@ export const sub = subtract;
  *
  * @returns a new 3x3 matrix
  */
-/**
- * Creates a new identity mat3
- *
- * @returns a new 3x3 matrix
- */
 export function create(): Mat3;
 ```
 
 #### `mat3.fromMat4`
 
 ```ts
-/**
- * Copies the upper-left 3x3 values into the given mat3.
- *
- * @param out the receiving 3x3 matrix
- * @param a   the source 4x4 matrix
- * @returns out
- */
 /**
  * Copies the upper-left 3x3 values into the given mat3.
  *
@@ -6746,12 +4886,6 @@ export function fromMat4(out: Mat3, a: Mat4): Mat3;
  * @param a matrix to clone
  * @returns a new 3x3 matrix
  */
-/**
- * Creates a new mat3 initialized with values from an existing matrix
- *
- * @param a matrix to clone
- * @returns a new 3x3 matrix
- */
 export function clone(a: Mat3): Mat3;
 ```
 
@@ -6765,33 +4899,12 @@ export function clone(a: Mat3): Mat3;
  * @param a the source matrix
  * @returns out
  */
-/**
- * Copy the values from one mat3 to another
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 export function copy(out: Mat3, a: Mat3): Mat3;
 ```
 
 #### `mat3.fromValues`
 
 ```ts
-/**
- * Create a new mat3 with the given values
- *
- * @param m00 Component in column 0, row 0 position (index 0)
- * @param m01 Component in column 0, row 1 position (index 1)
- * @param m02 Component in column 0, row 2 position (index 2)
- * @param m10 Component in column 1, row 0 position (index 3)
- * @param m11 Component in column 1, row 1 position (index 4)
- * @param m12 Component in column 1, row 2 position (index 5)
- * @param m20 Component in column 2, row 0 position (index 6)
- * @param m21 Component in column 2, row 1 position (index 7)
- * @param m22 Component in column 2, row 2 position (index 8)
- * @returns A new mat3
- */
 /**
  * Create a new mat3 with the given values
  *
@@ -6827,33 +4940,12 @@ export function fromValues(m00: number, m01: number, m02: number, m10: number, m
  * @param m22 Component in column 2, row 2 position (index 8)
  * @returns out
  */
-/**
- * Set the components of a mat3 to the given values
- *
- * @param out the receiving matrix
- * @param m00 Component in column 0, row 0 position (index 0)
- * @param m01 Component in column 0, row 1 position (index 1)
- * @param m02 Component in column 0, row 2 position (index 2)
- * @param m10 Component in column 1, row 0 position (index 3)
- * @param m11 Component in column 1, row 1 position (index 4)
- * @param m12 Component in column 1, row 2 position (index 5)
- * @param m20 Component in column 2, row 0 position (index 6)
- * @param m21 Component in column 2, row 1 position (index 7)
- * @param m22 Component in column 2, row 2 position (index 8)
- * @returns out
- */
 export function set(out: Mat3, m00: number, m01: number, m02: number, m10: number, m11: number, m12: number, m20: number, m21: number, m22: number): Mat3;
 ```
 
 #### `mat3.identity`
 
 ```ts
-/**
- * Set a mat3 to the identity matrix
- *
- * @param out the receiving matrix
- * @returns out
- */
 /**
  * Set a mat3 to the identity matrix
  *
@@ -6872,25 +4964,12 @@ export function identity(out: Mat3): Mat3;
  * @param out the receiving matrix
  * @returns out
  */
-/**
- * Set a mat3 to the zero matrix
- *
- * @param out the receiving matrix
- * @returns out
- */
 export function zero(out: Mat3): Mat3;
 ```
 
 #### `mat3.transpose`
 
 ```ts
-/**
- * Transpose the values of a mat3
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 /**
  * Transpose the values of a mat3
  *
@@ -6911,26 +4990,12 @@ export function transpose(out: Mat3, a: Mat3): Mat3;
  * @param a the source matrix
  * @returns out
  */
-/**
- * Inverts a mat3
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 export function invert(out: Mat3, a: Mat3): Mat3 | null;
 ```
 
 #### `mat3.adjoint`
 
 ```ts
-/**
- * Calculates the adjugate of a mat3
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 /**
  * Calculates the adjugate of a mat3
  *
@@ -6950,26 +5015,12 @@ export function adjoint(out: Mat3, a: Mat3): Mat3;
  * @param a the source matrix
  * @returns determinant of a
  */
-/**
- * Calculates the determinant of a mat3
- *
- * @param a the source matrix
- * @returns determinant of a
- */
 export function determinant(a: Mat3): number;
 ```
 
 #### `mat3.multiply`
 
 ```ts
-/**
- * Multiplies two mat3's
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Multiplies two mat3's
  *
@@ -6992,28 +5043,12 @@ export function multiply(out: Mat3, a: Mat3, b: Mat3): Mat3;
  * @param v vector to translate by
  * @returns out
  */
-/**
- * Translate a mat3 by the given vector
- *
- * @param out the receiving matrix
- * @param a the matrix to translate
- * @param v vector to translate by
- * @returns out
- */
 export function translate(out: Mat3, a: Mat3, v: Vec2): Mat3;
 ```
 
 #### `mat3.rotate`
 
 ```ts
-/**
- * Rotates a mat3 by the given angle
- *
- * @param out the receiving matrix
- * @param a the matrix to rotate
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 /**
  * Rotates a mat3 by the given angle
  *
@@ -7036,31 +5071,12 @@ export function rotate(out: Mat3, a: Mat3, rad: number): Mat3;
  * @param v the vec2 to scale the matrix by
  * @returns out
  **/
-/**
- * Scales the mat3 by the dimensions in the given vec2
- *
- * @param out the receiving matrix
- * @param a the matrix to rotate
- * @param v the vec2 to scale the matrix by
- * @returns out
- **/
 export function scale(out: Mat3, a: Mat3, v: Vec2): Mat3;
 ```
 
 #### `mat3.fromTranslation`
 
 ```ts
-/**
- * Creates a matrix from a vector translation
- * This is equivalent to (but much faster than):
- *
- *     mat3.identity(dest);
- *     mat3.translate(dest, dest, vec);
- *
- * @param out mat3 receiving operation result
- * @param v Translation vector
- * @returns out
- */
 /**
  * Creates a matrix from a vector translation
  * This is equivalent to (but much faster than):
@@ -7089,34 +5105,12 @@ export function fromTranslation(out: Mat3, v: Vec2): Mat3;
  * @param rad the angle to rotate the matrix by
  * @returns out
  */
-/**
- * Creates a matrix from a given angle
- * This is equivalent to (but much faster than):
- *
- *     mat3.identity(dest);
- *     mat3.rotate(dest, dest, rad);
- *
- * @param out mat3 receiving operation result
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 export function fromRotation(out: Mat3, rad: number): Mat3;
 ```
 
 #### `mat3.fromScaling`
 
 ```ts
-/**
- * Creates a matrix from a vector scaling
- * This is equivalent to (but much faster than):
- *
- *     mat3.identity(dest);
- *     mat3.scale(dest, dest, vec);
- *
- * @param out mat3 receiving operation result
- * @param v Scaling vector
- * @returns out
- */
 /**
  * Creates a matrix from a vector scaling
  * This is equivalent to (but much faster than):
@@ -7141,27 +5135,12 @@ export function fromScaling(out: Mat3, v: Vec2): Mat3;
  * @param a the matrix to copy
  * @returns out
  **/
-/**
- * Copies the values from a mat2d into a mat3
- *
- * @param out the receiving matrix
- * @param a the matrix to copy
- * @returns out
- **/
 export function fromMat2d(out: Mat3, a: Mat2d): Mat3;
 ```
 
 #### `mat3.fromQuat`
 
 ```ts
-/**
- * Calculates a 3x3 matrix from the given quaternion
- *
- * @param out mat3 receiving operation result
- * @param q Quaternion to create matrix from
- *
- * @returns out
- */
 /**
  * Calculates a 3x3 matrix from the given quaternion
  *
@@ -7184,28 +5163,12 @@ export function fromQuat(out: Mat3, q: Quat): Mat3;
  *
  * @returns out
  */
-/**
- * Calculates a 3x3 normal matrix (transpose inverse) from the 4x4 matrix
- *
- * @param out mat3 receiving operation result
- * @param a Mat4 to derive the normal matrix from
- *
- * @returns out
- */
 export function normalFromMat4(out: Mat3, a: Mat4): Mat3 | null;
 ```
 
 #### `mat3.projection`
 
 ```ts
-/**
- * Generates a 2D projection matrix with the given bounds
- *
- * @param out mat3 frustum matrix will be written into
- * @param width Width of your gl context
- * @param height Height of gl context
- * @returns out
- */
 /**
  * Generates a 2D projection matrix with the given bounds
  *
@@ -7226,12 +5189,6 @@ export function projection(out: Mat3, width: number, height: number): Mat3;
  * @param a matrix to represent as a string
  * @returns string representation of the matrix
  */
-/**
- * Returns a string representation of a mat3
- *
- * @param a matrix to represent as a string
- * @returns string representation of the matrix
- */
 export function str(a: Mat3): string;
 ```
 
@@ -7244,26 +5201,12 @@ export function str(a: Mat3): string;
  * @param a the matrix to calculate Frobenius norm of
  * @returns Frobenius norm
  */
-/**
- * Returns Frobenius norm of a mat3
- *
- * @param a the matrix to calculate Frobenius norm of
- * @returns Frobenius norm
- */
 export function frob(a: Mat3): number;
 ```
 
 #### `mat3.add`
 
 ```ts
-/**
- * Adds two mat3's
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Adds two mat3's
  *
@@ -7286,28 +5229,12 @@ export function add(out: Mat3, a: Mat3, b: Mat3): Mat3;
  * @param b the second operand
  * @returns out
  */
-/**
- * Subtracts matrix b from matrix a
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function subtract(out: Mat3, a: Mat3, b: Mat3): Mat3;
 ```
 
 #### `mat3.multiplyScalar`
 
 ```ts
-/**
- * Multiply each element of the matrix by a scalar.
- *
- * @param out the receiving matrix
- * @param a the matrix to scale
- * @param b amount to scale the matrix's elements by
- * @returns out
- */
 /**
  * Multiply each element of the matrix by a scalar.
  *
@@ -7331,15 +5258,6 @@ export function multiplyScalar(out: Mat3, a: Mat3, b: number): Mat3;
  * @param scale the amount to scale b's elements by before adding
  * @returns out
  */
-/**
- * Adds two mat3's after multiplying each element of the second operand by a scalar value.
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param scale the amount to scale b's elements by before adding
- * @returns out
- */
 export function multiplyScalarAndAdd(out: Mat3, a: Mat3, b: Mat3, scale: number): Mat3;
 ```
 
@@ -7353,26 +5271,12 @@ export function multiplyScalarAndAdd(out: Mat3, a: Mat3, b: Mat3, scale: number)
  * @param b The second matrix.
  * @returns True if the matrices are equal, false otherwise.
  */
-/**
- * Returns whether or not the matrices have exactly the same elements in the same position (when compared with ===)
- *
- * @param a The first matrix.
- * @param b The second matrix.
- * @returns True if the matrices are equal, false otherwise.
- */
 export function exactEquals(a: Mat3, b: Mat3): boolean;
 ```
 
 #### `mat3.equals`
 
 ```ts
-/**
- * Returns whether or not the matrices have approximately the same elements in the same position.
- *
- * @param a The first matrix.
- * @param b The second matrix.
- * @returns True if the matrices are equal, false otherwise.
- */
 /**
  * Returns whether or not the matrices have approximately the same elements in the same position.
  *
@@ -7413,23 +5317,12 @@ export const sub = subtract;
  *
  * @returns a new 4x4 matrix
  */
-/**
- * Creates a new identity mat4
- *
- * @returns a new 4x4 matrix
- */
 export function create(): Mat4;
 ```
 
 #### `mat4.clone`
 
 ```ts
-/**
- * Creates a new mat4 initialized with values from an existing matrix
- *
- * @param a matrix to clone
- * @returns a new 4x4 matrix
- */
 /**
  * Creates a new mat4 initialized with values from an existing matrix
  *
@@ -7449,40 +5342,12 @@ export function clone(a: Mat4): Mat4;
  * @param a the source matrix
  * @returns out
  */
-/**
- * Copy the values from one mat4 to another
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 export function copy(out: Mat4, a: Mat4): Mat4;
 ```
 
 #### `mat4.fromValues`
 
 ```ts
-/**
- * Create a new mat4 with the given values
- *
- * @param m00 Component in column 0, row 0 position (index 0)
- * @param m01 Component in column 0, row 1 position (index 1)
- * @param m02 Component in column 0, row 2 position (index 2)
- * @param m03 Component in column 0, row 3 position (index 3)
- * @param m10 Component in column 1, row 0 position (index 4)
- * @param m11 Component in column 1, row 1 position (index 5)
- * @param m12 Component in column 1, row 2 position (index 6)
- * @param m13 Component in column 1, row 3 position (index 7)
- * @param m20 Component in column 2, row 0 position (index 8)
- * @param m21 Component in column 2, row 1 position (index 9)
- * @param m22 Component in column 2, row 2 position (index 10)
- * @param m23 Component in column 2, row 3 position (index 11)
- * @param m30 Component in column 3, row 0 position (index 12)
- * @param m31 Component in column 3, row 1 position (index 13)
- * @param m32 Component in column 3, row 2 position (index 14)
- * @param m33 Component in column 3, row 3 position (index 15)
- * @returns A new mat4
- */
 /**
  * Create a new mat4 with the given values
  *
@@ -7532,28 +5397,6 @@ export function fromValues(m00: number, m01: number, m02: number, m03: number, m
  * @param m33 Component in column 3, row 3 position (index 15)
  * @returns out
  */
-/**
- * Set the components of a mat4 to the given values
- *
- * @param out the receiving matrix
- * @param m00 Component in column 0, row 0 position (index 0)
- * @param m01 Component in column 0, row 1 position (index 1)
- * @param m02 Component in column 0, row 2 position (index 2)
- * @param m03 Component in column 0, row 3 position (index 3)
- * @param m10 Component in column 1, row 0 position (index 4)
- * @param m11 Component in column 1, row 1 position (index 5)
- * @param m12 Component in column 1, row 2 position (index 6)
- * @param m13 Component in column 1, row 3 position (index 7)
- * @param m20 Component in column 2, row 0 position (index 8)
- * @param m21 Component in column 2, row 1 position (index 9)
- * @param m22 Component in column 2, row 2 position (index 10)
- * @param m23 Component in column 2, row 3 position (index 11)
- * @param m30 Component in column 3, row 0 position (index 12)
- * @param m31 Component in column 3, row 1 position (index 13)
- * @param m32 Component in column 3, row 2 position (index 14)
- * @param m33 Component in column 3, row 3 position (index 15)
- * @returns out
- */
 export function set(out: Mat4, m00: number, m01: number, m02: number, m03: number, m10: number, m11: number, m12: number, m13: number, m20: number, m21: number, m22: number, m23: number, m30: number, m31: number, m32: number, m33: number): Mat4;
 ```
 
@@ -7566,24 +5409,12 @@ export function set(out: Mat4, m00: number, m01: number, m02: number, m03: numbe
  * @param out the receiving matrix
  * @returns out
  */
-/**
- * Set a mat4 to the identity matrix
- *
- * @param out the receiving matrix
- * @returns out
- */
 export function identity(out: Mat4): Mat4;
 ```
 
 #### `mat4.zero`
 
 ```ts
-/**
- * Set a mat4 to the zero matrix
- *
- * @param out the receiving matrix
- * @returns out
- */
 /**
  * Set a mat4 to the zero matrix
  *
@@ -7603,26 +5434,12 @@ export function zero(out: Mat4): Mat4;
  * @param a the source matrix
  * @returns out
  */
-/**
- * Transpose the values of a mat4
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 export function transpose(out: Mat4, a: Mat4): Mat4;
 ```
 
 #### `mat4.invert`
 
 ```ts
-/**
- * Inverts a mat4
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out, or null if source matrix is not invertible
- */
 /**
  * Inverts a mat4
  *
@@ -7645,15 +5462,6 @@ export function invert(out: Mat4, a: Mat4): Mat4 | null;
  * @param a the source matrix
  * @returns out, or null if the 3x3 part is not invertible
  */
-/**
- * Inverts only the 3x3 rotation part of a mat4.
- * Sets the translation column and bottom row to [0, 0, 0, 1].
- * Equivalent to Jolt's Mat44::Inversed3x3()
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out, or null if the 3x3 part is not invertible
- */
 export function invert3x3(out: Mat4, a: Mat4): Mat4 | null;
 ```
 
@@ -7667,25 +5475,12 @@ export function invert3x3(out: Mat4, a: Mat4): Mat4 | null;
  * @param a the source matrix
  * @returns out
  */
-/**
- * Calculates the adjugate of a mat4
- *
- * @param out the receiving matrix
- * @param a the source matrix
- * @returns out
- */
 export function adjoint(out: Mat4, a: Mat4): Mat4;
 ```
 
 #### `mat4.determinant`
 
 ```ts
-/**
- * Calculates the determinant of a mat4
- *
- * @param a the source matrix
- * @returns determinant of a
- */
 /**
  * Calculates the determinant of a mat4
  *
@@ -7706,30 +5501,12 @@ export function determinant(a: Mat4): number;
  * @param b the second operand
  * @returns out
  */
-/**
- * Multiplies two mat4s
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function multiply(out: Mat4, a: Mat4, b: Mat4): Mat4;
 ```
 
 #### `mat4.multiply3x3`
 
 ```ts
-/**
- * Multiplies two mat4s treating them as 3x3 rotation matrices.
- * Only computes the upper-left 3x3 portion, sets the 4th column to [0,0,0,1].
- * More efficient than full mat4.multiply when working with pure rotations.
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Multiplies two mat4s treating them as 3x3 rotation matrices.
  * Only computes the upper-left 3x3 portion, sets the 4th column to [0,0,0,1].
@@ -7757,31 +5534,12 @@ export function multiply3x3(out: Mat4, a: Mat4, b: Mat4): Mat4;
  * @param b the second operand (will be transposed)
  * @returns out
  */
-/**
- * Multiplies a mat4 by the transpose of another mat4,
- * treating both as 3x3 rotation matrices.
- * Computes: out = a * transpose(b) (3x3 only)
- * Sets the 4th column to [0,0,0,1].
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand (will be transposed)
- * @returns out
- */
 export function multiply3x3RightTransposed(out: Mat4, a: Mat4, b: Mat4): Mat4;
 ```
 
 #### `mat4.multiply3x3TransposedVec`
 
 ```ts
-/**
- * Transform a Vec3 by the transpose of the 3x3 rotation part.
- *
- * @param out the receiving vector
- * @param mat the matrix to transform with
- * @param vec the vector to transform
- * @returns out
- */
 /**
  * Transform a Vec3 by the transpose of the 3x3 rotation part.
  *
@@ -7804,28 +5562,12 @@ export function multiply3x3TransposedVec(out: Vec3, mat: Mat4, vec: Vec3): Vec3;
  * @param vec the vector to transform
  * @returns out
  */
-/**
- * Transform a Vec3 by only the 3x3 rotation part of a Mat4.
- *
- * @param out the receiving vector
- * @param mat the matrix to transform with
- * @param vec the vector to transform
- * @returns out
- */
 export function multiply3x3Vec(out: Vec3, mat: Mat4, vec: Vec3): Vec3;
 ```
 
 #### `mat4.crossProductMatrix`
 
 ```ts
-/**
- * Cross product matrix (skew-symmetric matrix).
- * Equivalent to Jolt's Mat44::sCrossProduct(Vec3Arg)
- *
- * @param out the receiving matrix
- * @param v the vector to create the cross product matrix from
- * @returns out
- */
 /**
  * Cross product matrix (skew-symmetric matrix).
  * Equivalent to Jolt's Mat44::sCrossProduct(Vec3Arg)
@@ -7848,28 +5590,12 @@ export function crossProductMatrix(out: Mat4, v: Vec3): Mat4;
  * @param v vector to translate by
  * @returns out
  */
-/**
- * Translate a mat4 by the given vector
- *
- * @param out the receiving matrix
- * @param a the matrix to translate
- * @param v vector to translate by
- * @returns out
- */
 export function translate(out: Mat4, a: Mat4, v: Vec3): Mat4;
 ```
 
 #### `mat4.scale`
 
 ```ts
-/**
- * Scales the mat4 by the dimensions in the given vec3 not using vectorization
- *
- * @param out the receiving matrix
- * @param a the matrix to scale
- * @param v the vec3 to scale the matrix by
- * @returns out
- **/
 /**
  * Scales the mat4 by the dimensions in the given vec3 not using vectorization
  *
@@ -7893,29 +5619,12 @@ export function scale(out: Mat4, a: Mat4, v: Vec3): Mat4;
  * @param axis the axis to rotate around
  * @returns out
  */
-/**
- * Rotates a mat4 by the given angle around the given axis
- *
- * @param out the receiving matrix
- * @param a the matrix to rotate
- * @param rad the angle to rotate the matrix by
- * @param axis the axis to rotate around
- * @returns out
- */
 export function rotate(out: Mat4, a: Mat4, rad: number, axis: Vec3): Mat4 | null;
 ```
 
 #### `mat4.rotateX`
 
 ```ts
-/**
- * Rotates a matrix by the given angle around the X axis
- *
- * @param out the receiving matrix
- * @param a the matrix to rotate
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 /**
  * Rotates a matrix by the given angle around the X axis
  *
@@ -7938,28 +5647,12 @@ export function rotateX(out: Mat4, a: Mat4, rad: number): Mat4;
  * @param rad the angle to rotate the matrix by
  * @returns out
  */
-/**
- * Rotates a matrix by the given angle around the Y axis
- *
- * @param out the receiving matrix
- * @param a the matrix to rotate
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 export function rotateY(out: Mat4, a: Mat4, rad: number): Mat4;
 ```
 
 #### `mat4.rotateZ`
 
 ```ts
-/**
- * Rotates a matrix by the given angle around the Z axis
- *
- * @param out the receiving matrix
- * @param a the matrix to rotate
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 /**
  * Rotates a matrix by the given angle around the Z axis
  *
@@ -7985,34 +5678,12 @@ export function rotateZ(out: Mat4, a: Mat4, rad: number): Mat4;
  * @param v Translation vector
  * @returns out
  */
-/**
- * Creates a matrix from a vector translation
- * This is equivalent to (but much faster than):
- *
- *     mat4.identity(dest);
- *     mat4.translate(dest, dest, vec);
- *
- * @param out mat4 receiving operation result
- * @param v Translation vector
- * @returns out
- */
 export function fromTranslation(out: Mat4, v: Vec3): Mat4;
 ```
 
 #### `mat4.fromScaling`
 
 ```ts
-/**
- * Creates a matrix from a vector scaling
- * This is equivalent to (but much faster than):
- *
- *     mat4.identity(dest);
- *     mat4.scale(dest, dest, vec);
- *
- * @param out mat4 receiving operation result
- * @param v Scaling vector
- * @returns out
- */
 /**
  * Creates a matrix from a vector scaling
  * This is equivalent to (but much faster than):
@@ -8042,35 +5713,12 @@ export function fromScaling(out: Mat4, v: Vec3): Mat4;
  * @param axis the axis to rotate around
  * @returns out
  */
-/**
- * Creates a matrix from a given angle around a given axis
- * This is equivalent to (but much faster than):
- *
- *     mat4.identity(dest);
- *     mat4.rotate(dest, dest, rad, axis);
- *
- * @param out mat4 receiving operation result
- * @param rad the angle to rotate the matrix by
- * @param axis the axis to rotate around
- * @returns out
- */
 export function fromRotation(out: Mat4, rad: number, axis: Vec3): Mat4 | null;
 ```
 
 #### `mat4.fromXRotation`
 
 ```ts
-/**
- * Creates a matrix from the given angle around the X axis
- * This is equivalent to (but much faster than):
- *
- *     mat4.identity(dest);
- *     mat4.rotateX(dest, dest, rad);
- *
- * @param out mat4 receiving operation result
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 /**
  * Creates a matrix from the given angle around the X axis
  * This is equivalent to (but much faster than):
@@ -8099,34 +5747,12 @@ export function fromXRotation(out: Mat4, rad: number): Mat4;
  * @param rad the angle to rotate the matrix by
  * @returns out
  */
-/**
- * Creates a matrix from the given angle around the Y axis
- * This is equivalent to (but much faster than):
- *
- *     mat4.identity(dest);
- *     mat4.rotateY(dest, dest, rad);
- *
- * @param out mat4 receiving operation result
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 export function fromYRotation(out: Mat4, rad: number): Mat4;
 ```
 
 #### `mat4.fromZRotation`
 
 ```ts
-/**
- * Creates a matrix from the given angle around the Z axis
- * This is equivalent to (but much faster than):
- *
- *     mat4.identity(dest);
- *     mat4.rotateZ(dest, dest, rad);
- *
- * @param out mat4 receiving operation result
- * @param rad the angle to rotate the matrix by
- * @returns out
- */
 /**
  * Creates a matrix from the given angle around the Z axis
  * This is equivalent to (but much faster than):
@@ -8159,21 +5785,6 @@ export function fromZRotation(out: Mat4, rad: number): Mat4;
  * @param v Translation vector
  * @returns out
  */
-/**
- * Creates a matrix from a quaternion rotation and vector translation
- * This is equivalent to (but much faster than):
- *
- *     mat4.identity(dest);
- *     mat4.translate(dest, dest, vec);
- *     let quatMat = mat4.create();
- *     mat4.fromQuat(quatMat, quat);
- *     mat4.multiply(dest, dest, quatMat);
- *
- * @param out mat4 receiving operation result
- * @param q Rotation quaternion
- * @param v Translation vector
- * @returns out
- */
 export function fromRotationTranslation(out: Mat4, q: Quat | Quat2, v: Vec3): Mat4;
 ```
 
@@ -8187,28 +5798,12 @@ export function fromRotationTranslation(out: Mat4, q: Quat | Quat2, v: Vec3): Ma
  * @param a Dual Quaternion
  * @returns mat4 receiving operation result
  */
-/**
- * Creates a new mat4 from a dual quat.
- *
- * @param out Matrix
- * @param a Dual Quaternion
- * @returns mat4 receiving operation result
- */
 export function fromQuat2(out: Mat4, a: Quat2): Mat4;
 ```
 
 #### `mat4.getTranslation`
 
 ```ts
-/**
- * Returns the translation vector component of a transformation
- *  matrix. If a matrix is built with fromRotationTranslation,
- *  the returned vector will be the same as the translation vector
- *  originally supplied.
- * @param out Vector to receive translation component
- * @param mat Matrix to be decomposed (input)
- * @return out
- */
 /**
  * Returns the translation vector component of a transformation
  *  matrix. If a matrix is built with fromRotationTranslation,
@@ -8234,31 +5829,12 @@ export function getTranslation(out: Vec3, mat: Mat4): Vec3;
  * @param mat Matrix to be decomposed (input)
  * @return out
  */
-/**
- * Returns the scaling factor component of a transformation
- *  matrix. If a matrix is built with fromRotationTranslationScale
- *  with a normalized Quaternion parameter, the returned vector will be
- *  the same as the scaling vector
- *  originally supplied.
- * @param out Vector to receive scaling factor component
- * @param mat Matrix to be decomposed (input)
- * @return out
- */
 export function getScaling(out: Vec3, mat: Mat4): Vec3;
 ```
 
 #### `mat4.getRotation`
 
 ```ts
-/**
- * Returns a quaternion representing the rotational component
- *  of a transformation matrix. If a matrix is built with
- *  fromRotationTranslation, the returned quaternion will be the
- *  same as the quaternion originally supplied.
- * @param out Quaternion to receive the rotation component
- * @param mat Matrix to be decomposed (input)
- * @return out
- */
 /**
  * Returns a quaternion representing the rotational component
  *  of a transformation matrix. If a matrix is built with
@@ -8283,38 +5859,12 @@ export function getRotation(out: Quat, mat: Mat4): Quat;
  * @param mat Matrix to be decomposed (input)
  * @returns out_r
  */
-/**
- * Decomposes a transformation matrix into its rotation, translation
- * and scale components. Returns only the rotation component
- * @param out_r Quaternion to receive the rotation component
- * @param out_t Vector to receive the translation vector
- * @param out_s Vector to receive the scaling factor
- * @param mat Matrix to be decomposed (input)
- * @returns out_r
- */
 export function decompose(out_r: Quat, out_t: Vec3, out_s: Vec3, mat: Mat4): Quat;
 ```
 
 #### `mat4.fromRotationTranslationScale`
 
 ```ts
-/**
- * Creates a matrix from a quaternion rotation, vector translation and vector scale
- * This is equivalent to (but much faster than):
- *
- *     mat4.identity(dest);
- *     mat4.translate(dest, dest, vec);
- *     let quatMat = mat4.create();
- *     mat4.fromQuat(quatMat, quat);
- *     mat4.multiply(dest, dest, quatMat);
- *     mat4.scale(dest, dest, scale)
- *
- * @param out mat4 receiving operation result
- * @param q Rotation quaternion
- * @param v Translation vector
- * @param s Scaling vector
- * @returns out
- */
 /**
  * Creates a matrix from a quaternion rotation, vector translation and vector scale
  * This is equivalent to (but much faster than):
@@ -8358,26 +5908,6 @@ export function fromRotationTranslationScale(out: Mat4, q: Quat, v: Vec3, s: Vec
  * @param o The origin vector around which to scale and rotate
  * @returns out
  */
-/**
- * Creates a matrix from a quaternion rotation, vector translation and vector scale, rotating and scaling around the given origin
- * This is equivalent to (but much faster than):
- *
- *     mat4.identity(dest);
- *     mat4.translate(dest, dest, vec);
- *     mat4.translate(dest, dest, origin);
- *     let quatMat = mat4.create();
- *     mat4.fromQuat(quatMat, quat);
- *     mat4.multiply(dest, dest, quatMat);
- *     mat4.scale(dest, dest, scale)
- *     mat4.translate(dest, dest, negativeOrigin);
- *
- * @param out mat4 receiving operation result
- * @param q Rotation quaternion
- * @param v Translation vector
- * @param s Scaling vector
- * @param o The origin vector around which to scale and rotate
- * @returns out
- */
 export function fromRotationTranslationScaleOrigin(out: Mat4, q: Quat, v: Vec3, s: Vec3, o: Vec3): Mat4;
 ```
 
@@ -8392,34 +5922,12 @@ export function fromRotationTranslationScaleOrigin(out: Mat4, q: Quat, v: Vec3, 
  *
  * @returns out
  */
-/**
- * Calculates a 4x4 matrix from the given quaternion
- *
- * @param out mat4 receiving operation result
- * @param q Quaternion to create matrix from
- *
- * @returns out
- */
 export function fromQuat(out: Mat4, q: Quat): Mat4;
 ```
 
 #### `mat4.frustumNO`
 
 ```ts
-/**
- * Generates a frustum matrix with the given bounds.
- * The near/far clip planes correspond to a normalized device coordinate Z range of [-1, 1],
- * which matches WebGL/OpenGL's clip volume.
- *
- * @param out mat4 frustum matrix will be written into
- * @param left Left bound of the frustum
- * @param right Right bound of the frustum
- * @param bottom Bottom bound of the frustum
- * @param top Top bound of the frustum
- * @param near Near bound of the frustum
- * @param far Far bound of the frustum
- * @returns out
- */
 /**
  * Generates a frustum matrix with the given bounds.
  * The near/far clip planes correspond to a normalized device coordinate Z range of [-1, 1],
@@ -8454,39 +5962,12 @@ export function frustumNO(out: Mat4, left: number, right: number, bottom: number
  * @param far Far bound of the frustum
  * @returns out
  */
-/**
- * Generates a frustum matrix with the given bounds, suitable for WebGPU.
- * The near/far clip planes correspond to a normalized device coordinate Z range of [0, 1],
- * which matches WebGPU/Vulkan/DirectX/Metal's clip volume.
- *
- * @param out mat4 frustum matrix will be written into
- * @param left Left bound of the frustum
- * @param right Right bound of the frustum
- * @param bottom Bottom bound of the frustum
- * @param top Top bound of the frustum
- * @param near Near bound of the frustum
- * @param far Far bound of the frustum
- * @returns out
- */
 export function frustumZO(out: Mat4, left: number, right: number, bottom: number, top: number, near: number, far: number): Mat4;
 ```
 
 #### `mat4.perspectiveNO`
 
 ```ts
-/**
- * Generates a perspective projection matrix with the given bounds.
- * The near/far clip planes correspond to a normalized device coordinate Z range of [-1, 1],
- * which matches WebGL/OpenGL's clip volume.
- * Passing null/undefined/no value for far will generate infinite projection matrix.
- *
- * @param out mat4 frustum matrix will be written into
- * @param fovy Vertical field of view in radians
- * @param aspect Aspect ratio. typically viewport width/height
- * @param near Near bound of the frustum
- * @param far Far bound of the frustum, can be null or Infinity
- * @returns out
- */
 /**
  * Generates a perspective projection matrix with the given bounds.
  * The near/far clip planes correspond to a normalized device coordinate Z range of [-1, 1],
@@ -8519,38 +6000,12 @@ export function perspectiveNO(out: Mat4, fovy: number, aspect: number, near: num
  * @param far Far bound of the frustum, can be null or Infinity
  * @returns out
  */
-/**
- * Generates a perspective projection matrix suitable for WebGPU with the given bounds.
- * The near/far clip planes correspond to a normalized device coordinate Z range of [0, 1],
- * which matches WebGPU/Vulkan/DirectX/Metal's clip volume.
- * Passing null/undefined/no value for far will generate infinite projection matrix.
- *
- * @param out mat4 frustum matrix will be written into
- * @param fovy Vertical field of view in radians
- * @param aspect Aspect ratio. typically viewport width/height
- * @param near Near bound of the frustum
- * @param far Far bound of the frustum, can be null or Infinity
- * @returns out
- */
 export function perspectiveZO(out: Mat4, fovy: number, aspect: number, near: number, far: number): Mat4;
 ```
 
 #### `mat4.perspectiveFromFieldOfViewNO`
 
 ```ts
-/**
- * Generates a perspective projection matrix with the given field of view.
- * This is primarily useful for generating projection matrices to be used
- * with the still experimental WebVR API.
- * The near/far clip planes correspond to a normalized device coordinate Z range of [-1, 1],
- * which matches WebGL/OpenGL's clip volume.
- *
- * @param out mat4 frustum matrix will be written into
- * @param fov Object containing the following values: upDegrees, downDegrees, leftDegrees, rightDegrees
- * @param near Near bound of the frustum
- * @param far Far bound of the frustum
- * @returns out
- */
 /**
  * Generates a perspective projection matrix with the given field of view.
  * This is primarily useful for generating projection matrices to be used
@@ -8575,19 +6030,6 @@ export function perspectiveFromFieldOfViewNO(out: Mat4, fov: {
 #### `mat4.perspectiveFromFieldOfViewZO`
 
 ```ts
-/**
- * Generates a perspective projection matrix with the given field of view, suitable for WebGPU.
- * This is primarily useful for generating projection matrices to be used
- * with the still experimental WebVR API.
- * The near/far clip planes correspond to a normalized device coordinate Z range of [0, 1],
- * which matches WebGPU/Vulkan/DirectX/Metal's clip volume.
- *
- * @param out mat4 frustum matrix will be written into
- * @param fov Object containing the following values: upDegrees, downDegrees, leftDegrees, rightDegrees
- * @param near Near bound of the frustum
- * @param far Far bound of the frustum
- * @returns out
- */
 /**
  * Generates a perspective projection matrix with the given field of view, suitable for WebGPU.
  * This is primarily useful for generating projection matrices to be used
@@ -8626,40 +6068,12 @@ export function perspectiveFromFieldOfViewZO(out: Mat4, fov: {
  * @param far Far bound of the frustum
  * @returns out
  */
-/**
- * Generates a orthogonal projection matrix with the given bounds.
- * The near/far clip planes correspond to a normalized device coordinate Z range of [-1, 1],
- * which matches WebGL/OpenGL's clip volume.
- *
- * @param out mat4 frustum matrix will be written into
- * @param left Left bound of the frustum
- * @param right Right bound of the frustum
- * @param bottom Bottom bound of the frustum
- * @param top Top bound of the frustum
- * @param near Near bound of the frustum
- * @param far Far bound of the frustum
- * @returns out
- */
 export function orthoNO(out: Mat4, left: number, right: number, bottom: number, top: number, near: number, far: number): Mat4;
 ```
 
 #### `mat4.orthoZO`
 
 ```ts
-/**
- * Generates a orthogonal projection matrix with the given bounds.
- * The near/far clip planes correspond to a normalized device coordinate Z range of [0, 1],
- * which matches WebGPU/Vulkan/DirectX/Metal's clip volume.
- *
- * @param out mat4 frustum matrix will be written into
- * @param left Left bound of the frustum
- * @param right Right bound of the frustum
- * @param bottom Bottom bound of the frustum
- * @param top Top bound of the frustum
- * @param near Near bound of the frustum
- * @param far Far bound of the frustum
- * @returns out
- */
 /**
  * Generates a orthogonal projection matrix with the given bounds.
  * The near/far clip planes correspond to a normalized device coordinate Z range of [0, 1],
@@ -8690,31 +6104,12 @@ export function orthoZO(out: Mat4, left: number, right: number, bottom: number, 
  * @param up vec3 pointing up
  * @returns out
  */
-/**
- * Generates a look-at matrix with the given eye position, focal point, and up axis.
- * If you want a matrix that actually makes an object look at another object, you should use targetTo instead.
- *
- * @param out mat4 frustum matrix will be written into
- * @param eye Position of the viewer
- * @param center Point the viewer is looking at
- * @param up vec3 pointing up
- * @returns out
- */
 export function lookAt(out: Mat4, eye: Vec3, center: Vec3, up: Vec3): Mat4;
 ```
 
 #### `mat4.targetTo`
 
 ```ts
-/**
- * Generates a matrix that makes something look at something else.
- *
- * @param out mat4 frustum matrix will be written into
- * @param eye Position of the viewer
- * @param target Point the viewer is looking at
- * @param up vec3 pointing up
- * @returns out
- */
 /**
  * Generates a matrix that makes something look at something else.
  *
@@ -8736,12 +6131,6 @@ export function targetTo(out: Mat4, eye: Vec3, target: Vec3, up: Vec3): Mat4;
  * @param a matrix to represent as a string
  * @returns {String} string representation of the matrix
  */
-/**
- * Returns a string representation of a mat4
- *
- * @param a matrix to represent as a string
- * @returns {String} string representation of the matrix
- */
 export function str(a: Mat4): string;
 ```
 
@@ -8754,26 +6143,12 @@ export function str(a: Mat4): string;
  * @param a the matrix to calculate Frobenius norm of
  * @returns Frobenius norm
  */
-/**
- * Returns Frobenius norm of a mat4
- *
- * @param a the matrix to calculate Frobenius norm of
- * @returns Frobenius norm
- */
 export function frob(a: Mat4): number;
 ```
 
 #### `mat4.add`
 
 ```ts
-/**
- * Adds two mat4's
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 /**
  * Adds two mat4's
  *
@@ -8796,28 +6171,12 @@ export function add(out: Mat4, a: Mat4, b: Mat4): Mat4;
  * @param b the second operand
  * @returns out
  */
-/**
- * Subtracts matrix b from matrix a
- *
- * @param out the receiving matrix
- * @param a the first operand
- * @param b the second operand
- * @returns out
- */
 export function subtract(out: Mat4, a: Mat4, b: Mat4): Mat4;
 ```
 
 #### `mat4.multiplyScalar`
 
 ```ts
-/**
- * Multiply each element of the matrix by a scalar.
- *
- * @param out the receiving matrix
- * @param a the matrix to scale
- * @param b amount to scale the matrix's elements by
- * @returns out
- */
 /**
  * Multiply each element of the matrix by a scalar.
  *
@@ -8841,15 +6200,6 @@ export function multiplyScalar(out: Mat4, a: Mat4, b: number): Mat4;
  * @param scale the amount to scale b's elements by before adding
  * @returns out
  */
-/**
- * Adds two mat4's after multiplying each element of the second operand by a scalar value.
- *
- * @param out the receiving vector
- * @param a the first operand
- * @param b the second operand
- * @param scale the amount to scale b's elements by before adding
- * @returns out
- */
 export function multiplyScalarAndAdd(out: Mat4, a: Mat4, b: Mat4, scale: number): Mat4;
 ```
 
@@ -8863,26 +6213,12 @@ export function multiplyScalarAndAdd(out: Mat4, a: Mat4, b: Mat4, scale: number)
  * @param b The second matrix.
  * @returns {Boolean} True if the matrices are equal, false otherwise.
  */
-/**
- * Returns whether or not the matrices have exactly the same elements in the same position (when compared with ===)
- *
- * @param a The first matrix.
- * @param b The second matrix.
- * @returns {Boolean} True if the matrices are equal, false otherwise.
- */
 export function exactEquals(a: Mat4, b: Mat4): boolean;
 ```
 
 #### `mat4.equals`
 
 ```ts
-/**
- * Returns whether or not the matrices have approximately the same elements in the same position.
- *
- * @param a The first matrix.
- * @param b The second matrix.
- * @returns {Boolean} True if the matrices are equal, false otherwise.
- */
 /**
  * Returns whether or not the matrices have approximately the same elements in the same position.
  *
@@ -8923,25 +6259,12 @@ export const sub = subtract;
  *
  * @returns a new Spherical
  */
-/**
- * Creates a new spherical coordinate at r=1, theta=0, phi=0
- *
- * @returns a new Spherical
- */
 export function create(): Spherical;
 ```
 
 #### `spherical.fromValues`
 
 ```ts
-/**
- * Creates a new Spherical initialized with the given values
- *
- * @param r radial distance
- * @param theta azimuthal angle in the XZ plane from +Z (radians)
- * @param phi polar angle from +Y axis (radians)
- * @returns a new Spherical
- */
 /**
  * Creates a new Spherical initialized with the given values
  *
@@ -8962,25 +6285,12 @@ export function fromValues(r: number, theta: number, phi: number): Spherical;
  * @param a the source Spherical
  * @returns a new Spherical
  */
-/**
- * Creates a new Spherical initialized with values from an existing one
- *
- * @param a the source Spherical
- * @returns a new Spherical
- */
 export function clone(a: Spherical): Spherical;
 ```
 
 #### `spherical.copy`
 
 ```ts
-/**
- * Copies values from one Spherical to another
- *
- * @param out the receiving Spherical
- * @param a the source Spherical
- * @returns out
- */
 /**
  * Copies values from one Spherical to another
  *
@@ -9003,15 +6313,6 @@ export function copy(out: Spherical, a: Spherical): Spherical;
  * @param phi polar angle from +Y axis (radians)
  * @returns out
  */
-/**
- * Sets the components of a Spherical
- *
- * @param out the receiving Spherical
- * @param r radial distance
- * @param theta azimuthal angle in the XZ plane from +Z (radians)
- * @param phi polar angle from +Y axis (radians)
- * @returns out
- */
 export function set(out: Spherical, r: number, theta: number, phi: number): Spherical;
 ```
 
@@ -9025,27 +6326,12 @@ export function set(out: Spherical, r: number, theta: number, phi: number): Sphe
  * @param a the source Spherical
  * @returns out
  */
-/**
- * Sets r=1, preserving the angles. No-op if r is already zero.
- *
- * @param out the receiving Spherical
- * @param a the source Spherical
- * @returns out
- */
 export function normalize(out: Spherical, a: Spherical): Spherical;
 ```
 
 #### `spherical.scale`
 
 ```ts
-/**
- * Scales the radial distance r by a scalar
- *
- * @param out the receiving Spherical
- * @param a the source Spherical
- * @param s scalar to multiply r by
- * @returns out
- */
 /**
  * Scales the radial distance r by a scalar
  *
@@ -9070,32 +6356,12 @@ export function scale(out: Spherical, a: Spherical, s: number): Spherical;
  * @param t interpolation factor in [0, 1]
  * @returns out
  */
-/**
- * Linearly interpolates between two Spherical coordinates taking the shortest
- * angular path for theta and phi.
- *
- * @param out the receiving Spherical
- * @param a the first operand
- * @param b the second operand
- * @param t interpolation factor in [0, 1]
- * @returns out
- */
 export function lerp(out: Spherical, a: Spherical, b: Spherical, t: number): Spherical;
 ```
 
 #### `spherical.setFromVec3`
 
 ```ts
-/**
- * Sets a Spherical from Cartesian Vec3 coordinates (Three.js / OpenGL convention):
- *   r     = sqrt(x² + y² + z²)
- *   theta = atan2(x, z)   (azimuthal angle in XZ plane from +Z)
- *   phi   = acos(y / r)   (polar angle from +Y)
- *
- * @param out the receiving Spherical
- * @param v the source Vec3
- * @returns out
- */
 /**
  * Sets a Spherical from Cartesian Vec3 coordinates (Three.js / OpenGL convention):
  *   r     = sqrt(x² + y² + z²)
@@ -9128,31 +6394,12 @@ export const fromVec3 = setFromVec3;
  * @param a the source Spherical
  * @returns out
  */
-/**
- * Clamps phi to the range [EPSILON, π - EPSILON] to avoid coordinate
- * singularities at the poles (gimbal lock / division by zero).
- * r and theta are left unchanged.
- *
- * @param out the receiving Spherical
- * @param a the source Spherical
- * @returns out
- */
 export function makeSafe(out: Spherical, a: Spherical): Spherical;
 ```
 
 #### `spherical.toVec3`
 
 ```ts
-/**
- * Converts spherical coordinates to a Cartesian Vec3 (Three.js / OpenGL convention):
- *   x = r * sin(phi) * sin(theta)
- *   y = r * cos(phi)
- *   z = r * sin(phi) * cos(theta)
- *
- * @param out the receiving Vec3
- * @param a the source Spherical
- * @returns out
- */
 /**
  * Converts spherical coordinates to a Cartesian Vec3 (Three.js / OpenGL convention):
  *   x = r * sin(phi) * sin(theta)
@@ -9177,28 +6424,12 @@ export function toVec3(out: Vec3, a: Spherical): Vec3;
  * @param v the source Vec2 interpreted as (x, z)
  * @returns out
  */
-/**
- * Converts a Vec2 (x, z) in the horizontal XZ plane to spherical coordinates.
- * The point is treated as lying on the equator (phi = π/2, y = 0).
- *
- * @param out the receiving Spherical
- * @param v the source Vec2 interpreted as (x, z)
- * @returns out
- */
 export function fromVec2(out: Spherical, v: Vec2): Spherical;
 ```
 
 #### `spherical.toVec2`
 
 ```ts
-/**
- * Projects spherical coordinates onto the XZ plane, returning a Vec2 (x, z).
- * Equivalent to taking the horizontal footprint of the 3D point.
- *
- * @param out the receiving Vec2
- * @param a the source Spherical
- * @returns out
- */
 /**
  * Projects spherical coordinates onto the XZ plane, returning a Vec2 (x, z).
  * Equivalent to taking the horizontal footprint of the 3D point.
@@ -9221,27 +6452,12 @@ export function toVec2(out: Vec2, a: Spherical): Vec2;
  * @param b the second Spherical
  * @returns true if approximately equal
  */
-/**
- * Returns true if two Spherical coordinates are approximately equal,
- * within an absolute/relative tolerance of EPSILON.
- *
- * @param a the first Spherical
- * @param b the second Spherical
- * @returns true if approximately equal
- */
 export function equals(a: Spherical, b: Spherical): boolean;
 ```
 
 #### `spherical.exactEquals`
 
 ```ts
-/**
- * Returns true if two Spherical coordinates are exactly equal (===).
- *
- * @param a the first Spherical
- * @param b the second Spherical
- * @returns true if exactly equal
- */
 /**
  * Returns true if two Spherical coordinates are exactly equal (===).
  *
@@ -9261,29 +6477,12 @@ export function exactEquals(a: Spherical, b: Spherical): boolean;
  * @param a the source Spherical
  * @returns string representation
  */
-/**
- * Returns a string representation of a Spherical
- *
- * @param a the source Spherical
- * @returns string representation
- */
 export function str(a: Spherical): string;
 ```
 
 #### `spherical.angleTo`
 
 ```ts
-/**
- * Returns the great-circle angle (in radians) between two spherical coordinates,
- * ignoring r. Equivalent to the central angle between the two directions on a
- * unit sphere.
- *
- * Uses the numerically stable haversine formula.
- *
- * @param a the first Spherical
- * @param b the second Spherical
- * @returns angle in radians in [0, π]
- */
 /**
  * Returns the great-circle angle (in radians) between two spherical coordinates,
  * ignoring r. Equivalent to the central angle between the two directions on a
@@ -9368,21 +6567,12 @@ export type Circle = {
  * Create a new empty Box3 with "min" set to positive infinity and "max" set to negative infinity
  * @returns A new Box3
  */
-/**
- * Create a new empty Box3 with "min" set to positive infinity and "max" set to negative infinity
- * @returns A new Box3
- */
 export function create(): Box3;
 ```
 
 #### `box3.clone`
 
 ```ts
-/**
- * Clones a Box3
- * @param box - A Box3 to clone
- * @returns a clone of box
- */
 /**
  * Clones a Box3
  * @param box - A Box3 to clone
@@ -9400,29 +6590,12 @@ export function clone(box: Box3): Box3;
  * @param box the input Box3
  * @returns the output Box3
  */
-/**
- * Copies a Box3 to another Box3
- * @param out the output Box3
- * @param box the input Box3
- * @returns the output Box3
- */
 export function copy(out: Box3, box: Box3): Box3;
 ```
 
 #### `box3.set`
 
 ```ts
-/**
- * Sets the min and max values of a Box3
- * @param out - The output Box3
- * @param minX - The minimum X coordinate
- * @param minY - The minimum Y coordinate
- * @param minZ - The minimum Z coordinate
- * @param maxX - The maximum X coordinate
- * @param maxY - The maximum Y coordinate
- * @param maxZ - The maximum Z coordinate
- * @returns The updated Box3
- */
 /**
  * Sets the min and max values of a Box3
  * @param out - The output Box3
@@ -9447,25 +6620,12 @@ export function set(out: Box3, minX: number, minY: number, minZ: number, maxX: n
  * @param max - The maximum corner
  * @returns The updated Box3
  */
-/**
- * Sets the min and max values of a Box3 from Vec3 vectors
- * @param out - The output Box3
- * @param min - The minimum corner
- * @param max - The maximum corner
- * @returns The updated Box3
- */
 export function setFromVectors(out: Box3, min: Vec3, max: Vec3): Box3;
 ```
 
 #### `box3.min`
 
 ```ts
-/**
- * Extracts the minimum corner of a Box3
- * @param out - The output Vec3 for the minimum corner
- * @param box - The input Box3
- * @returns The minimum corner
- */
 /**
  * Extracts the minimum corner of a Box3
  * @param out - The output Vec3 for the minimum corner
@@ -9484,12 +6644,6 @@ export function min(out: Vec3, box: Box3): Vec3;
  * @param box - The input Box3
  * @returns The maximum corner
  */
-/**
- * Extracts the maximum corner of a Box3
- * @param out - The output Vec3 for the maximum corner
- * @param box - The input Box3
- * @returns The maximum corner
- */
 export function max(out: Vec3, box: Box3): Vec3;
 ```
 
@@ -9501,23 +6655,12 @@ export function max(out: Vec3, box: Box3): Vec3;
  * @param out - The Box3 to make empty
  * @returns The emptied Box3
  */
-/**
- * Set a Box3 to empty (min to positive infinity, max to negative infinity)
- * @param out - The Box3 to make empty
- * @returns The emptied Box3
- */
 export function empty(out: Box3): Box3;
 ```
 
 #### `box3.exactEquals`
 
 ```ts
-/**
- * Returns whether or not the boxes have exactly the same elements in the same position (when compared with ===)
- * @param a - The first box
- * @param b - The second box
- * @returns True if the boxes are equal, false otherwise
- */
 /**
  * Returns whether or not the boxes have exactly the same elements in the same position (when compared with ===)
  * @param a - The first box
@@ -9536,25 +6679,12 @@ export function exactEquals(a: Box3, b: Box3): boolean;
  * @param b - The second box
  * @returns True if the boxes are equal, false otherwise
  */
-/**
- * Returns whether or not the boxes have approximately the same elements in the same position
- * @param a - The first box
- * @param b - The second box
- * @returns True if the boxes are equal, false otherwise
- */
 export function equals(a: Box3, b: Box3): boolean;
 ```
 
 #### `box3.setFromCenterAndSize`
 
 ```ts
-/**
- * Sets the box from a center point and size
- * @param out - The output Box3
- * @param center - The center point
- * @param size - The size of the box
- * @returns The updated Box3
- */
 /**
  * Sets the box from a center point and size
  * @param out - The output Box3
@@ -9575,27 +6705,12 @@ export function setFromCenterAndSize(out: Box3, center: Vec3, size: Vec3): Box3;
  * @param point - The point to include
  * @returns The expanded Box3
  */
-/**
- * Expands a Box3 to include a point
- * @param out - The output Box3
- * @param box - The input Box3
- * @param point - The point to include
- * @returns The expanded Box3
- */
 export function expandByPoint(out: Box3, box: Box3, point: Vec3): Box3;
 ```
 
 #### `box3.expandByExtents`
 
 ```ts
-/**
- * Widens a Box3 by a vector on both sides
- * Subtracts the vector from min and adds it to max
- * @param out - The output Box3
- * @param box - The input Box3
- * @param vector - The vector to expand by
- * @returns The expanded Box3
- */
 /**
  * Widens a Box3 by a vector on both sides
  * Subtracts the vector from min and adds it to max
@@ -9618,28 +6733,12 @@ export function expandByExtents(out: Box3, box: Box3, vector: Vec3): Box3;
  * @param margin - The uniform margin to expand by
  * @returns The expanded Box3
  */
-/**
- * Expands a Box3 uniformly by a scalar margin on all sides
- * Subtracts the margin from min and adds it to max on each axis
- * @param out - The output Box3
- * @param box - The input Box3
- * @param margin - The uniform margin to expand by
- * @returns The expanded Box3
- */
 export function expandByMargin(out: Box3, box: Box3, margin: number): Box3;
 ```
 
 #### `box3.union`
 
 ```ts
-/**
- * Computes the union of two bounding boxes
- * Returns a Box3 that encompasses both input boxes
- * @param out - The output Box3
- * @param boxA - The first Box3
- * @param boxB - The second Box3
- * @returns The union Box3
- */
 /**
  * Computes the union of two bounding boxes
  * Returns a Box3 that encompasses both input boxes
@@ -9660,24 +6759,12 @@ export function union(out: Box3, boxA: Box3, boxB: Box3): Box3;
  * @param box - The input Box3
  * @returns The center point
  */
-/**
- * Calculate the center point of a bounding box
- * @param out - The output Vec3 for the center
- * @param box - The input Box3
- * @returns The center point
- */
 export function center(out: Vec3, box: Box3): Vec3;
 ```
 
 #### `box3.extents`
 
 ```ts
-/**
- * Calculate the extents (half-size) of a bounding box
- * @param out - The output Vec3 for the extents
- * @param box - The input Box3
- * @returns The extents (distance from center to each face)
- */
 /**
  * Calculate the extents (half-size) of a bounding box
  * @param out - The output Vec3 for the extents
@@ -9696,12 +6783,6 @@ export function extents(out: Vec3, box: Box3): Vec3;
  * @param box - The input Box3
  * @returns The size (width, height, depth)
  */
-/**
- * Calculate the size (dimensions) of a bounding box
- * @param out - The output Vec3 for the size
- * @param box - The input Box3
- * @returns The size (width, height, depth)
- */
 export function size(out: Vec3, box: Box3): Vec3;
 ```
 
@@ -9713,24 +6794,12 @@ export function size(out: Vec3, box: Box3): Vec3;
  * @param box - The input Box3
  * @returns The surface area
  */
-/**
- * Calculate the surface area of a bounding box
- * @param box - The input Box3
- * @returns The surface area
- */
 export function surfaceArea(box: Box3): number;
 ```
 
 #### `box3.scale`
 
 ```ts
-/**
- * Scale a bounding box by a vector, handling non-uniform and negative scaling
- * @param out - The output Box3
- * @param box - The input Box3
- * @param scale - The scale to apply (as a Vec3)
- * @returns The scaled Box3
- */
 /**
  * Scale a bounding box by a vector, handling non-uniform and negative scaling
  * @param out - The output Box3
@@ -9760,34 +6829,12 @@ export function scale(out: Box3, box: Box3, scale: Vec3): Box3;
  * @param mat - The 4x4 transformation matrix
  * @returns The transformed Box3
  */
-/**
- * Transform a bounding box by a 4x4 matrix.
- * Uses Arvo's trick — transform the center, build new half-extents from
- * |M| · extents — which is ~4× fewer ops than transforming all 8 corners.
- * Reference: Jim Arvo, "Transforming Axis-Aligned Bounding Boxes",
- * Graphics Gems I (1990).
- * https://github.com/erich666/GraphicsGems/blob/master/gems/TransBox.c
- * Assumes mat is affine (no perspective), which is always true for AABB
- * transforms in practice.
- * Safe under aliasing (out and box may be the same array): all six box
- * components are read into locals before out is written.
- * @param out - The output Box3
- * @param box - The input Box3
- * @param mat - The 4x4 transformation matrix
- * @returns The transformed Box3
- */
 export function transformMat4(out: Box3, box: Box3, mat: Mat4): Box3;
 ```
 
 #### `box3.containsPoint`
 
 ```ts
-/**
- * Test if a point is contained within the bounding box
- * @param box - The bounding box
- * @param point - The point to test
- * @returns true if the point is inside or on the boundary of the box
- */
 /**
  * Test if a point is contained within the bounding box
  * @param box - The bounding box
@@ -9806,21 +6853,12 @@ export function containsPoint(box: Box3, point: Vec3): boolean;
  * @param contained - The Box3 that might be contained
  * @returns true if the container Box3 completely contains the contained Box3
  */
-/**
- * Test if one Box3 completely contains another Box3
- * @param container - The potentially containing Box3
- * @param contained - The Box3 that might be contained
- * @returns true if the container Box3 completely contains the contained Box3
- */
 export function containsBox3(container: Box3, contained: Box3): boolean;
 ```
 
 #### `box3.intersectsBox3`
 
 ```ts
-/**
- * Check whether two bounding boxes intersect
- */
 /**
  * Check whether two bounding boxes intersect
  */
@@ -9839,18 +6877,12 @@ export function intersectsTriangle3(box: Box3, a: Vec3, b: Vec3, c: Vec3): boole
 /**
  * Test intersection between axis-aligned bounding box and a sphere.
  */
-/**
- * Test intersection between axis-aligned bounding box and a sphere.
- */
 export function intersectsSphere(box: Box3, sphere: Sphere): boolean;
 ```
 
 #### `box3.intersectsPlane3`
 
 ```ts
-/**
- * Test intersection between axis-aligned bounding box and plane.
- */
 /**
  * Test intersection between axis-aligned bounding box and plane.
  */
@@ -9888,30 +6920,12 @@ export function copy(out: OBB3, a: OBB3): OBB3;
  * @param rotation the Mat3 rotation matrix
  * @returns the OBB with the given center, half extents, and rotation
  */
-/**
- * Sets an OBB from center, half extents, and a rotation matrix.
- * @param out the OBB to store the result
- * @param center the center of the OBB
- * @param halfExtents the half extents of the OBB
- * @param rotation the Mat3 rotation matrix
- * @returns the OBB with the given center, half extents, and rotation
- */
 export function set(out: OBB3, center: Vec3, halfExtents: Vec3, rotation: Mat3): OBB3;
 ```
 
 #### `obb3.setFromCenterHalfExtentsQuaternion`
 
 ```ts
-/**
- * Sets an OBB from center, half extents, and a quaternion.
- * Convenience helper for users who store orientation as a quaternion.
- *
- * @param out - The OBB to store the result
- * @param center - The center of the OBB
- * @param halfExtents - The half extents of the OBB
- * @param q - The quaternion representing the OBB's orientation
- * @returns out
- */
 /**
  * Sets an OBB from center, half extents, and a quaternion.
  * Convenience helper for users who store orientation as a quaternion.
@@ -9937,15 +6951,6 @@ export function setFromCenterHalfExtentsQuaternion(out: OBB3, center: Vec3, half
  * @param aabb - The AABB (min and max corners)
  * @returns out
  */
-/**
- * Creates an OBB from an axis-aligned bounding box (AABB).
- * The resulting OBB will have the same center and extents as the AABB,
- * with no rotation (identity orientation).
- *
- * @param out - The OBB to store the result
- * @param aabb - The AABB (min and max corners)
- * @returns out
- */
 export function setFromBox3(out: OBB3, aabb: Box3): OBB3;
 ```
 
@@ -9959,29 +6964,12 @@ export function setFromBox3(out: OBB3, aabb: Box3): OBB3;
  * @param point - The point to test
  * @returns true if the point is inside the OBB
  */
-/**
- * Tests whether a point is contained within an OBB.
- *
- * @param obb - The OBB to test
- * @param point - The point to test
- * @returns true if the point is inside the OBB
- */
 export function containsPoint(obb: OBB3, point: Vec3): boolean;
 ```
 
 #### `obb3.clampPoint`
 
 ```ts
-/**
- * Clamps a point to the surface or interior of an OBB.
- * Reference: Closest Point on OBB to Point in Real-Time Collision Detection
- * by Christer Ericson (chapter 5.1.4)
- *
- * @param out - The clamped point result
- * @param obb - The OBB
- * @param point - The point to clamp
- * @returns out
- */
 /**
  * Clamps a point to the surface or interior of an OBB.
  * Reference: Closest Point on OBB to Point in Real-Time Collision Detection
@@ -10011,13 +6999,6 @@ export function intersectsOBB3(a: OBB3, b: OBB3, epsilon = Number.EPSILON): bool
  * @param aabb - The AABB (axis-aligned bounding box)
  * @returns true if they intersect
  */
-/**
- * Tests whether an OBB intersects with an AABB.
- *
- * @param obb - The OBB
- * @param aabb - The AABB (axis-aligned bounding box)
- * @returns true if they intersect
- */
 export function intersectsBox3(obb: OBB3, aabb: Box3): boolean;
 ```
 
@@ -10036,10 +7017,6 @@ export function applyMatrix4(out: OBB3, obb: OBB3, matrix: Mat4): OBB3;
  * Creates a new plane with normal (0, 1, 0) and constant 0
  * @returns A new plane
  */
-/**
- * Creates a new plane with normal (0, 1, 0) and constant 0
- * @returns A new plane
- */
 export function create(): Plane3;
 ```
 
@@ -10053,26 +7030,12 @@ export function create(): Plane3;
  * @param constant - The signed distance from origin
  * @returns The output plane
  */
-/**
- * Creates a plane from a normal and constant
- * @param out - The output plane
- * @param normal - The plane normal (should be unit length)
- * @param constant - The signed distance from origin
- * @returns The output plane
- */
 export function fromNormalAndConstant(out: Plane3, normal: Vec3, constant: number): Plane3;
 ```
 
 #### `plane3.fromNormalAndPoint`
 
 ```ts
-/**
- * Creates a plane from a normal and a point on the plane
- * @param out - The output plane
- * @param normal - The plane normal (should be unit length)
- * @param point - A point on the plane
- * @returns The output plane
- */
 /**
  * Creates a plane from a normal and a point on the plane
  * @param out - The output plane
@@ -10094,14 +7057,6 @@ export function fromNormalAndPoint(out: Plane3, normal: Vec3, point: Vec3): Plan
  * @param c - Third point
  * @returns The output plane
  */
-/**
- * Creates a plane from three coplanar points
- * @param out - The output plane
- * @param a - First point
- * @param b - Second point
- * @param c - Third point
- * @returns The output plane
- */
 export function fromCoplanarPoints(out: Plane3, a: Vec3, b: Vec3, c: Vec3): Plane3;
 ```
 
@@ -10113,23 +7068,12 @@ export function fromCoplanarPoints(out: Plane3, a: Vec3, b: Vec3, c: Vec3): Plan
  * @param plane - The plane to clone
  * @returns A new plane
  */
-/**
- * Clones a plane
- * @param plane - The plane to clone
- * @returns A new plane
- */
 export function clone(plane: Plane3): Plane3;
 ```
 
 #### `plane3.copy`
 
 ```ts
-/**
- * Copies one plane to another
- * @param out - The output plane
- * @param plane - The source plane
- * @returns The output plane
- */
 /**
  * Copies one plane to another
  * @param out - The output plane
@@ -10148,24 +7092,12 @@ export function copy(out: Plane3, plane: Plane3): Plane3;
  * @param plane - The input plane
  * @returns The normalized plane
  */
-/**
- * Normalizes a plane (ensures the normal vector is unit length)
- * @param out - The output plane
- * @param plane - The input plane
- * @returns The normalized plane
- */
 export function normalize(out: Plane3, plane: Plane3): Plane3;
 ```
 
 #### `plane3.negate`
 
 ```ts
-/**
- * Negates a plane (flips the normal and constant)
- * @param out - The output plane
- * @param plane - The input plane
- * @returns The negated plane
- */
 /**
  * Negates a plane (flips the normal and constant)
  * @param out - The output plane
@@ -10185,13 +7117,6 @@ export function negate(out: Plane3, plane: Plane3): Plane3;
  * @param distance - The distance to offset (positive = in direction of normal)
  * @returns The offset plane
  */
-/**
- * Offsets a plane by a distance along its normal
- * @param out - The output plane
- * @param plane - The input plane
- * @param distance - The distance to offset (positive = in direction of normal)
- * @returns The offset plane
- */
 export function offset(out: Plane3, plane: Plane3, distance: number): Plane3;
 ```
 
@@ -10204,25 +7129,12 @@ export function offset(out: Plane3, plane: Plane3, distance: number): Plane3;
  * @param point - The point
  * @returns The signed distance (positive = in direction of normal)
  */
-/**
- * Calculates the signed distance from a point to the plane
- * @param plane - The plane
- * @param point - The point
- * @returns The signed distance (positive = in direction of normal)
- */
 export function distanceToPoint(plane: Plane3, point: Vec3): number;
 ```
 
 #### `plane3.projectPoint`
 
 ```ts
-/**
- * Projects a point onto the plane
- * @param out - The output point
- * @param plane - The plane
- * @param point - The point to project
- * @returns The projected point
- */
 /**
  * Projects a point onto the plane
  * @param out - The output point
@@ -10243,13 +7155,6 @@ export function projectPoint(out: Vec3, plane: Plane3, point: Vec3): Vec3;
  * @param matrix - The transformation matrix
  * @returns The transformed plane
  */
-/**
- * Transforms a plane by a 4x4 matrix
- * @param out - The output plane
- * @param plane - The plane to transform
- * @param matrix - The transformation matrix
- * @returns The transformed plane
- */
 export function transform(out: Plane3, plane: Plane3, matrix: Mat4): Plane3;
 ```
 
@@ -10262,24 +7167,12 @@ export function transform(out: Plane3, plane: Plane3, matrix: Mat4): Plane3;
  * @param sphere - The sphere
  * @returns True if they intersect
  */
-/**
- * Tests if a sphere intersects the plane
- * @param plane - The plane
- * @param sphere - The sphere
- * @returns True if they intersect
- */
 export function intersectsSphere(plane: Plane3, sphere: Sphere): boolean;
 ```
 
 #### `plane3.exactEquals`
 
 ```ts
-/**
- * Tests if two planes are exactly equal
- * @param a - First plane
- * @param b - Second plane
- * @returns True if planes are exactly equal
- */
 /**
  * Tests if two planes are exactly equal
  * @param a - First plane
@@ -10300,26 +7193,12 @@ export function exactEquals(a: Plane3, b: Plane3): boolean;
  * @param p3 - Third plane
  * @returns True if intersection exists, false if planes are degenerate or parallel
  */
-/**
- * Finds the intersection point of three planes
- * @param out - The output point where the three planes intersect
- * @param p1 - First plane
- * @param p2 - Second plane
- * @param p3 - Third plane
- * @returns True if intersection exists, false if planes are degenerate or parallel
- */
 export function intersect(out: Vec3, p1: Plane3, p2: Plane3, p3: Plane3): boolean;
 ```
 
 #### `plane3.equals`
 
 ```ts
-/**
- * Tests if two planes are equal
- * @param a - First plane
- * @param b - Second plane
- * @returns True if planes are equal
- */
 /**
  * Tests if two planes are equal
  * @param a - First plane
@@ -10334,10 +7213,6 @@ export function equals(a: Plane3, b: Plane3): boolean;
 #### `sphere.create`
 
 ```ts
-/**
- * Creates a new sphere with a default center 0,0,0 and radius 1
- * @returns A new sphere.
- */
 /**
  * Creates a new sphere with a default center 0,0,0 and radius 1
  * @returns A new sphere.
@@ -10365,13 +7240,6 @@ export function create(): Circle;
  * @param a First endpoint of the segment
  * @param b Second endpoint of the segment
  */
-/**
- * Calculates the closest point on a line segment to a given point
- * @param out Output parameter for the closest point
- * @param point The point
- * @param a First endpoint of the segment
- * @param b Second endpoint of the segment
- */
 export function closestPoint(out: Vec2, point: Vec2, a: Vec2, b: Vec2): Vec2;
 ```
 
@@ -10380,14 +7248,6 @@ export function closestPoint(out: Vec2, point: Vec2, a: Vec2, b: Vec2): Vec2;
 #### `triangle3.bounds`
 
 ```ts
-/**
- * Computes the axis-aligned bounding box of a triangle defined by three vertices.
- * @param out the output box to store the result.
- * @param a the first vertex of the triangle.
- * @param b the second vertex of the triangle.
- * @param c the third vertex of the triangle.
- * @returns the output box containing the axis-aligned bounding box of the triangle.
- */
 /**
  * Computes the axis-aligned bounding box of a triangle defined by three vertices.
  * @param out the output box to store the result.
@@ -10410,28 +7270,12 @@ export function bounds(out: Box3, a: Vec3, b: Vec3, c: Vec3): Box3;
  * @param c the third vertex of the triangle.
  * @returns the output vector containing the normal of the triangle.
  */
-/**
- * Computes the normal vector of a triangle defined by three vertices.
- * @param out the output vector to store the result.
- * @param a the first vertex of the triangle.
- * @param b the second vertex of the triangle.
- * @param c the third vertex of the triangle.
- * @returns the output vector containing the normal of the triangle.
- */
 export function normal(out: Vec3, a: Vec3, b: Vec3, c: Vec3): Vec3;
 ```
 
 #### `triangle3.centroid`
 
 ```ts
-/**
- * Computes the centroid of a triangle defined by three vertices.
- * @param out the output vector to store the result.
- * @param a the first vertex of the triangle.
- * @param b the second vertex of the triangle.
- * @param c the third vertex of the triangle.
- * @returns the output vector containing the centroid of the triangle.
- */
 /**
  * Computes the centroid of a triangle defined by three vertices.
  * @param out the output vector to store the result.
@@ -10467,29 +7311,12 @@ export type IntersectsTriangleResult = {
  * Creates a new IntersectsTriangleResult with default values.
  * @returns A new IntersectsTriangleResult.
  */
-/**
- * Creates a new IntersectsTriangleResult with default values.
- * @returns A new IntersectsTriangleResult.
- */
 export function createIntersectsTriangleResult(): IntersectsTriangleResult;
 ```
 
 #### `raycast3.intersectsTriangle`
 
 ```ts
-/**
- * Ray-triangle intersection test.
- * Based on https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
- *
- * @param out output object to store result (hit boolean, fraction, frontFacing)
- * @param origin ray origin
- * @param direction ray direction
- * @param length ray length
- * @param a first vertex of triangle
- * @param b second vertex of triangle
- * @param c third vertex of triangle
- * @param backfaceCulling if true, backfaces will not be considered hits
- */
 /**
  * Ray-triangle intersection test.
  * Based on https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
@@ -10519,16 +7346,6 @@ export function intersectsTriangle(out: IntersectsTriangleResult, origin: Vec3, 
  * @param aabb AABB to test against
  * @returns true if ray intersects the AABB, false otherwise
  */
-/**
- * Test if a ray intersects an axis-aligned bounding box.
- * Uses slab-based algorithm that handles parallel rays correctly.
- *
- * @param origin ray origin
- * @param direction ray direction
- * @param length ray length
- * @param aabb AABB to test against
- * @returns true if ray intersects the AABB, false otherwise
- */
 export function intersectsBox3(origin: Vec3, direction: Vec3, length: number, aabb: Box3): boolean;
 ```
 
@@ -10537,12 +7354,6 @@ export function intersectsBox3(origin: Vec3, direction: Vec3, length: number, aa
 #### `circumcircle`
 
 ```ts
-/**
- * Calculates the circumcircle of three points and stores the center in the output parameter.
- * @param out The circle to store the result in
- * @param triangle The triangle defined by three points
- * @returns
- */
 /**
  * Calculates the circumcircle of three points and stores the center in the output parameter.
  * @param out The circle to store the result in
@@ -10564,27 +7375,12 @@ export function circumcircle(out: Circle, a: Vec2, b: Vec2, c: Vec2): Circle;
  * @param points flat array of 2D points: [x0, y0, x1, y1, ...]
  * @returns indices of hull vertices in ccw order
  */
-/**
- * Computes the convex hull of a set of 2D points using the QuickHull algorithm.
- * The hull is returned as an array of indices in counter-clockwise order.
- *
- * Implementation of pseudocode from: https://en.wikipedia.org/wiki/Quickhull
- *
- * @param points flat array of 2D points: [x0, y0, x1, y1, ...]
- * @returns indices of hull vertices in ccw order
- */
 export function quickhull2(points: number[]): number[];
 ```
 
 #### `quickhull3`
 
 ```ts
-/**
- * Computes the convex hull of a set of 3D points using an incremental QuickHull algorithm.
- *
- * @param points An array of numbers representing the 3D points (x1, y1, z1, x2, y2, z2, ...)
- * @returns An array of indices representing the triangles of the convex hull (i1, j1, k1, i2, j2, k2, ...).
- */
 /**
  * Computes the convex hull of a set of 3D points using an incremental QuickHull algorithm.
  *
@@ -10763,16 +7559,6 @@ export function create(value = 0): Spring<number>;
  * @param delta frame delta, for refresh-rate independence
  * @returns state
  */
-/**
- * Springs `state.value` toward `target`, mutating `state` in place. Returns it.
- *
- * @param state spring state, mutated in place
- * @param target goal value
- * @param smoothTime approximate time to reach the target; smaller is faster
- * @param dampingRatio 1 = critically damped (no overshoot), <1 bouncy, >1 sluggish
- * @param delta frame delta, for refresh-rate independence
- * @returns state
- */
 export function update(state: Spring<number>, target: number, smoothTime: number, dampingRatio: number, delta: number): Spring<number>;
 ```
 
@@ -10783,20 +7569,12 @@ export function update(state: Spring<number>, target: number, smoothTime: number
  * Critically-damped {@link update} (dampingRatio = 1): moves toward `target` as
  * fast as possible without overshooting.
  */
-/**
- * Critically-damped {@link update} (dampingRatio = 1): moves toward `target` as
- * fast as possible without overshooting.
- */
 export function damp(state: Spring<number>, target: number, smoothTime: number, delta: number): Spring<number>;
 ```
 
 #### `spring.dampAngle`
 
 ```ts
-/**
- * Like {@link damp}, but takes the shortest angular path to `target` (radians),
- * wrapping across the ±π seam rather than unwinding the long way around.
- */
 /**
  * Like {@link damp}, but takes the shortest angular path to `target` (radians),
  * wrapping across the ±π seam rather than unwinding the long way around.
@@ -10837,17 +7615,12 @@ export function create(value: Vec2 = [0, 0]): Spring<Vec2>;
  * Springs `state.value` toward `target`, mutating `state` in place. Returns it.
  * @param dampingRatio 1 = critically damped (no overshoot), <1 bouncy, >1 sluggish
  */
-/**
- * Springs `state.value` toward `target`, mutating `state` in place. Returns it.
- * @param dampingRatio 1 = critically damped (no overshoot), <1 bouncy, >1 sluggish
- */
 export function update(state: Spring<Vec2>, target: Vec2, smoothTime: number, dampingRatio: number, delta: number): Spring<Vec2>;
 ```
 
 #### `spring2.damp`
 
 ```ts
-/** Critically-damped Vec2 spring (dampingRatio = 1). See {@link update}. */
 /** Critically-damped Vec2 spring (dampingRatio = 1). See {@link update}. */
 export function damp(state: Spring<Vec2>, target: Vec2, smoothTime: number, delta: number): Spring<Vec2>;
 ```
@@ -10868,17 +7641,12 @@ export function create(value: Vec3 = [0, 0, 0]): Spring<Vec3>;
  * Springs `state.value` toward `target`, mutating `state` in place. Returns it.
  * @param dampingRatio 1 = critically damped (no overshoot), <1 bouncy, >1 sluggish
  */
-/**
- * Springs `state.value` toward `target`, mutating `state` in place. Returns it.
- * @param dampingRatio 1 = critically damped (no overshoot), <1 bouncy, >1 sluggish
- */
 export function update(state: Spring<Vec3>, target: Vec3, smoothTime: number, dampingRatio: number, delta: number): Spring<Vec3>;
 ```
 
 #### `spring3.damp`
 
 ```ts
-/** Critically-damped Vec3 spring (dampingRatio = 1). See {@link update}. */
 /** Critically-damped Vec3 spring (dampingRatio = 1). See {@link update}. */
 export function damp(state: Spring<Vec3>, target: Vec3, smoothTime: number, delta: number): Spring<Vec3>;
 ```
@@ -10899,17 +7667,12 @@ export function create(value: Vec4 = [0, 0, 0, 0]): Spring<Vec4>;
  * Springs `state.value` toward `target`, mutating `state` in place. Returns it.
  * @param dampingRatio 1 = critically damped (no overshoot), <1 bouncy, >1 sluggish
  */
-/**
- * Springs `state.value` toward `target`, mutating `state` in place. Returns it.
- * @param dampingRatio 1 = critically damped (no overshoot), <1 bouncy, >1 sluggish
- */
 export function update(state: Spring<Vec4>, target: Vec4, smoothTime: number, dampingRatio: number, delta: number): Spring<Vec4>;
 ```
 
 #### `spring4.damp`
 
 ```ts
-/** Critically-damped Vec4 spring (dampingRatio = 1). See {@link update}. */
 /** Critically-damped Vec4 spring (dampingRatio = 1). See {@link update}. */
 export function damp(state: Spring<Vec4>, target: Vec4, smoothTime: number, delta: number): Spring<Vec4>;
 ```
@@ -10952,15 +7715,6 @@ export type RandomGenerator = () => number;
  * @param seed the seed value (32-bit integer)
  * @returns state to pass to {@link sample}
  */
-/**
- * Creates Mulberry32 PRNG state seeded with `seed`.
- *
- * Mulberry32 is a simple, fast, and effective PRNG that passes statistical tests
- * and has good distribution properties.
- *
- * @param seed the seed value (32-bit integer)
- * @returns state to pass to {@link sample}
- */
 export function create(seed: number): Mulberry32;
 ```
 
@@ -10973,22 +7727,12 @@ export function create(seed: number): Mulberry32;
  * @param state PRNG state created with {@link create}, mutated in place
  * @returns a number in the range [0, 1)
  */
-/**
- * Advances `state` and returns the next number in the range [0, 1).
- *
- * @param state PRNG state created with {@link create}, mutated in place
- * @returns a number in the range [0, 1)
- */
 export function sample(state: Mulberry32): number;
 ```
 
 #### `mulberry32.seed`
 
 ```ts
-/**
- * Generates a random 32-bit unsigned integer seed, suitable for use with
- * {@link create}.
- */
 /**
  * Generates a random 32-bit unsigned integer seed, suitable for use with
  * {@link create}.
@@ -11007,24 +7751,12 @@ export function seed(): number;
  * @param min the minimum value (inclusive)
  * @param max the maximum value (exclusive)
  */
-/**
- * Returns a random float in the range [min, max).
- * @param random the random generator to use
- * @param min the minimum value (inclusive)
- * @param max the maximum value (exclusive)
- */
 export function float(random: RandomGenerator, min: number, max: number): number;
 ```
 
 #### `random.int`
 
 ```ts
-/**
- * Returns a random integer in the range [min, max] (inclusive).
- * @param random the random generator to use
- * @param min the minimum value (inclusive)
- * @param max the maximum value (inclusive)
- */
 /**
  * Returns a random integer in the range [min, max] (inclusive).
  * @param random the random generator to use
@@ -11042,11 +7774,6 @@ export function int(random: RandomGenerator, min: number, max: number): number;
  * @param random the random generator to use
  * @param chance the probability of returning true, in the range [0, 1]. Defaults to 0.5.
  */
-/**
- * Returns a random boolean.
- * @param random the random generator to use
- * @param chance the probability of returning true, in the range [0, 1]. Defaults to 0.5.
- */
 export function bool(random: RandomGenerator, chance = 0.5): boolean;
 ```
 
@@ -11058,23 +7785,12 @@ export function bool(random: RandomGenerator, chance = 0.5): boolean;
  * @param random the random generator to use
  * @param plusChance the probability of returning 1, in the range [0, 1]. Defaults to 0.5.
  */
-/**
- * Returns a random sign, either 1 or -1.
- * @param random the random generator to use
- * @param plusChance the probability of returning 1, in the range [0, 1]. Defaults to 0.5.
- */
 export function sign(random: RandomGenerator, plusChance = 0.5): number;
 ```
 
 #### `random.choice`
 
 ```ts
-/**
- * Returns a random item from an array.
- * @param random the random generator to use
- * @param items the array to choose from
- * @throws if the array is empty
- */
 /**
  * Returns a random item from an array.
  * @param random the random generator to use
@@ -11093,24 +7809,12 @@ export function choice<T>(random: RandomGenerator, items: T[]): T;
  * @param random the random generator to use
  * @returns out
  */
-/**
- * Writes a random unit-length Vec2 into out.
- * @param out the receiving vector
- * @param random the random generator to use
- * @returns out
- */
 export function vec2(out: Vec2, random: RandomGenerator): Vec2;
 ```
 
 #### `random.vec3`
 
 ```ts
-/**
- * Writes a random unit-length Vec3 into out.
- * @param out the receiving vector
- * @param random the random generator to use
- * @returns out
- */
 /**
  * Writes a random unit-length Vec3 into out.
  * @param out the receiving vector
@@ -11129,24 +7833,12 @@ export function vec3(out: Vec3, random: RandomGenerator): Vec3;
  * @param random the random generator to use
  * @returns out
  */
-/**
- * Writes a random unit-length Vec4 into out.
- * @param out the receiving vector
- * @param random the random generator to use
- * @returns out
- */
 export function vec4(out: Vec4, random: RandomGenerator): Vec4;
 ```
 
 #### `random.quat`
 
 ```ts
-/**
- * Writes a random unit quaternion into out.
- * @param out the receiving quaternion
- * @param random the random generator to use
- * @returns out
- */
 /**
  * Writes a random unit quaternion into out.
  * @param out the receiving quaternion
@@ -11207,26 +7899,12 @@ export type Perlin2DGenerator = Permutation;
  * @param seed The seed value for the noise generator
  * @returns A generator to pass to {@link sample}
  */
-/**
- * Creates a 2D Perlin noise generator with the given seed.
- *
- * @param seed The seed value for the noise generator
- * @returns A generator to pass to {@link sample}
- */
 export function create(seed: number): Perlin2DGenerator;
 ```
 
 #### `perlin2d.sample`
 
 ```ts
-/**
- * Samples 2D Perlin noise.
- *
- * @param generator A generator created with {@link create}
- * @param x X coordinate
- * @param y Y coordinate
- * @returns The noise value at (x, y)
- */
 /**
  * Samples 2D Perlin noise.
  *
@@ -11256,27 +7934,12 @@ export type Perlin3DGenerator = Permutation;
  * @param seed The seed value for the noise generator
  * @returns A generator to pass to {@link sample}
  */
-/**
- * Creates a 3D Perlin noise generator with the given seed.
- *
- * @param seed The seed value for the noise generator
- * @returns A generator to pass to {@link sample}
- */
 export function create(seed: number): Perlin3DGenerator;
 ```
 
 #### `perlin3d.sample`
 
 ```ts
-/**
- * Samples 3D Perlin noise.
- *
- * @param generator A generator created with {@link create}
- * @param x X coordinate
- * @param y Y coordinate
- * @param z Z coordinate
- * @returns The noise value at (x, y, z)
- */
 /**
  * Samples 3D Perlin noise.
  *
@@ -11307,26 +7970,12 @@ export type Simplex2DGenerator = Permutation;
  * @param seed The seed value for the noise generator
  * @returns A generator to pass to {@link sample}
  */
-/**
- * Creates a 2D simplex noise generator with the given seed.
- *
- * @param seed The seed value for the noise generator
- * @returns A generator to pass to {@link sample}
- */
 export function create(seed: number): Simplex2DGenerator;
 ```
 
 #### `simplex2d.sample`
 
 ```ts
-/**
- * Samples 2D simplex noise, returning a value in the interval [-1, 1].
- *
- * @param generator A generator created with {@link create}
- * @param x X coordinate
- * @param y Y coordinate
- * @returns The noise value at (x, y)
- */
 /**
  * Samples 2D simplex noise, returning a value in the interval [-1, 1].
  *
@@ -11356,27 +8005,12 @@ export type Simplex3DGenerator = Permutation;
  * @param seed The seed value for the noise generator
  * @returns A generator to pass to {@link sample}
  */
-/**
- * Creates a 3D simplex noise generator with the given seed.
- *
- * @param seed The seed value for the noise generator
- * @returns A generator to pass to {@link sample}
- */
 export function create(seed: number): Simplex3DGenerator;
 ```
 
 #### `simplex3d.sample`
 
 ```ts
-/**
- * Samples 3D simplex noise, returning a value in the interval [-1, 1].
- *
- * @param generator A generator created with {@link create}
- * @param x X coordinate
- * @param y Y coordinate
- * @param z Z coordinate
- * @returns The noise value at (x, y, z)
- */
 /**
  * Samples 3D simplex noise, returning a value in the interval [-1, 1].
  *
@@ -11432,14 +8066,12 @@ export type HSL = [
 
 ```ts
 /** Create a new Color initialized to black [0, 0, 0]. */
-/** Create a new Color initialized to black [0, 0, 0]. */
 export function create(): Color;
 ```
 
 #### `color.fromValues`
 
 ```ts
-/** Create a new Color with the given linear r, g, b values. */
 /** Create a new Color with the given linear r, g, b values. */
 export function fromValues(r: number, g: number, b: number): Color;
 ```
@@ -11448,14 +8080,12 @@ export function fromValues(r: number, g: number, b: number): Color;
 
 ```ts
 /** Create a new Color that is a copy of `c`. */
-/** Create a new Color that is a copy of `c`. */
 export function clone(c: Color): Color;
 ```
 
 #### `color.copy`
 
 ```ts
-/** Copy the values from `src` into `out`. Returns `out`. */
 /** Copy the values from `src` into `out`. Returns `out`. */
 export function copy(out: Color, src: Color): Color;
 ```
@@ -11464,7 +8094,6 @@ export function copy(out: Color, src: Color): Color;
 
 ```ts
 /** Set the linear r, g, b components of `out` directly. Returns `out`. */
-/** Set the linear r, g, b components of `out` directly. Returns `out`. */
 export function set(out: Color, r: number, g: number, b: number): Color;
 ```
 
@@ -11472,17 +8101,12 @@ export function set(out: Color, r: number, g: number, b: number): Color;
 
 ```ts
 /** Set all three channels of `out` to the same linear value `s` (a gray). Returns `out`. */
-/** Set all three channels of `out` to the same linear value `s` (a gray). Returns `out`. */
 export function setScalar(out: Color, s: number): Color;
 ```
 
 #### `color.setFromSRGB`
 
 ```ts
-/**
- * Set `out` from an sRGB gamma-encoded [r, g, b] array with values in [0, 1].
- * Converts from sRGB gamma space to linear. Returns `out`.
- */
 /**
  * Set `out` from an sRGB gamma-encoded [r, g, b] array with values in [0, 1].
  * Converts from sRGB gamma space to linear. Returns `out`.
@@ -11498,7 +8122,6 @@ export function setFromSRGB(out: Color, srgb: [
 
 ```ts
 /** Create a new Color from an sRGB gamma-encoded [r, g, b] array with values in [0, 1]. */
-/** Create a new Color from an sRGB gamma-encoded [r, g, b] array with values in [0, 1]. */
 export function fromSRGB(srgb: [
     number,
     number,
@@ -11509,7 +8132,6 @@ export function fromSRGB(srgb: [
 #### `color.toSRGB`
 
 ```ts
-/** Write the sRGB gamma-encoded [r, g, b] of a linear Color into `out` (values [0, 1]). */
 /** Write the sRGB gamma-encoded [r, g, b] of a linear Color into `out` (values [0, 1]). */
 export function toSRGB(out: [
     number,
@@ -11526,14 +8148,12 @@ export function toSRGB(out: [
 
 ```ts
 /** Create a CSS `rgb(...)` string in sRGB gamma space (for HTML/canvas use). */
-/** Create a CSS `rgb(...)` string in sRGB gamma space (for HTML/canvas use). */
 export function toCSS(c: Color): string;
 ```
 
 #### `color.toHex`
 
 ```ts
-/** Convert to a 0xRRGGBB integer in sRGB gamma space. */
 /** Convert to a 0xRRGGBB integer in sRGB gamma space. */
 export function toHex(c: Color): number;
 ```
@@ -11542,14 +8162,12 @@ export function toHex(c: Color): number;
 
 ```ts
 /** Convert to a 6-digit sRGB hex string without a leading '#', e.g. 'ff8800'. */
-/** Convert to a 6-digit sRGB hex string without a leading '#', e.g. 'ff8800'. */
 export function toHexString(c: Color): string;
 ```
 
 #### `color.add`
 
 ```ts
-/** Add `a + b` component-wise into `out`. Returns `out`. */
 /** Add `a + b` component-wise into `out`. Returns `out`. */
 export function add(out: Color, a: Color, b: Color): Color;
 ```
@@ -11558,14 +8176,12 @@ export function add(out: Color, a: Color, b: Color): Color;
 
 ```ts
 /** Add scalar `s` to each channel of `a` into `out`. Returns `out`. */
-/** Add scalar `s` to each channel of `a` into `out`. Returns `out`. */
 export function addScalar(out: Color, a: Color, s: number): Color;
 ```
 
 #### `color.sub`
 
 ```ts
-/** Subtract `a - b` component-wise into `out`. Returns `out`. */
 /** Subtract `a - b` component-wise into `out`. Returns `out`. */
 export function sub(out: Color, a: Color, b: Color): Color;
 ```
@@ -11574,14 +8190,12 @@ export function sub(out: Color, a: Color, b: Color): Color;
 
 ```ts
 /** Multiply `a * b` component-wise into `out` (tinting). Returns `out`. */
-/** Multiply `a * b` component-wise into `out` (tinting). Returns `out`. */
 export function multiply(out: Color, a: Color, b: Color): Color;
 ```
 
 #### `color.multiplyScalar`
 
 ```ts
-/** Scale each channel of `a` by `s` into `out` (brightness). Returns `out`. */
 /** Scale each channel of `a` by `s` into `out` (brightness). Returns `out`. */
 export function multiplyScalar(out: Color, a: Color, s: number): Color;
 ```
@@ -11590,14 +8204,12 @@ export function multiplyScalar(out: Color, a: Color, s: number): Color;
 
 ```ts
 /** Linearly interpolate from `a` to `b` by `t` into `out` (physically-correct blend). Returns `out`. */
-/** Linearly interpolate from `a` to `b` by `t` into `out` (physically-correct blend). Returns `out`. */
 export function lerp(out: Color, a: Color, b: Color, t: number): Color;
 ```
 
 #### `color.clamp`
 
 ```ts
-/** Clamp each channel of `c` to [0, 1] into `out`. Returns `out`. */
 /** Clamp each channel of `c` to [0, 1] into `out`. Returns `out`. */
 export function clamp(out: Color, c: Color): Color;
 ```
@@ -11606,14 +8218,12 @@ export function clamp(out: Color, c: Color): Color;
 
 ```ts
 /** Whether `a` and `b` are equal, within an optional per-channel `epsilon` (default exact). */
-/** Whether `a` and `b` are equal, within an optional per-channel `epsilon` (default exact). */
 export function equals(a: Color, b: Color, epsilon = 0): boolean;
 ```
 
 #### `color.luminance`
 
 ```ts
-/** Relative luminance in [0, 1] (Rec. 709 weights, on linear light). */
 /** Relative luminance in [0, 1] (Rec. 709 weights, on linear light). */
 export function luminance(c: Color): number;
 ```
@@ -11624,13 +8234,6 @@ export function luminance(c: Color): number;
 
 ```ts
 /** Convert a single sRGB gamma-encoded channel [0, 1] to linear light [0, 1]. */
-// Color-space conversions (pure functions — no global working-space state).
-//
-// maath's Color is stored in linear sRGB. Two kinds of conversion live here:
-//   - transfer functions: encode/decode a channel's gamma (sRGB <-> linear)
-//   - gamut conversions:   move between primaries (linear sRGB <-> linear Display-P3)
-// Display-P3 uses the same sRGB transfer curve, so only the primaries differ.
-/** Convert a single sRGB gamma-encoded channel [0, 1] to linear light [0, 1]. */
 export function srgbToLinear(c: number): number;
 ```
 
@@ -11638,17 +8241,12 @@ export function srgbToLinear(c: number): number;
 
 ```ts
 /** Convert a single linear light channel [0, 1] to sRGB gamma-encoded [0, 1]. */
-/** Convert a single linear light channel [0, 1] to sRGB gamma-encoded [0, 1]. */
 export function linearToSrgb(c: number): number;
 ```
 
 #### `colorspace.linearSrgbToLinearDisplayP3`
 
 ```ts
-/**
- * Convert a linear-sRGB Color to linear Display-P3 primaries, into `out`. Returns `out`.
- * (Both spaces share the sRGB transfer curve; this changes only the primaries.)
- */
 /**
  * Convert a linear-sRGB Color to linear Display-P3 primaries, into `out`. Returns `out`.
  * (Both spaces share the sRGB transfer curve; this changes only the primaries.)
@@ -11663,10 +8261,6 @@ export function linearSrgbToLinearDisplayP3(out: Color, c: Color): Color;
  * Convert a linear Display-P3 Color to linear-sRGB primaries, into `out`. Returns `out`.
  * Colors outside the sRGB gamut yield channels outside [0, 1] — clamp if needed.
  */
-/**
- * Convert a linear Display-P3 Color to linear-sRGB primaries, into `out`. Returns `out`.
- * Colors outside the sRGB gamut yield channels outside [0, 1] — clamp if needed.
- */
 export function linearDisplayP3ToLinearSrgb(out: Color, c: Color): Color;
 ```
 
@@ -11676,14 +8270,12 @@ export function linearDisplayP3ToLinearSrgb(out: Color, c: Color): Color;
 
 ```ts
 /** Create a new HSL initialized to [0, 0, 0] (black). */
-/** Create a new HSL initialized to [0, 0, 0] (black). */
 export function create(): HSL;
 ```
 
 #### `hsl.fromValues`
 
 ```ts
-/** Create a new HSL with the given h, s, l values (all in [0, 1]). */
 /** Create a new HSL with the given h, s, l values (all in [0, 1]). */
 export function fromValues(h: number, s: number, l: number): HSL;
 ```
@@ -11692,14 +8284,12 @@ export function fromValues(h: number, s: number, l: number): HSL;
 
 ```ts
 /** Create a new HSL that is a copy of `a`. */
-/** Create a new HSL that is a copy of `a`. */
 export function clone(a: HSL): HSL;
 ```
 
 #### `hsl.copy`
 
 ```ts
-/** Copy the values from `src` into `out`. Returns `out`. */
 /** Copy the values from `src` into `out`. Returns `out`. */
 export function copy(out: HSL, src: HSL): HSL;
 ```
@@ -11708,7 +8298,6 @@ export function copy(out: HSL, src: HSL): HSL;
 
 ```ts
 /** Set the h, s, l components of `out` directly. Returns `out`. */
-/** Set the h, s, l components of `out` directly. Returns `out`. */
 export function set(out: HSL, h: number, s: number, l: number): HSL;
 ```
 
@@ -11716,14 +8305,12 @@ export function set(out: HSL, h: number, s: number, l: number): HSL;
 
 ```ts
 /** Write the HSL of a linear Color into `out`. Returns `out`. */
-/** Write the HSL of a linear Color into `out`. Returns `out`. */
 export function fromColor(out: HSL, c: Color): HSL;
 ```
 
 #### `hsl.toColor`
 
 ```ts
-/** Write the linear Color of an HSL into `out`. Returns `out`. */
 /** Write the linear Color of an HSL into `out`. Returns `out`. */
 export function toColor(out: Color, a: HSL): Color;
 ```
@@ -11736,21 +8323,12 @@ export function toColor(out: Color, a: HSL): Color;
  * the hue wheel (so e.g. 350°→10° passes through 0°, not all the way back).
  * Returns `out`.
  */
-/**
- * Interpolate from `a` to `b` by `t` into `out`, taking the shortest path around
- * the hue wheel (so e.g. 350°→10° passes through 0°, not all the way back).
- * Returns `out`.
- */
 export function lerp(out: HSL, a: HSL, b: HSL, t: number): HSL;
 ```
 
 #### `hsl.offset`
 
 ```ts
-/**
- * Offset `a` by (dh, ds, dl) into `out`: hue wraps into [0, 1), saturation and
- * lightness are clamped to [0, 1]. Returns `out`.
- */
 /**
  * Offset `a` by (dh, ds, dl) into `out`: hue wraps into [0, 1), saturation and
  * lightness are clamped to [0, 1]. Returns `out`.
