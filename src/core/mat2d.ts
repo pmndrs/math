@@ -20,14 +20,7 @@ export function create(): Mat2d {
  * @returns a new 2x3 matrix
  */
 export function clone(a: Mat2d): Mat2d {
-    const out = create();
-    out[0] = a[0];
-    out[1] = a[1];
-    out[2] = a[2];
-    out[3] = a[3];
-    out[4] = a[4];
-    out[5] = a[5];
-    return out;
+    return [a[0], a[1], a[2], a[3], a[4], a[5]];
 }
 
 /**
@@ -75,14 +68,7 @@ export function identity(out: Mat2d): Mat2d {
  * @returns A new mat2d
  */
 export function fromValues(a: number, b: number, c: number, d: number, tx: number, ty: number): Mat2d {
-    const out = create();
-    out[0] = a;
-    out[1] = b;
-    out[2] = c;
-    out[3] = d;
-    out[4] = tx;
-    out[5] = ty;
-    return out;
+    return [a, b, c, d, tx, ty];
 }
 
 /**

@@ -43,17 +43,7 @@ export function fromMat4(out: Mat3, a: Mat4): Mat3 {
  * @returns a new 3x3 matrix
  */
 export function clone(a: Mat3): Mat3 {
-    const out = create();
-    out[0] = a[0];
-    out[1] = a[1];
-    out[2] = a[2];
-    out[3] = a[3];
-    out[4] = a[4];
-    out[5] = a[5];
-    out[6] = a[6];
-    out[7] = a[7];
-    out[8] = a[8];
-    return out;
+    return [a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]];
 }
 
 /**
@@ -101,17 +91,7 @@ export function fromValues(
     m21: number,
     m22: number,
 ): Mat3 {
-    const out = create();
-    out[0] = m00;
-    out[1] = m01;
-    out[2] = m02;
-    out[3] = m10;
-    out[4] = m11;
-    out[5] = m12;
-    out[6] = m20;
-    out[7] = m21;
-    out[8] = m22;
-    return out;
+    return [m00, m01, m02, m10, m11, m12, m20, m21, m22];
 }
 
 /**

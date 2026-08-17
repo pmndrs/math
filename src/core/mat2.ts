@@ -20,12 +20,7 @@ export function create(): Mat2 {
  * @returns a new 2x2 matrix
  */
 export function clone(a: Mat2): Mat2 {
-    const out = create();
-    out[0] = a[0];
-    out[1] = a[1];
-    out[2] = a[2];
-    out[3] = a[3];
-    return out;
+    return [a[0], a[1], a[2], a[3]];
 }
 
 /**
@@ -67,12 +62,7 @@ export function identity(out: Mat2): Mat2 {
  * @returns out A new 2x2 matrix
  */
 export function fromValues(m00: number, m01: number, m10: number, m11: number): Mat2 {
-    const out = create();
-    out[0] = m00;
-    out[1] = m01;
-    out[2] = m10;
-    out[3] = m11;
-    return out;
+    return [m00, m01, m10, m11];
 }
 
 /**
