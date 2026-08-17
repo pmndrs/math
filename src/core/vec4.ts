@@ -22,12 +22,7 @@ export function create(): Vec4 {
  * @returns a new 4D vector
  */
 export function clone(a: Vec4): Vec4 {
-    const out = create();
-    out[0] = a[0];
-    out[1] = a[1];
-    out[2] = a[2];
-    out[3] = a[3];
-    return out;
+    return [a[0], a[1], a[2], a[3]];
 }
 
 /**
@@ -40,12 +35,7 @@ export function clone(a: Vec4): Vec4 {
  * @returns a new 4D vector
  */
 export function fromValues(x: number, y: number, z: number, w: number): Vec4 {
-    const out = create();
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
-    out[3] = w;
-    return out;
+    return [x, y, z, w];
 }
 
 /**
