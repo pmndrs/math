@@ -1,8 +1,6 @@
 import { EPSILON } from './scalar';
 import type { Mat4 } from './mat4';
-import * as mat4 from './mat4';
 import type { Quat } from './quat';
-import * as quat from './quat';
 import type { Vec3 } from './vec3';
 
 /** A dual quaternion that represents both rotation and translation */
@@ -170,15 +168,69 @@ export function fromRotation(out: Quat2, q: Quat): Quat2 {
  * @param out the dual quaternion
  * @param a the matrix
  * @returns dual quat receiving operation result
- * @function
  */
 export function fromMat4(out: Quat2, a: Mat4): Quat2 {
-    //TODO Optimize this
-    const outer = quat.create();
-    mat4.getRotation(outer, a);
-    const t = [0, 0, 0] as Vec3;
-    mat4.getTranslation(t, a);
-    fromRotationTranslation(out, outer, t);
+    // Rotation: extract the quaternion from the (possibly scaled) upper-3x3.
+    // Inlined from mat4.getRotation/getScaling so no scratch quat or Vec3 is allocated.
+    const is1 = 1 / Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
+    const is2 = 1 / Math.sqrt(a[4] * a[4] + a[5] * a[5] + a[6] * a[6]);
+    const is3 = 1 / Math.sqrt(a[8] * a[8] + a[9] * a[9] + a[10] * a[10]);
+
+    const sm11 = a[0] * is1;
+    const sm12 = a[1] * is2;
+    const sm13 = a[2] * is3;
+    const sm21 = a[4] * is1;
+    const sm22 = a[5] * is2;
+    const sm23 = a[6] * is3;
+    const sm31 = a[8] * is1;
+    const sm32 = a[9] * is2;
+    const sm33 = a[10] * is3;
+
+    const trace = sm11 + sm22 + sm33;
+    let bx: number;
+    let by: number;
+    let bz: number;
+    let bw: number;
+
+    if (trace > 0) {
+        const S = Math.sqrt(trace + 1.0) * 2;
+        bw = 0.25 * S;
+        bx = (sm23 - sm32) / S;
+        by = (sm31 - sm13) / S;
+        bz = (sm12 - sm21) / S;
+    } else if (sm11 > sm22 && sm11 > sm33) {
+        const S = Math.sqrt(1.0 + sm11 - sm22 - sm33) * 2;
+        bw = (sm23 - sm32) / S;
+        bx = 0.25 * S;
+        by = (sm12 + sm21) / S;
+        bz = (sm31 + sm13) / S;
+    } else if (sm22 > sm33) {
+        const S = Math.sqrt(1.0 + sm22 - sm11 - sm33) * 2;
+        bw = (sm31 - sm13) / S;
+        bx = (sm12 + sm21) / S;
+        by = 0.25 * S;
+        bz = (sm23 + sm32) / S;
+    } else {
+        const S = Math.sqrt(1.0 + sm33 - sm11 - sm22) * 2;
+        bw = (sm12 - sm21) / S;
+        bx = (sm31 + sm13) / S;
+        by = (sm23 + sm32) / S;
+        bz = 0.25 * S;
+    }
+
+    out[0] = bx;
+    out[1] = by;
+    out[2] = bz;
+    out[3] = bw;
+
+    // Dual part from the translation (last column), inlined from fromRotationTranslation.
+    const ax = a[12] * 0.5;
+    const ay = a[13] * 0.5;
+    const az = a[14] * 0.5;
+    out[4] = ax * bw + ay * bz - az * by;
+    out[5] = ay * bw + az * bx - ax * bz;
+    out[6] = az * bw + ax * by - ay * bx;
+    out[7] = -ax * bx - ay * by - az * bz;
     return out;
 }
 

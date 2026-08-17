@@ -1,10 +1,32 @@
 import { bench, group } from "@pmndrs/labs";
+import * as mat4 from "../../src/core/mat4";
+import type { Mat4 } from "../../src/core/mat4";
 import * as quat from "../../src/core/quat";
 import * as quat2 from "../../src/core/quat2";
 import type { Quat2 } from "../../src/core/quat2";
 import * as mulberry32 from "../../src/random/mulberry32";
 
 const N = 10_000;
+
+function makeMats(seed: number): Mat4[] {
+  const rand = mulberry32.create(seed);
+  const out: Mat4[] = [];
+  for (let i = 0; i < N; i++) {
+    const q = quat.setAxisAngle(
+      quat.create(),
+      [0.267261, 0.534522, 0.801784],
+      mulberry32.sample(rand) * Math.PI * 2,
+    );
+    const m = mat4.create();
+    mat4.fromRotationTranslation(m, q, [
+      mulberry32.sample(rand) * 10,
+      mulberry32.sample(rand) * 10,
+      mulberry32.sample(rand) * 10,
+    ]);
+    out.push(m);
+  }
+  return out;
+}
 
 function makeDualQuats(seed: number): Quat2[] {
   const rand = mulberry32.create(seed);
@@ -98,7 +120,7 @@ group("quat2 ops 10k @core @quat2", () => {
 
   bench("fromRotationTranslation", function* () {
     const rand = mulberry32.create(3);
-    const quats = makeDualQuats(1).map((_, i) =>
+    const quats = makeDualQuats(1).map(() =>
       quat.setAxisAngle(
         quat.create(),
         [0.267261, 0.534522, 0.801784],
@@ -111,6 +133,17 @@ group("quat2 ops 10k @core @quat2", () => {
     yield () => {
       for (let i = 0; i < N; i++) {
         quat2.fromRotationTranslation(out, quats[i], t);
+      }
+    };
+  });
+
+  bench("fromMat4", function* () {
+    const mats = makeMats(1);
+    const out = quat2.create();
+
+    yield () => {
+      for (let i = 0; i < N; i++) {
+        quat2.fromMat4(out, mats[i]);
       }
     };
   });
