@@ -61,6 +61,7 @@
     "build:bundle": "rolldown --config rolldown.config.mjs",
     "build:dts": "tsc -p tsconfig.build.json && node scripts/add-js-extensions-dts.mjs",
     "build:examples": "pnpm --filter maath-examples build",
+    "dev:examples": "pnpm --filter maath-examples dev",
     "build:website": "pnpm --filter website build",
     "format": "biome format --write src/. tst/.",
     "lint": "biome lint --write src/. tst/.",
