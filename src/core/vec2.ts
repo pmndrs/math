@@ -360,7 +360,6 @@ export function normalize(out: Vec2, a: Vec2): Vec2 {
     const y = a[1];
     let len = x * x + y * y;
     if (len > 0) {
-        //TODO: evaluate use of glm_invsqrt here?
         len = 1 / Math.sqrt(len);
     }
     out[0] = a[0] * len;
