@@ -1,6 +1,6 @@
+import { dashboard } from 'dashcat';
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import GUI from 'lil-gui';
 import { mat4, quat, type Spherical, spherical, vec3 as v3 } from 'math';
 import { rainbowRGB, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
@@ -144,10 +144,11 @@ const settings = {
     spin: true,
 };
 
-const gui = new GUI();
-gui.add(settings, 'points', 24, 3000, 1).name('Points').onChange(rebuild);
-gui.add(settings, 'twist', -4, 4, 0.001).name('Twist off φ (°)').onChange(rebuild);
-gui.add(settings, 'spin').name('Auto-spin');
+const dash = dashboard();
+const panel = dash.panel({ title: 'fibonacci sphere' });
+panel.add(settings, 'points', { min: 24, max: 3000, step: 1, label: 'Points' }).onChange(rebuild);
+panel.add(settings, 'twist', { min: -4, max: 4, step: 0.001, label: 'Twist off φ (°)' }).onChange(rebuild);
+panel.add(settings, 'spin', { label: 'Auto-spin' });
 
 rebuild();
 camera.updateProjectionMatrix();
