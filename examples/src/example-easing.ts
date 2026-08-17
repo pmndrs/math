@@ -58,8 +58,6 @@ camera.position[2] = 4.2;
 camera.updateProjectionMatrix();
 scene.add(camera);
 
-renderer.setInspector(new g.Inspector());
-
 // project a world (x, y) on the z=0 plane to screen pixels (camera looks down -z)
 const FOV = Math.PI / 4;
 function project(wx: number, wy: number): [number, number] {

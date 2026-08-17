@@ -30,8 +30,6 @@ camera.position[2] = 4;
 camera.updateProjectionMatrix();
 scene.add(camera);
 
-renderer.setInspector(new g.Inspector());
-
 const FOV = Math.PI / 4;
 function project(wx: number, wy: number): [number, number] {
     const w = window.innerWidth;
@@ -115,7 +113,7 @@ document.body.appendChild(marker);
 const panel = document.createElement('div');
 // no container — just monospace text + a swatch
 panel.style.cssText =
-    'position:absolute;left:16px;top:16px;display:flex;align-items:center;gap:11px;font-family:var(--mc-mono);font-size:13px;line-height:1.6;color:var(--mc-ink);text-shadow:0 1px 2px rgba(0,0,0,0.6);white-space:nowrap;pointer-events:none;z-index:10';
+    'position:absolute;left:16px;bottom:16px;display:flex;align-items:center;gap:11px;font-family:var(--mc-mono);font-size:13px;line-height:1.6;color:var(--mc-ink);text-shadow:0 1px 2px rgba(0,0,0,0.6);white-space:nowrap;pointer-events:none;z-index:10';
 const swatch = document.createElement('div');
 swatch.style.cssText = 'width:34px;height:34px;border-radius:6px;border:1px solid rgba(255,255,255,0.22);flex:none';
 const readout = document.createElement('div');

@@ -55,8 +55,6 @@ const controls = new g.OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.1;
 
-renderer.setInspector(new g.Inspector());
-
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;

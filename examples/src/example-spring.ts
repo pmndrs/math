@@ -38,8 +38,6 @@ const camera = new g.PerspectiveCamera(Math.PI / 4, window.innerWidth / window.i
 camera.position[2] = 5;
 scene.add(camera);
 
-renderer.setInspector(new g.Inspector());
-
 const FOV = Math.PI / 4;
 function unproject(clientX: number, clientY: number): [number, number] {
     const rect = canvas.getBoundingClientRect();
@@ -107,7 +105,7 @@ scene.add(beads);
 const hint = document.createElement('div');
 hint.className = 'mc-info';
 hint.style.left = '16px';
-hint.style.top = '16px';
+hint.style.bottom = '16px';
 hint.textContent = 'move the pointer to lead the tail';
 document.body.appendChild(hint);
 
