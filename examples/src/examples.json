@@ -1,4 +1,15 @@
 {
+    "example-random-orientations": {
+        "title": "Random Orientations",
+        "description": "A grid of hand-built arrows slerping between uniform random rotations (math's random.quat) — every direction equally likely, so the field stays evenly stirred. Toggle naive euler to watch the sampling bias pull them toward the poles.",
+        "tags": [
+            "random",
+            "quaternion",
+            "slerp",
+            "uniform-sampling"
+        ],
+        "category": "basics"
+    },
     "example-fibonacci-sphere": {
         "title": "Fibonacci Sphere",
         "description": "Points spread evenly over a sphere with the Fibonacci lattice, built in math's spherical coordinates (spherical.toVec3) — each steps one equal-area band down while turning by the golden angle, so sunflower-like spiral arms emerge. Nudge the twist off φ to shear them into spokes.",
