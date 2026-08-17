@@ -1,8 +1,7 @@
-import { dashboard } from 'dashcat';
 import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { mat4, quat, type Spherical, spherical, vec3 as v3 } from 'math';
-import { pinTopRight } from './common/dash';
+import { createPanel } from './common/dash';
 import { rainbowRGB, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
 
@@ -134,9 +133,7 @@ const settings = {
     spin: true,
 };
 
-const dash = dashboard();
-const panel = dash.panel({ title: 'fibonacci sphere' });
-pinTopRight(panel);
+const panel = createPanel('fibonacci sphere');
 panel.add(settings, 'points', { min: 24, max: 3000, step: 1, label: 'Points' }).onChange(rebuild);
 panel.add(settings, 'twist', { min: -4, max: 4, step: 0.001, label: 'Twist off φ (°)' }).onChange(rebuild);
 panel.add(settings, 'spin', { label: 'Auto-spin' });
