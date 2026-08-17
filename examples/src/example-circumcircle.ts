@@ -89,13 +89,13 @@ window.addEventListener('resize', () => {
 // morphing triangle outline (neutral) and its circumcircle (rainbow ring)
 const triPoints = new Float32Array(9);
 const triGeometry = new g.LineGeometry(triPoints, true, 3);
-const triangle = new g.Line(triGeometry, new g.LineMaterial({ color: g.vec4f(0.85, 0.88, 0.95, 1), lineWidth: 2 }));
+const triangle = new g.Line(triGeometry, new g.LineMaterial({ color: g.vec4f(0.85, 0.88, 0.95, 1), lineWidth: 4 }));
 scene.add(triangle);
 
 const CIRCLE_SEGMENTS = 128;
 const circlePoints = new Float32Array(CIRCLE_SEGMENTS * 3);
 const circleGeometry = new g.LineGeometry(circlePoints, true, CIRCLE_SEGMENTS);
-const circleLine = new g.Line(circleGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2), lineWidth: 3 }));
+const circleLine = new g.Line(circleGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2), lineWidth: 5 }));
 scene.add(circleLine);
 
 // dots: 3 triangle vertices + the circumcenter
