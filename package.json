@@ -72,7 +72,7 @@
     "build:docs": "pnpm run docs && pnpm run typedoc",
     "release": "pnpm run build && pnpm run test && pnpm run build:examples && pnpm run build:docs && pnpm run build:website"
   },
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@11.22.0",
   "devDependencies": {
     "@biomejs/biome": "^2.5.6",
     "rolldown": "^1.2.1",
