@@ -117,83 +117,73 @@
 
         .example-item {
             display: block;
-            padding: 0;
             color: #cfd8dc;
             background-color: var(--color-card);
             text-decoration: none;
-            font-size: 14px;
-            transition: background-color 0.2s, border 0.2s ease;
             cursor: pointer;
-            border: 3px solid transparent;
-            border-radius: 0.2em;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+            transition: transform 0.18s ease, box-shadow 0.18s ease,
+                border-color 0.18s ease;
         }
 
         .example-item:hover {
-            color: #fff;
+            transform: translateY(-3px);
+            border-color: #4a5b64;
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.38);
         }
 
         .example-item.active {
-            color: #fff;
-            border: 3px solid #0277bd;
+            border-color: #0288d1;
+            box-shadow: 0 0 0 1px #0288d1, 0 10px 24px rgba(2, 136, 209, 0.28);
         }
 
         .example-preview {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
+            position: relative;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            /* placeholder gradient shown until (or if) the screenshot loads */
+            background: radial-gradient(120% 120% at 30% 20%,
+                    #313c44 0%, #262d34 55%, #1a2025 100%);
         }
 
         .example-screenshot {
+            position: absolute;
+            inset: 0;
             width: 100%;
-            height: 140px;
+            height: 100%;
             object-fit: cover;
-            border-radius: 0;
-            flex-shrink: 0;
             display: block;
+            transition: transform 0.4s ease;
         }
 
-        .example-info {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 16px 16px 20px 16px;
+        .example-item:hover .example-screenshot {
+            transform: scale(1.05);
+        }
+
+        .example-overlay {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 30px 14px 12px 14px;
+            pointer-events: none;
+            background: linear-gradient(to top,
+                    rgba(9, 12, 15, 0.92) 0%,
+                    rgba(9, 12, 15, 0.55) 45%,
+                    rgba(9, 12, 15, 0) 100%);
         }
 
         .example-title {
-            font-weight: 500;
-            font-size: 16px;
             margin: 0;
-            line-height: 1.2;
-        }
-
-        .example-description {
-            font-size: 13px;
-            color: #b0bec5;
-            margin: 0;
-            line-height: 1.4;
-        }
-
-        .example-source-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 11px;
-            color: #eceff1;
-            text-decoration: none;
-            align-self: flex-start;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            font-weight: 500;
-            border-bottom: 1px solid rgba(236, 239, 241, 0.25);
-            padding-bottom: 1px;
-            transition: border-color 0.2s, opacity 0.2s;
-            opacity: 0.5;
-        }
-
-        .example-source-link:hover {
-            opacity: 1;
-            border-bottom-color: #eceff1;
+            font-weight: 600;
+            font-size: 15px;
+            line-height: 1.25;
+            letter-spacing: 0.01em;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
         }
 
         .content {
@@ -269,18 +259,8 @@
                 padding: 20px;
             }
 
-            .example-info {
-                padding: 20px 20px 24px 20px;
-                gap: 10px;
-            }
-
             .example-title {
-                font-size: 17px;
-            }
-
-            .example-description {
-                font-size: 14px;
-                line-height: 1.5;
+                font-size: 16px;
             }
 
             .hamburger {
@@ -345,17 +325,12 @@
             return `
                 <li class="example-card" data-example="${key}">
                     <div class="example-item" data-example="${key}">
-                    <div class="example-preview">
-                        <img src="./screenshots/${key}.png" alt="${example.title}" class="example-screenshot" onerror="this.style.display='none'">
-                        <div class="example-info">
-                        <h3 class="example-title">${example.title}</h3>
-                        <p class="example-description">${example.description}</p>
-                        <a class="example-source-link" href="https://github.com/pmndrs/math/blob/main/examples/src/${key}.ts" target="_blank" onclick="event.stopPropagation()">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18v-6h6v6M9 6h6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-                            source
-                        </a>
+                        <div class="example-preview">
+                            <img src="./screenshots/${key}.png" alt="${example.title}" class="example-screenshot" onerror="this.style.display='none'">
+                            <div class="example-overlay">
+                                <h3 class="example-title">${example.title}</h3>
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </li>
             `;
