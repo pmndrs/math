@@ -357,20 +357,152 @@ export function intersectsOBB3(a: OBB3, b: OBB3, epsilon = EPSILON): boolean {
     return true;
 }
 
-const _intersectsBox3_obbFromAABB = /*@__PURE__*/ create();
-
 /**
  * Tests whether an OBB intersects with an AABB.
  *
- * The AABB is treated as an axis-aligned OBB and handed to {@link intersectsOBB3}.
+ * Specialised form of {@link intersectsOBB3}: the AABB's axes are the world axes, so
+ * the axis dot-product matrix R is just the OBB's rotation (no 9 dot-products), and the
+ * AABB's centre/half-extents come straight from its min/max. The near-parallel edge
+ * skip works identically — here it fires when an OBB axis aligns with a world axis.
  *
  * @param obb - The OBB
  * @param aabb - The AABB (axis-aligned bounding box)
  * @returns true if they intersect
  */
 export function intersectsBox3(obb: OBB3, aabb: Box3): boolean {
-    const obbFromAABB = setFromBox3(_intersectsBox3_obbFromAABB, aabb);
-    return intersectsOBB3(obb, obbFromAABB);
+    const rotA = obb.rotation;
+    const epsilon = EPSILON;
+
+    // R[i][j] = dot(A axis i, AABB axis j) = A axis i's j-th component = rotA itself
+    const r00 = rotA[0];
+    const r01 = rotA[1];
+    const r02 = rotA[2];
+    const r10 = rotA[3];
+    const r11 = rotA[4];
+    const r12 = rotA[5];
+    const r20 = rotA[6];
+    const r21 = rotA[7];
+    const r22 = rotA[8];
+
+    const q00 = Math.abs(r00);
+    const q01 = Math.abs(r01);
+    const q02 = Math.abs(r02);
+    const q10 = Math.abs(r10);
+    const q11 = Math.abs(r11);
+    const q12 = Math.abs(r12);
+    const q20 = Math.abs(r20);
+    const q21 = Math.abs(r21);
+    const q22 = Math.abs(r22);
+
+    // AABB centre and half-extents
+    const bcx = (aabb[0] + aabb[3]) * 0.5;
+    const bcy = (aabb[1] + aabb[4]) * 0.5;
+    const bcz = (aabb[2] + aabb[5]) * 0.5;
+    const be0 = (aabb[3] - aabb[0]) * 0.5;
+    const be1 = (aabb[4] - aabb[1]) * 0.5;
+    const be2 = (aabb[5] - aabb[2]) * 0.5;
+
+    // Translation (aabb.center - obb.center) brought into the OBB's frame
+    const dx = bcx - obb.center[0];
+    const dy = bcy - obb.center[1];
+    const dz = bcz - obb.center[2];
+    const t0 = dx * r00 + dy * r01 + dz * r02;
+    const t1 = dx * r10 + dy * r11 + dz * r12;
+    const t2 = dx * r20 + dy * r21 + dz * r22;
+
+    const ae0 = obb.halfExtents[0];
+    const ae1 = obb.halfExtents[1];
+    const ae2 = obb.halfExtents[2];
+
+    let ra: number;
+    let rb: number;
+
+    // Test axes L = A0, A1, A2
+    ra = ae0;
+    rb = be0 * q00 + be1 * q01 + be2 * q02;
+    if (Math.abs(t0) > ra + rb) return false;
+    ra = ae1;
+    rb = be0 * q10 + be1 * q11 + be2 * q12;
+    if (Math.abs(t1) > ra + rb) return false;
+    ra = ae2;
+    rb = be0 * q20 + be1 * q21 + be2 * q22;
+    if (Math.abs(t2) > ra + rb) return false;
+
+    // Test axes L = B0, B1, B2
+    ra = ae0 * q00 + ae1 * q10 + ae2 * q20;
+    rb = be0;
+    if (Math.abs(t0 * r00 + t1 * r10 + t2 * r20) > ra + rb) return false;
+    ra = ae0 * q01 + ae1 * q11 + ae2 * q21;
+    rb = be1;
+    if (Math.abs(t0 * r01 + t1 * r11 + t2 * r21) > ra + rb) return false;
+    ra = ae0 * q02 + ae1 * q12 + ae2 * q22;
+    rb = be2;
+    if (Math.abs(t0 * r02 + t1 * r12 + t2 * r22) > ra + rb) return false;
+
+    // Test axis L = A0 x B0 (skip when A0 aligns with world X)
+    if (1 - r00 * r00 >= epsilon) {
+        ra = ae1 * q20 + ae2 * q10;
+        rb = be1 * q02 + be2 * q01;
+        if (Math.abs(t2 * r10 - t1 * r20) > ra + rb) return false;
+    }
+
+    // Test axis L = A0 x B1 (skip when A0 aligns with world Y)
+    if (1 - r01 * r01 >= epsilon) {
+        ra = ae1 * q21 + ae2 * q11;
+        rb = be0 * q02 + be2 * q00;
+        if (Math.abs(t2 * r11 - t1 * r21) > ra + rb) return false;
+    }
+
+    // Test axis L = A0 x B2 (skip when A0 aligns with world Z)
+    if (1 - r02 * r02 >= epsilon) {
+        ra = ae1 * q22 + ae2 * q12;
+        rb = be0 * q01 + be1 * q00;
+        if (Math.abs(t2 * r12 - t1 * r22) > ra + rb) return false;
+    }
+
+    // Test axis L = A1 x B0 (skip when A1 aligns with world X)
+    if (1 - r10 * r10 >= epsilon) {
+        ra = ae0 * q20 + ae2 * q00;
+        rb = be1 * q12 + be2 * q11;
+        if (Math.abs(t0 * r20 - t2 * r00) > ra + rb) return false;
+    }
+
+    // Test axis L = A1 x B1 (skip when A1 aligns with world Y)
+    if (1 - r11 * r11 >= epsilon) {
+        ra = ae0 * q21 + ae2 * q01;
+        rb = be0 * q12 + be2 * q10;
+        if (Math.abs(t0 * r21 - t2 * r01) > ra + rb) return false;
+    }
+
+    // Test axis L = A1 x B2 (skip when A1 aligns with world Z)
+    if (1 - r12 * r12 >= epsilon) {
+        ra = ae0 * q22 + ae2 * q02;
+        rb = be0 * q11 + be1 * q10;
+        if (Math.abs(t0 * r22 - t2 * r02) > ra + rb) return false;
+    }
+
+    // Test axis L = A2 x B0 (skip when A2 aligns with world X)
+    if (1 - r20 * r20 >= epsilon) {
+        ra = ae0 * q10 + ae1 * q00;
+        rb = be1 * q22 + be2 * q21;
+        if (Math.abs(t1 * r00 - t0 * r10) > ra + rb) return false;
+    }
+
+    // Test axis L = A2 x B1 (skip when A2 aligns with world Y)
+    if (1 - r21 * r21 >= epsilon) {
+        ra = ae0 * q11 + ae1 * q01;
+        rb = be0 * q22 + be2 * q20;
+        if (Math.abs(t1 * r01 - t0 * r11) > ra + rb) return false;
+    }
+
+    // Test axis L = A2 x B2 (skip when A2 aligns with world Z)
+    if (1 - r22 * r22 >= epsilon) {
+        ra = ae0 * q12 + ae1 * q02;
+        rb = be0 * q21 + be1 * q20;
+        if (Math.abs(t1 * r02 - t0 * r12) > ra + rb) return false;
+    }
+
+    return true;
 }
 
 /**
