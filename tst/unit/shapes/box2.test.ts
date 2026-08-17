@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Box2, Circle, Vec2 } from '../../../src/shapes';
+import type { Box2, Circle } from '../../../src/shapes';
 import { box2 } from '../../../src/shapes';
 
 describe('box2', () => {
