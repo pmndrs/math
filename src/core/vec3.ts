@@ -1,8 +1,8 @@
 import type { MutableArrayLike } from './arrays';
-import * as scalar from './scalar';
 import type { Mat3 } from './mat3';
 import type { Mat4 } from './mat4';
 import type { Quat } from './quat';
+import * as scalar from './scalar';
 
 /** A 3D vector */
 export type Vec3 = [x: number, y: number, z: number];
@@ -397,7 +397,6 @@ export function normalize(out: Vec3, a: Vec3): Vec3 {
     const z = a[2];
     let len = x * x + y * y + z * z;
     if (len > 0) {
-        //TODO: evaluate use of glm_invsqrt here?
         len = 1 / Math.sqrt(len);
     }
     out[0] = a[0] * len;
@@ -679,17 +678,18 @@ export function rotateX(out: Vec3, a: Vec3, b: Vec3, rad: number): Vec3 {
 export function rotateY(out: Vec3, a: Vec3, b: Vec3, rad: number): Vec3 {
     const p: number[] = [];
     const r: number[] = [];
-    //Translate point to the origin
+
+    // translate point to the origin
     p[0] = a[0] - b[0];
     p[1] = a[1] - b[1];
     p[2] = a[2] - b[2];
 
-    //perform rotation
+    // perform rotation
     r[0] = p[2] * Math.sin(rad) + p[0] * Math.cos(rad);
     r[1] = p[1];
     r[2] = p[2] * Math.cos(rad) - p[0] * Math.sin(rad);
 
-    //translate to correct position
+    // translate to correct position
     out[0] = r[0] + b[0];
     out[1] = r[1] + b[1];
     out[2] = r[2] + b[2];
@@ -708,17 +708,17 @@ export function rotateY(out: Vec3, a: Vec3, b: Vec3, rad: number): Vec3 {
 export function rotateZ(out: Vec3, a: Vec3, b: Vec3, rad: number): Vec3 {
     const p: number[] = [];
     const r: number[] = [];
-    //Translate point to the origin
+    // translate point to the origin
     p[0] = a[0] - b[0];
     p[1] = a[1] - b[1];
     p[2] = a[2] - b[2];
 
-    //perform rotation
+    // perform rotation
     r[0] = p[0] * Math.cos(rad) - p[1] * Math.sin(rad);
     r[1] = p[0] * Math.sin(rad) + p[1] * Math.cos(rad);
     r[2] = p[2];
 
-    //translate to correct position
+    // translate to correct position
     out[0] = r[0] + b[0];
     out[1] = r[1] + b[1];
     out[2] = r[2] + b[2];
