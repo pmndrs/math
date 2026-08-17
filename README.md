@@ -1,5 +1,5 @@
 ```sh
-> npm install math
+> npm install math@canary
 ```
 
 # math
@@ -27,8 +27,8 @@ import { type Vec3, vec3 } from 'math';
 
 // math types are plain arrays — the constructors just return literals:
 const a: Vec3 = [1, 2, 3]; // a plain-array literal
-const b = vec3.fromValues(1, 2, 3); // …exactly the same as `a`
-const out = vec3.create(); // …and create() is just [0, 0, 0]
+const b = vec3.fromValues(1, 2, 3); // the same as `a`
+const out = vec3.create(); // returns [0, 0, 0]
 
 // functions write into their first argument, so nothing is allocated:
 vec3.add(out, a, b); // out = [2, 4, 6]
@@ -48,6 +48,26 @@ import { easing, spring } from 'math/time'; // easings & springs
 ## Examples
 
 <table>
+  <tr>
+    <td align="center">
+      <a href="https://pmndrs.github.io/math/examples/#example-look-at">
+        <img src="./examples/public/screenshots/example-look-at.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Look At
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://pmndrs.github.io/math/examples/#example-fibonacci-sphere">
+        <img src="./examples/public/screenshots/example-fibonacci-sphere.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Fibonacci Sphere
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://pmndrs.github.io/math/examples/#example-contains-point">
+        <img src="./examples/public/screenshots/example-contains-point.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Contains Point
+      </a>
+    </td>
+  </tr>
   <tr>
     <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-convex-hull-3d">
@@ -82,19 +102,33 @@ import { easing, spring } from 'math/time'; // easings & springs
       </a>
     </td>
     <td align="center">
+      <a href="https://pmndrs.github.io/math/examples/#example-ridged-noise-voxel-terrain">
+        <img src="./examples/public/screenshots/example-ridged-noise-voxel-terrain.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Ridged Noise Voxel Terrain
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://pmndrs.github.io/math/examples/#example-simplex-4d-looping-noise">
+        <img src="./examples/public/screenshots/example-simplex-4d-looping-noise.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Simplex 4D Looping Noise
+      </a>
+    </td>
+    <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-simplex-2d-noise-terrain">
         <img src="./examples/public/screenshots/example-simplex-2d-noise-terrain.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Simplex 2D Noise Terrain
       </a>
     </td>
-  </tr>
-  <tr>
     <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-quaternion-slerp">
         <img src="./examples/public/screenshots/example-quaternion-slerp.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Quaternion Slerp
       </a>
     </td>
+  </tr>
+  <tr>
     <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-spring">
         <img src="./examples/public/screenshots/example-spring.png" width="180" height="120" style="object-fit:cover;"/><br/>
@@ -127,7 +161,7 @@ import { easing, spring } from 'math/time'; // easings & springs
 </tr><tr>
 <td><a href="#mat2"><code>Mat2</code></a></td><td><a href="#mat2d"><code>Mat2d</code></a></td><td><a href="#mat3"><code>Mat3</code></a></td><td><a href="#mat4"><code>Mat4</code></a></td>
 </tr><tr>
-<td><a href="#spherical"><code>Spherical</code></a></td><td></td><td></td><td></td>
+<td><a href="#spherical"><code>Spherical</code></a></td><td><a href="#polar"><code>Polar</code></a></td><td></td><td></td>
 </tr></table>
 
 **vec2**
@@ -504,12 +538,56 @@ import { easing, spring } from 'math/time'; // easings & springs
 <td><a href="#sphericalexactequals"><code>spherical.exactEquals</code></a></td><td><a href="#sphericalstr"><code>spherical.str</code></a></td><td><a href="#sphericalangleto"><code>spherical.angleTo</code></a></td>
 </tr></table>
 
+**polar**
+
+<table><tr>
+<td><a href="#polarcreate"><code>polar.create</code></a></td><td><a href="#polarfromvalues"><code>polar.fromValues</code></a></td><td><a href="#polarclone"><code>polar.clone</code></a></td>
+</tr><tr>
+<td><a href="#polarcopy"><code>polar.copy</code></a></td><td><a href="#polarset"><code>polar.set</code></a></td><td><a href="#polarnormalize"><code>polar.normalize</code></a></td>
+</tr><tr>
+<td><a href="#polarscale"><code>polar.scale</code></a></td><td><a href="#polarrotate"><code>polar.rotate</code></a></td><td><a href="#polarlerp"><code>polar.lerp</code></a></td>
+</tr><tr>
+<td><a href="#polarsetfromvec2"><code>polar.setFromVec2</code></a></td><td><a href="#polarfromvec2"><code>polar.fromVec2</code></a></td><td><a href="#polartovec2"><code>polar.toVec2</code></a></td>
+</tr><tr>
+<td><a href="#polarangleto"><code>polar.angleTo</code></a></td><td><a href="#polardistance"><code>polar.distance</code></a></td><td><a href="#polarequals"><code>polar.equals</code></a></td>
+</tr><tr>
+<td><a href="#polarexactequals"><code>polar.exactEquals</code></a></td><td><a href="#polarstr"><code>polar.str</code></a></td><td></td>
+</tr></table>
+
 **`math/shapes`**
 
 <table><tr>
-<td><a href="#box3"><code>Box3</code></a></td><td><a href="#obb3"><code>OBB3</code></a></td><td><a href="#plane3"><code>Plane3</code></a></td><td><a href="#sphere"><code>Sphere</code></a></td>
+<td><a href="#box2"><code>Box2</code></a></td><td><a href="#box3"><code>Box3</code></a></td><td><a href="#obb3"><code>OBB3</code></a></td><td><a href="#plane3"><code>Plane3</code></a></td>
 </tr><tr>
-<td><a href="#circle"><code>Circle</code></a></td><td></td><td></td><td></td>
+<td><a href="#sphere"><code>Sphere</code></a></td><td><a href="#circle"><code>Circle</code></a></td><td></td><td></td>
+</tr></table>
+
+**box2**
+
+<table><tr>
+<td><a href="#box2create"><code>box2.create</code></a></td><td><a href="#box2clone"><code>box2.clone</code></a></td>
+</tr><tr>
+<td><a href="#box2copy"><code>box2.copy</code></a></td><td><a href="#box2set"><code>box2.set</code></a></td>
+</tr><tr>
+<td><a href="#box2setfromvectors"><code>box2.setFromVectors</code></a></td><td><a href="#box2min"><code>box2.min</code></a></td>
+</tr><tr>
+<td><a href="#box2max"><code>box2.max</code></a></td><td><a href="#box2empty"><code>box2.empty</code></a></td>
+</tr><tr>
+<td><a href="#box2exactequals"><code>box2.exactEquals</code></a></td><td><a href="#box2equals"><code>box2.equals</code></a></td>
+</tr><tr>
+<td><a href="#box2setfromcenterandsize"><code>box2.setFromCenterAndSize</code></a></td><td><a href="#box2expandbypoint"><code>box2.expandByPoint</code></a></td>
+</tr><tr>
+<td><a href="#box2expandbyextents"><code>box2.expandByExtents</code></a></td><td><a href="#box2expandbymargin"><code>box2.expandByMargin</code></a></td>
+</tr><tr>
+<td><a href="#box2union"><code>box2.union</code></a></td><td><a href="#box2center"><code>box2.center</code></a></td>
+</tr><tr>
+<td><a href="#box2extents"><code>box2.extents</code></a></td><td><a href="#box2size"><code>box2.size</code></a></td>
+</tr><tr>
+<td><a href="#box2area"><code>box2.area</code></a></td><td><a href="#box2scale"><code>box2.scale</code></a></td>
+</tr><tr>
+<td><a href="#box2containspoint"><code>box2.containsPoint</code></a></td><td><a href="#box2containsbox2"><code>box2.containsBox2</code></a></td>
+</tr><tr>
+<td><a href="#box2intersectsbox2"><code>box2.intersectsBox2</code></a></td><td><a href="#box2intersectscircle"><code>box2.intersectsCircle</code></a></td>
 </tr></table>
 
 **box3**
@@ -583,7 +661,7 @@ import { easing, spring } from 'math/time'; // easings & springs
 **sphere**
 
 <table><tr>
-<td><a href="#spherecreate"><code>sphere.create</code></a></td>
+<td><a href="#spherecreate"><code>sphere.create</code></a></td><td><a href="#spherecontainspoint"><code>sphere.containsPoint</code></a></td>
 </tr></table>
 
 **circle**
@@ -707,7 +785,11 @@ import { easing, spring } from 'math/time'; // easings & springs
 **`math/noise`**
 
 <table><tr>
-<td><a href="#permutation"><code>Permutation</code></a></td>
+<td><a href="#fractaloptions"><code>FractalOptions</code></a></td><td><a href="#fbm"><code>fbm</code></a></td><td><a href="#ridged"><code>ridged</code></a></td><td><a href="#billow"><code>billow</code></a></td>
+</tr><tr>
+<td><a href="#domainwarp2"><code>domainWarp2</code></a></td><td><a href="#domainwarp3"><code>domainWarp3</code></a></td><td><a href="#curl2"><code>curl2</code></a></td><td><a href="#curl3"><code>curl3</code></a></td>
+</tr><tr>
+<td><a href="#permutation"><code>Permutation</code></a></td><td></td><td></td><td></td>
 </tr></table>
 
 **perlin2d**
@@ -740,6 +822,30 @@ import { easing, spring } from 'math/time'; // easings & springs
 <td><a href="#simplex3dsimplex3dgenerator"><code>simplex3d.Simplex3DGenerator</code></a></td><td><a href="#simplex3dcreate"><code>simplex3d.create</code></a></td>
 </tr><tr>
 <td><a href="#simplex3dsample"><code>simplex3d.sample</code></a></td><td></td>
+</tr></table>
+
+**simplex4d**
+
+<table><tr>
+<td><a href="#simplex4dsimplex4dgenerator"><code>simplex4d.Simplex4DGenerator</code></a></td><td><a href="#simplex4dcreate"><code>simplex4d.create</code></a></td>
+</tr><tr>
+<td><a href="#simplex4dsample"><code>simplex4d.sample</code></a></td><td></td>
+</tr></table>
+
+**worley2d**
+
+<table><tr>
+<td><a href="#worley2dworley2dgenerator"><code>worley2d.Worley2DGenerator</code></a></td><td><a href="#worley2dcreate"><code>worley2d.create</code></a></td>
+</tr><tr>
+<td><a href="#worley2dsample"><code>worley2d.sample</code></a></td><td></td>
+</tr></table>
+
+**worley3d**
+
+<table><tr>
+<td><a href="#worley3dworley3dgenerator"><code>worley3d.Worley3DGenerator</code></a></td><td><a href="#worley3dcreate"><code>worley3d.create</code></a></td>
+</tr><tr>
+<td><a href="#worley3dsample"><code>worley3d.sample</code></a></td><td></td>
 </tr></table>
 
 **`math/color`**
@@ -1089,6 +1195,25 @@ export type Spherical = [
     r: number,
     theta: number,
     phi: number
+];
+```
+
+#### `Polar`
+
+```ts
+/**
+ * A point in polar coordinates [r, theta]
+ *   r     - radial distance from the origin (>= 0)
+ *   theta - angle from the +X axis, counter-clockwise (radians, range (-pi, pi])
+ *
+ * This is the standard 2D convention: Vec2 is (x, y) and theta = atan2(y, x).
+ * It is deliberately NOT the ground-plane slice of [[spherical]] (which is
+ * Y-up, with an XZ ground plane and azimuth measured from +Z); for that
+ * horizontal projection use spherical.fromVec2 / spherical.toVec2 instead.
+ */
+export type Polar = [
+    r: number,
+    theta: number
 ];
 ```
 
@@ -3811,7 +3936,6 @@ export function fromRotation(out: Quat2, q: Quat): Quat2;
  * @param out the dual quaternion
  * @param a the matrix
  * @returns dual quat receiving operation result
- * @function
  */
 export function fromMat4(out: Quat2, a: Mat4): Quat2;
 ```
@@ -3872,7 +3996,7 @@ export function set(out: Quat2, x1: number, y1: number, z1: number, w1: number, 
  * @param  a Dual Quaternion
  * @return real part
  */
-export const getReal = quat.copy;
+export function getReal(out: Quat, a: Quat2): Quat;
 ```
 
 #### `quat2.getDual`
@@ -3893,12 +4017,11 @@ export function getDual(out: Quat, a: Quat2): Quat;
 /**
  * Set the real component of a dual quat to the given quaternion
  *
- * @param out the receiving quaternion
+ * @param out the receiving dual quaternion
  * @param q a quaternion representing the real part
  * @returns out
- * @function
  */
-export const setReal = quat.copy;
+export function setReal(out: Quat2, q: Quat): Quat2;
 ```
 
 #### `quat2.setDual`
@@ -4089,9 +4212,8 @@ export function scale(out: Quat2, a: Quat2, b: number): Quat2;
  * @param a the first operand
  * @param b the second operand
  * @returns dot product of a and b
- * @function
  */
-export const dot = quat.dot;
+export function dot(a: Quat2, b: Quat2): number;
 ```
 
 #### `quat2.lerp`
@@ -4141,13 +4263,12 @@ export function conjugate(out: Quat2, a: Quat2): Quat2;
 
 ```ts
 /**
- * Calculates the length of a dual quat
+ * Calculates the length of a dual quat (the length of its real/rotation part)
  *
  * @param a dual quat to calculate length of
  * @returns length of a
- * @function
  */
-export const length = quat.length;
+export function length(a: Quat2): number;
 ```
 
 #### `quat2.len`
@@ -4164,13 +4285,12 @@ export const len = length;
 
 ```ts
 /**
- * Calculates the squared length of a dual quat
+ * Calculates the squared length of a dual quat (the squared length of its real/rotation part)
  *
  * @param a dual quat to calculate squared length of
  * @returns squared length of a
- * @function
  */
-export const squaredLength = quat.squaredLength;
+export function squaredLength(a: Quat2): number;
 ```
 
 #### `quat2.sqrLen`
@@ -6573,7 +6693,245 @@ export function str(a: Spherical): string;
 export function angleTo(a: Spherical, b: Spherical): number;
 ```
 
+**polar**
+
+#### `polar.create`
+
+```ts
+/**
+ * Creates a new polar coordinate at r=1, theta=0
+ *
+ * @returns a new Polar
+ */
+export function create(): Polar;
+```
+
+#### `polar.fromValues`
+
+```ts
+/**
+ * Creates a new Polar initialized with the given values
+ *
+ * @param r radial distance
+ * @param theta angle from +X, counter-clockwise (radians)
+ * @returns a new Polar
+ */
+export function fromValues(r: number, theta: number): Polar;
+```
+
+#### `polar.clone`
+
+```ts
+/**
+ * Creates a new Polar initialized with values from an existing one
+ *
+ * @param a the source Polar
+ * @returns a new Polar
+ */
+export function clone(a: Polar): Polar;
+```
+
+#### `polar.copy`
+
+```ts
+/**
+ * Copies values from one Polar to another
+ *
+ * @param out the receiving Polar
+ * @param a the source Polar
+ * @returns out
+ */
+export function copy(out: Polar, a: Polar): Polar;
+```
+
+#### `polar.set`
+
+```ts
+/**
+ * Sets the components of a Polar
+ *
+ * @param out the receiving Polar
+ * @param r radial distance
+ * @param theta angle from +X, counter-clockwise (radians)
+ * @returns out
+ */
+export function set(out: Polar, r: number, theta: number): Polar;
+```
+
+#### `polar.normalize`
+
+```ts
+/**
+ * Sets r=1, preserving the angle. No-op on the angle if r is already zero.
+ *
+ * @param out the receiving Polar
+ * @param a the source Polar
+ * @returns out
+ */
+export function normalize(out: Polar, a: Polar): Polar;
+```
+
+#### `polar.scale`
+
+```ts
+/**
+ * Scales the radial distance r by a scalar
+ *
+ * @param out the receiving Polar
+ * @param a the source Polar
+ * @param s scalar to multiply r by
+ * @returns out
+ */
+export function scale(out: Polar, a: Polar, s: number): Polar;
+```
+
+#### `polar.rotate`
+
+```ts
+/**
+ * Rotates a Polar by an angle (in radians), wrapping theta into (-pi, pi].
+ *
+ * @param out the receiving Polar
+ * @param a the source Polar
+ * @param rad the angle to add to theta
+ * @returns out
+ */
+export function rotate(out: Polar, a: Polar, rad: number): Polar;
+```
+
+#### `polar.lerp`
+
+```ts
+/**
+ * Linearly interpolates between two Polar coordinates, taking the shortest
+ * angular path for theta.
+ *
+ * @param out the receiving Polar
+ * @param a the first operand
+ * @param b the second operand
+ * @param t interpolation factor in [0, 1]
+ * @returns out
+ */
+export function lerp(out: Polar, a: Polar, b: Polar, t: number): Polar;
+```
+
+#### `polar.setFromVec2`
+
+```ts
+/**
+ * Sets a Polar from Cartesian Vec2 coordinates:
+ *   r     = sqrt(x^2 + y^2)
+ *   theta = atan2(y, x)
+ *
+ * @param out the receiving Polar
+ * @param v the source Vec2
+ * @returns out
+ */
+export function setFromVec2(out: Polar, v: Vec2): Polar;
+```
+
+#### `polar.fromVec2`
+
+```ts
+/** @alias setFromVec2 */
+export const fromVec2 = setFromVec2;
+```
+
+#### `polar.toVec2`
+
+```ts
+/**
+ * Converts polar coordinates to a Cartesian Vec2:
+ *   x = r * cos(theta)
+ *   y = r * sin(theta)
+ *
+ * @param out the receiving Vec2
+ * @param a the source Polar
+ * @returns out
+ */
+export function toVec2(out: Vec2, a: Polar): Vec2;
+```
+
+#### `polar.angleTo`
+
+```ts
+/**
+ * Returns the smallest angle (in radians) between two polar directions,
+ * ignoring r. Range [0, pi].
+ *
+ * @param a the first Polar
+ * @param b the second Polar
+ * @returns angle in radians in [0, pi]
+ */
+export function angleTo(a: Polar, b: Polar): number;
+```
+
+#### `polar.distance`
+
+```ts
+/**
+ * Returns the straight-line (chord) distance between two polar coordinates,
+ * via the law of cosines.
+ *
+ * @param a the first Polar
+ * @param b the second Polar
+ * @returns the Euclidean distance between the two points
+ */
+export function distance(a: Polar, b: Polar): number;
+```
+
+#### `polar.equals`
+
+```ts
+/**
+ * Returns true if two Polar coordinates are approximately equal,
+ * within an absolute/relative tolerance of EPSILON.
+ *
+ * @param a the first Polar
+ * @param b the second Polar
+ * @returns true if approximately equal
+ */
+export function equals(a: Polar, b: Polar): boolean;
+```
+
+#### `polar.exactEquals`
+
+```ts
+/**
+ * Returns true if two Polar coordinates are exactly equal (===).
+ *
+ * @param a the first Polar
+ * @param b the second Polar
+ * @returns true if exactly equal
+ */
+export function exactEquals(a: Polar, b: Polar): boolean;
+```
+
+#### `polar.str`
+
+```ts
+/**
+ * Returns a string representation of a Polar
+ *
+ * @param a the source Polar
+ * @returns string representation
+ */
+export function str(a: Polar): string;
+```
+
 ### `math/shapes`
+
+#### `Box2`
+
+```ts
+/** An axis-aligned box in 2D space, as [minX, minY, maxX, maxY] */
+export type Box2 = [
+    minX: number,
+    minY: number,
+    maxX: number,
+    maxY: number
+];
+```
 
 #### `Box3`
 
@@ -6632,6 +6990,298 @@ export type Circle = {
     center: Vec2;
     radius: number;
 };
+```
+
+**box2**
+
+#### `box2.create`
+
+```ts
+/**
+ * Create a new empty Box2 with "min" set to positive infinity and "max" set to negative infinity
+ * @returns A new Box2
+ */
+export function create(): Box2;
+```
+
+#### `box2.clone`
+
+```ts
+/**
+ * Clones a Box2
+ * @param box - A Box2 to clone
+ * @returns a clone of box
+ */
+export function clone(box: Box2): Box2;
+```
+
+#### `box2.copy`
+
+```ts
+/**
+ * Copies a Box2 to another Box2
+ * @param out the output Box2
+ * @param box the input Box2
+ * @returns the output Box2
+ */
+export function copy(out: Box2, box: Box2): Box2;
+```
+
+#### `box2.set`
+
+```ts
+/**
+ * Sets the min and max values of a Box2
+ * @param out - The output Box2
+ * @param minX - The minimum X coordinate
+ * @param minY - The minimum Y coordinate
+ * @param maxX - The maximum X coordinate
+ * @param maxY - The maximum Y coordinate
+ * @returns The updated Box2
+ */
+export function set(out: Box2, minX: number, minY: number, maxX: number, maxY: number): Box2;
+```
+
+#### `box2.setFromVectors`
+
+```ts
+/**
+ * Sets the min and max values of a Box2 from Vec2 vectors
+ * @param out - The output Box2
+ * @param min - The minimum corner
+ * @param max - The maximum corner
+ * @returns The updated Box2
+ */
+export function setFromVectors(out: Box2, min: Vec2, max: Vec2): Box2;
+```
+
+#### `box2.min`
+
+```ts
+/**
+ * Extracts the minimum corner of a Box2
+ * @param out - The output Vec2 for the minimum corner
+ * @param box - The input Box2
+ * @returns The minimum corner
+ */
+export function min(out: Vec2, box: Box2): Vec2;
+```
+
+#### `box2.max`
+
+```ts
+/**
+ * Extracts the maximum corner of a Box2
+ * @param out - The output Vec2 for the maximum corner
+ * @param box - The input Box2
+ * @returns The maximum corner
+ */
+export function max(out: Vec2, box: Box2): Vec2;
+```
+
+#### `box2.empty`
+
+```ts
+/**
+ * Set a Box2 to empty (min to positive infinity, max to negative infinity)
+ * @param out - The Box2 to make empty
+ * @returns The emptied Box2
+ */
+export function empty(out: Box2): Box2;
+```
+
+#### `box2.exactEquals`
+
+```ts
+/**
+ * Returns whether or not the boxes have exactly the same elements in the same position (when compared with ===)
+ * @param a - The first box
+ * @param b - The second box
+ * @returns True if the boxes are equal, false otherwise
+ */
+export function exactEquals(a: Box2, b: Box2): boolean;
+```
+
+#### `box2.equals`
+
+```ts
+/**
+ * Returns whether or not the boxes have approximately the same elements in the same position
+ * @param a - The first box
+ * @param b - The second box
+ * @returns True if the boxes are equal, false otherwise
+ */
+export function equals(a: Box2, b: Box2): boolean;
+```
+
+#### `box2.setFromCenterAndSize`
+
+```ts
+/**
+ * Sets the box from a center point and size
+ * @param out - The output Box2
+ * @param center - The center point
+ * @param size - The size of the box
+ * @returns The updated Box2
+ */
+export function setFromCenterAndSize(out: Box2, center: Vec2, size: Vec2): Box2;
+```
+
+#### `box2.expandByPoint`
+
+```ts
+/**
+ * Expands a Box2 to include a point
+ * @param out - The output Box2
+ * @param box - The input Box2
+ * @param point - The point to include
+ * @returns The expanded Box2
+ */
+export function expandByPoint(out: Box2, box: Box2, point: Vec2): Box2;
+```
+
+#### `box2.expandByExtents`
+
+```ts
+/**
+ * Widens a Box2 by a vector on both sides
+ * Subtracts the vector from min and adds it to max
+ * @param out - The output Box2
+ * @param box - The input Box2
+ * @param vector - The vector to expand by
+ * @returns The expanded Box2
+ */
+export function expandByExtents(out: Box2, box: Box2, vector: Vec2): Box2;
+```
+
+#### `box2.expandByMargin`
+
+```ts
+/**
+ * Expands a Box2 uniformly by a scalar margin on all sides
+ * Subtracts the margin from min and adds it to max on each axis
+ * @param out - The output Box2
+ * @param box - The input Box2
+ * @param margin - The uniform margin to expand by
+ * @returns The expanded Box2
+ */
+export function expandByMargin(out: Box2, box: Box2, margin: number): Box2;
+```
+
+#### `box2.union`
+
+```ts
+/**
+ * Computes the union of two bounding boxes
+ * Returns a Box2 that encompasses both input boxes
+ * @param out - The output Box2
+ * @param boxA - The first Box2
+ * @param boxB - The second Box2
+ * @returns The union Box2
+ */
+export function union(out: Box2, boxA: Box2, boxB: Box2): Box2;
+```
+
+#### `box2.center`
+
+```ts
+/**
+ * Calculate the center point of a bounding box
+ * @param out - The output Vec2 for the center
+ * @param box - The input Box2
+ * @returns The center point
+ */
+export function center(out: Vec2, box: Box2): Vec2;
+```
+
+#### `box2.extents`
+
+```ts
+/**
+ * Calculate the extents (half-size) of a bounding box
+ * @param out - The output Vec2 for the extents
+ * @param box - The input Box2
+ * @returns The extents (distance from center to each edge)
+ */
+export function extents(out: Vec2, box: Box2): Vec2;
+```
+
+#### `box2.size`
+
+```ts
+/**
+ * Calculate the size (dimensions) of a bounding box
+ * @param out - The output Vec2 for the size
+ * @param box - The input Box2
+ * @returns The size (width, height)
+ */
+export function size(out: Vec2, box: Box2): Vec2;
+```
+
+#### `box2.area`
+
+```ts
+/**
+ * Calculate the area of a bounding box
+ * @param box - The input Box2
+ * @returns The area (width * height)
+ */
+export function area(box: Box2): number;
+```
+
+#### `box2.scale`
+
+```ts
+/**
+ * Scale a bounding box by a vector, handling non-uniform and negative scaling
+ * @param out - The output Box2
+ * @param box - The input Box2
+ * @param scale - The scale to apply (as a Vec2)
+ * @returns The scaled Box2
+ */
+export function scale(out: Box2, box: Box2, scale: Vec2): Box2;
+```
+
+#### `box2.containsPoint`
+
+```ts
+/**
+ * Test if a point is contained within the bounding box
+ * @param box - The bounding box
+ * @param point - The point to test
+ * @returns true if the point is inside or on the boundary of the box
+ */
+export function containsPoint(box: Box2, point: Vec2): boolean;
+```
+
+#### `box2.containsBox2`
+
+```ts
+/**
+ * Test if one Box2 completely contains another Box2
+ * @param container - The potentially containing Box2
+ * @param contained - The Box2 that might be contained
+ * @returns true if the container Box2 completely contains the contained Box2
+ */
+export function containsBox2(container: Box2, contained: Box2): boolean;
+```
+
+#### `box2.intersectsBox2`
+
+```ts
+/**
+ * Check whether two bounding boxes intersect
+ */
+export function intersectsBox2(boxA: Box2, boxB: Box2): boolean;
+```
+
+#### `box2.intersectsCircle`
+
+```ts
+/**
+ * Test intersection between an axis-aligned bounding box and a circle.
+ */
+export function intersectsCircle(box: Box2, circle: Circle): boolean;
 ```
 
 **box3**
@@ -6944,6 +7594,19 @@ export function intersectsBox3(boxA: Box3, boxB: Box3): boolean;
 #### `box3.intersectsTriangle3`
 
 ```ts
+/**
+ * Test whether an axis-aligned bounding box intersects a triangle, via the
+ * separating-axis theorem over 13 axes: the 3 box face normals, the triangle
+ * face normal, and the 9 box-axis × triangle-edge cross products.
+ *
+ * Fully inlined with local scalars — no scratch arrays or per-call allocations.
+ * Axes are tested cheapest-first (box faces, i.e. the triangle-vs-box AABB
+ * reject) so the common non-overlapping case exits before any edge or cross
+ * product is computed. On each edge-cross axis two of the three vertices project
+ * to the same value (the axis is perpendicular to that edge), so only two
+ * projections are needed. An all-zero cross axis (edge parallel to a box axis)
+ * collapses every projection and the radius to 0, passing automatically.
+ */
 export function intersectsTriangle3(box: Box3, a: Vec3, b: Vec3, c: Vec3): boolean;
 ```
 
@@ -7062,7 +7725,24 @@ export function clampPoint(out: Vec3, obb: OBB3, point: Vec3): Vec3;
 #### `obb3.intersectsOBB3`
 
 ```ts
-export function intersectsOBB3(a: OBB3, b: OBB3, epsilon = Number.EPSILON): boolean;
+/**
+ * Tests whether an OBB intersects with another OBB using the Separating Axis Theorem.
+ * Reference: OBB-OBB Intersection in Real-Time Collision Detection
+ * by Christer Ericson (chapter 4.4.1)
+ *
+ * A cross-product axis A_i x B_j degenerates to ~zero when those edges are near
+ * parallel, which makes its (un-normalised) separation test numerically unstable.
+ * Such an axis carries no separation information not already covered by the face
+ * axes, so it is skipped when `1 - R[i][j]^2` (its squared length, = sin^2 of the
+ * angle between the edges) falls below `epsilon`. This is scale-invariant — R is a
+ * matrix of cosines — unlike fudging the projected radii.
+ *
+ * @param a - The first OBB
+ * @param b - The second OBB
+ * @param epsilon - Squared-sine threshold below which near-parallel edge axes are skipped
+ * @returns true if the OBBs intersect
+ */
+export function intersectsOBB3(a: OBB3, b: OBB3, epsilon = EPSILON): boolean;
 ```
 
 #### `obb3.intersectsBox3`
@@ -7070,6 +7750,11 @@ export function intersectsOBB3(a: OBB3, b: OBB3, epsilon = Number.EPSILON): bool
 ```ts
 /**
  * Tests whether an OBB intersects with an AABB.
+ *
+ * Specialised form of {@link intersectsOBB3}: the AABB's axes are the world axes, so
+ * the axis dot-product matrix R is just the OBB's rotation (no 9 dot-products), and the
+ * AABB's centre/half-extents come straight from its min/max. The near-parallel edge
+ * skip works identically — here it fires when an OBB axis aligns with a world axis.
  *
  * @param obb - The OBB
  * @param aabb - The AABB (axis-aligned bounding box)
@@ -7294,6 +7979,19 @@ export function equals(a: Plane3, b: Plane3): boolean;
  * @returns A new sphere.
  */
 export function create(): Sphere;
+```
+
+#### `sphere.containsPoint`
+
+```ts
+/**
+ * Returns true if a point lies inside (or on the surface of) the sphere.
+ *
+ * @param sphere the sphere
+ * @param point the point to test
+ * @returns true if the point is within the sphere's radius
+ */
+export function containsPoint(sphere: Sphere, point: Vec3): boolean;
 ```
 
 **circle**
@@ -8133,6 +8831,152 @@ export function quat(out: Quat, random: RandomGenerator): Quat;
 
 ### `math/noise`
 
+#### `FractalOptions`
+
+```ts
+// Fractal combinators: helpers that layer octaves of ANY base noise source into
+// the richer fields used for terrain, clouds, and marble. They are generic - the
+// `sample` callback receives the current octave's frequency and returns the base
+// noise at your coordinates scaled by it, so the same helper works with any
+// generator at any dimension:
+//
+//   fbm((f) => simplex2d.sample(gen, x * f, y * f), { octaves: 5 })
+//   fbm((f) => simplex3d.sample(gen, x * f, y * f, z * f))
+/** Options for the fractal (multi-octave) noise helpers. */
+export type FractalOptions = {
+    /** number of octaves to sum (default 4) */
+    octaves?: number;
+    /** frequency of the first octave (default 1) */
+    frequency?: number;
+    /** frequency multiplier between octaves (default 2) */
+    lacunarity?: number;
+    /** amplitude multiplier between octaves (default 0.5) */
+    gain?: number;
+};
+```
+
+#### `fbm`
+
+```ts
+/**
+ * Fractional Brownian motion: sums octaves of a noise source at increasing
+ * frequency and decreasing amplitude - the workhorse for natural-looking
+ * heightmaps and clouds. Given a source in [-1, 1], returns a value in [-1, 1].
+ *
+ * @param sample receives an octave frequency, returns the base noise scaled by it
+ * @param options octave count and per-octave frequency/amplitude falloff
+ * @returns the summed, normalized noise value
+ */
+export function fbm(sample: (frequency: number) => number, options?: FractalOptions): number;
+```
+
+#### `ridged`
+
+```ts
+/**
+ * Ridged multifractal: like {@link fbm}, but each octave is folded to
+ * `1 - abs(noise)`, filling the field with sharp ridges - the classic mountain
+ * range / canyon look. Given a source in [-1, 1], returns a value in [0, 1].
+ *
+ * @param sample receives an octave frequency, returns the base noise scaled by it
+ * @param options octave count and per-octave frequency/amplitude falloff
+ * @returns the summed, normalized ridged value
+ */
+export function ridged(sample: (frequency: number) => number, options?: FractalOptions): number;
+```
+
+#### `billow`
+
+```ts
+/**
+ * Billow noise: like {@link fbm}, but each octave is folded to `2*abs(noise) - 1`,
+ * giving puffy, rounded, cloud-like lobes. Given a source in [-1, 1], returns a
+ * value in [-1, 1].
+ *
+ * @param sample receives an octave frequency, returns the base noise scaled by it
+ * @param options octave count and per-octave frequency/amplitude falloff
+ * @returns the summed, normalized billow value
+ */
+export function billow(sample: (frequency: number) => number, options?: FractalOptions): number;
+```
+
+#### `domainWarp2`
+
+```ts
+/**
+ * Domain warping (2D): offsets a point by a noise-derived vector, so feeding the
+ * result back into a noise source bends and swirls it - marble, meandering
+ * terrain, organic distortion. The two axes sample the warp noise at
+ * decorrelated offsets so they don't move in lockstep.
+ *
+ * @param out the receiving Vec2 (the warped point)
+ * @param sample the warp noise source, sampled at (x, y)
+ * @param x x coordinate
+ * @param y y coordinate
+ * @param amount displacement scale (default 1)
+ * @returns out
+ */
+export function domainWarp2(out: Vec2, sample: (x: number, y: number) => number, x: number, y: number, amount = 1): Vec2;
+```
+
+#### `domainWarp3`
+
+```ts
+/**
+ * Domain warping (3D): offsets a point by a noise-derived vector so a noise
+ * source sampled at the result is bent and swirled. See {@link domainWarp2}.
+ *
+ * @param out the receiving Vec3 (the warped point)
+ * @param sample the warp noise source, sampled at (x, y, z)
+ * @param x x coordinate
+ * @param y y coordinate
+ * @param z z coordinate
+ * @param amount displacement scale (default 1)
+ * @returns out
+ */
+export function domainWarp3(out: Vec3, sample: (x: number, y: number, z: number) => number, x: number, y: number, z: number, amount = 1): Vec3;
+```
+
+#### `curl2`
+
+```ts
+/**
+ * Curl of a 2D scalar noise potential - a divergence-free (incompressible) flow
+ * field. Particles advected through it swirl like a fluid and never converge to
+ * sinks or fly apart, which is why it's the cheap go-to for procedural smoke /
+ * flow. Given a scalar potential psi(x, y), the flow is (d psi/dy, -d psi/dx),
+ * with the derivatives taken by central differences of step `eps`.
+ *
+ * @param out the receiving Vec2 (the flow velocity)
+ * @param sample the scalar potential noise, sampled at (x, y)
+ * @param x x coordinate
+ * @param y y coordinate
+ * @param eps finite-difference step (default 1e-4)
+ * @returns out
+ */
+export function curl2(out: Vec2, sample: (x: number, y: number) => number, x: number, y: number, eps = 1e-4): Vec2;
+```
+
+#### `curl3`
+
+```ts
+/**
+ * Curl of a 3D noise vector potential - a divergence-free 3D flow field for
+ * volumetric smoke / fluid motion. The three potential components reuse a single
+ * `sample` at large, decorrelating offsets, and the flow is their curl,
+ * `∇ × psi`, with derivatives taken by central differences of step `eps`.
+ *
+ * @param out the receiving Vec3 (the flow velocity)
+ * @param sample the scalar potential noise, sampled at (x, y, z)
+ * @param x x coordinate
+ * @param y y coordinate
+ * @param z z coordinate
+ * @param eps finite-difference step (default 1e-4)
+ * @returns out
+ */
+export function curl3(out: Vec3, sample: (x: number, y: number, z: number) => number, x: number, y: number, z: number, eps = 1e-4): Vec3;
+```
+
 #### `Permutation`
 
 ```ts
@@ -8155,12 +8999,14 @@ export function quat(out: Quat, random: RandomGenerator): Quat;
 /**
  * Seeded permutation and gradient tables that back a noise generator.
  *
- * All noise variants (simplex/perlin, 2D/3D) share this same table shape, so
- * each generator type is a structural alias of this.
+ * All noise variants (simplex/perlin, 2D/3D/4D) share this same table shape, so
+ * each generator type is a structural alias of this. `gradP` holds the 3D
+ * gradients (used by 2D and 3D noise); `gradP4` holds the 4D gradients.
  */
 export type Permutation = {
     perm: number[];
     gradP: Vec3[];
+    gradP4: Vec4[];
 };
 ```
 
@@ -8304,6 +9150,123 @@ export function create(seed: number): Simplex3DGenerator;
  * @returns The noise value at (x, y, z)
  */
 export function sample({ perm, gradP }: Simplex3DGenerator, x: number, y: number, z: number): number;
+```
+
+**simplex4d**
+
+#### `simplex4d.Simplex4DGenerator`
+
+```ts
+/** A seeded 4D simplex noise generator. Create one with {@link create}. */
+export type Simplex4DGenerator = Permutation;
+```
+
+#### `simplex4d.create`
+
+```ts
+/**
+ * Creates a 4D simplex noise generator with the given seed.
+ *
+ * @param seed The seed value for the noise generator
+ * @returns A generator to pass to {@link sample}
+ */
+export function create(seed: number): Simplex4DGenerator;
+```
+
+#### `simplex4d.sample`
+
+```ts
+/**
+ * Samples 4D simplex noise, returning a value in the interval [-1, 1].
+ *
+ * The fourth axis is commonly used as time (for animated 3D noise) or as a wrap
+ * dimension (map a coordinate around a circle in w for seamless looping).
+ *
+ * @param generator A generator created with {@link create}
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param z Z coordinate
+ * @param w W coordinate
+ * @returns The noise value at (x, y, z, w)
+ */
+export function sample({ perm, gradP4 }: Simplex4DGenerator, x: number, y: number, z: number, w: number): number;
+```
+
+**worley2d**
+
+#### `worley2d.Worley2DGenerator`
+
+```ts
+/** A seeded 2D Worley (cellular) noise generator. Create one with {@link create}. */
+export type Worley2DGenerator = Permutation;
+```
+
+#### `worley2d.create`
+
+```ts
+/**
+ * Creates a 2D Worley noise generator with the given seed.
+ *
+ * @param seed The seed value for the noise generator
+ * @returns A generator to pass to {@link sample}
+ */
+export function create(seed: number): Worley2DGenerator;
+```
+
+#### `worley2d.sample`
+
+```ts
+/**
+ * Samples 2D Worley (cellular) noise: the Euclidean distance to the nearest of a
+ * set of feature points, one scattered per unit cell. Gives organic cell / scale
+ * / caustic patterns; values are roughly in [0, 1] (0 right at a feature point,
+ * rising between them). Threshold it for cracks, cells, or region masks.
+ *
+ * @param generator A generator created with {@link create}
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @returns The distance to the nearest feature point (F1)
+ */
+export function sample({ perm }: Worley2DGenerator, x: number, y: number): number;
+```
+
+**worley3d**
+
+#### `worley3d.Worley3DGenerator`
+
+```ts
+/** A seeded 3D Worley (cellular) noise generator. Create one with {@link create}. */
+export type Worley3DGenerator = Permutation;
+```
+
+#### `worley3d.create`
+
+```ts
+/**
+ * Creates a 3D Worley noise generator with the given seed.
+ *
+ * @param seed The seed value for the noise generator
+ * @returns A generator to pass to {@link sample}
+ */
+export function create(seed: number): Worley3DGenerator;
+```
+
+#### `worley3d.sample`
+
+```ts
+/**
+ * Samples 3D Worley (cellular) noise: the Euclidean distance to the nearest of a
+ * set of feature points, one scattered per unit cell. Values are roughly in
+ * [0, 1] (0 right at a feature point). Threshold a 3D field for cave networks,
+ * ore pockets, or volumetric cell structures.
+ *
+ * @param generator A generator created with {@link create}
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param z Z coordinate
+ * @returns The distance to the nearest feature point (F1)
+ */
+export function sample({ perm }: Worley3DGenerator, x: number, y: number, z: number): number;
 ```
 
 ### `math/color`

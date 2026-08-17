@@ -1,5 +1,5 @@
 ```sh
-> npm install math
+> npm install math@canary
 ```
 
 # math
