@@ -1,22 +1,21 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { type Quat, quat } from 'math';
-import { mulberry32, random } from 'math/random';
+import { quat, type Vec3, vec3 as v3 } from 'math';
 import { createPanel } from './common/dash';
 import { rainbowRGB, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
 
-// A grid of arrows, each smoothly slerping (quat.slerp) between orientations
-// drawn from math's random.quat — a *uniform* random rotation (Shoemake's
-// method), so every direction is equally likely and the field stays evenly
-// stirred. Flip "naive euler" to instead draw three random Euler angles: that
-// looks reasonable at a glance but is biased toward the poles, and over time the
-// arrows visibly bunch up pointing the same ways. Reshuffle for a new seed.
-// The arrow geometry is built by hand below (a cylinder shaft + a faceted cone).
+// A grid of arrows that all turn to point at a glowing orb as it wanders above
+// them — like sunflowers tracking the sun. Each arrow aims with a single call:
+// quat.rotationTo([0,1,0], normalize(target - position)) gives the shortest
+// rotation that swings its +Y tip onto the target. The orb drifts on a Lissajous
+// path, so the field sweeps and fans out in unison. The arrow geometry (cylinder
+// shaft + faceted cone) is built by hand below.
 
 const TAU = Math.PI * 2;
 const GRID = 7;
 const SPACING = 1.05;
+const UP: Vec3 = [0, 1, 0];
 
 /* hand-built arrow geometry, pointing along +Y, centred on the origin */
 
@@ -106,8 +105,8 @@ const scene = new g.Scene();
 
 const camera = new g.PerspectiveCamera(Math.PI / 4, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.position[0] = 0;
-camera.position[1] = 4.4;
-camera.position[2] = 8;
+camera.position[1] = 4.6;
+camera.position[2] = 8.2;
 scene.add(camera);
 
 const controls = new g.OrbitControls(camera, canvas);
@@ -136,69 +135,42 @@ const vNormal = g.varying(g.normalize(g.mul(g.modelNormalMatrix, nrm)), 'v_n');
 const vWorld = g.varying(world.xyz, 'v_w');
 const lightDirection = g.vec3(0.5, 1.0, 0.7).normalize();
 const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
-const light = g.Var('light', g.f32(0.4).add(diffuse.mul(g.f32(0.7))));
+const shade = g.Var('shade', g.f32(0.4).add(diffuse.mul(g.f32(0.7))));
 const base = g.Var('base', rainbowRGB(vWorld));
-const material = new g.Material({ vertex: clip, fragment: g.vec4(base.mul(light), g.f32(1)), cullMode: 'none' });
+const material = new g.Material({ vertex: clip, fragment: g.vec4(base.mul(shade), g.f32(1)), cullMode: 'none' });
 
-/* per-arrow slerp state */
-
-type Arrow = { mesh: g.Mesh; from: Quat; to: Quat; t: number; dur: number };
+// arrows, laid out on the ground grid
+type Arrow = { mesh: g.Mesh; pos: Vec3 };
 const arrows: Arrow[] = [];
-
-const settings = {
-    speed: 1,
-    naive: false,
-    seed: 7,
-};
-
-let rng = mulberry32.create(settings.seed);
-const rand = () => mulberry32.sample(rng);
-
-// draw the next target orientation — uniform (random.quat) or the biased naive
-// approach (three independent random Euler angles)
-function nextOrientation(out: Quat): Quat {
-    if (settings.naive) return quat.fromEuler(out, [rand() * TAU, rand() * TAU, rand() * TAU]);
-    return random.quat(out, rand);
-}
-
-const newDuration = () => 0.9 + rand() * 1.7; // seconds per transition
-
 for (let ix = 0; ix < GRID; ix++) {
     for (let iz = 0; iz < GRID; iz++) {
         const mesh = new g.Mesh(geometry, material);
-        mesh.position[0] = (ix - (GRID - 1) / 2) * SPACING;
-        mesh.position[1] = 0;
-        mesh.position[2] = (iz - (GRID - 1) / 2) * SPACING;
+        const p: Vec3 = [(ix - (GRID - 1) / 2) * SPACING, 0, (iz - (GRID - 1) / 2) * SPACING];
+        mesh.position[0] = p[0];
+        mesh.position[1] = p[1];
+        mesh.position[2] = p[2];
         scene.add(mesh);
-        const ar: Arrow = { mesh, from: quat.create(), to: quat.create(), t: 0, dur: 1 };
-        arrows.push(ar);
+        arrows.push({ mesh, pos: p });
     }
 }
 
-// (re)seed every arrow's keyframes from the current seed / sampling mode
-function reseed(): void {
-    rng = mulberry32.create(settings.seed);
-    for (const ar of arrows) {
-        nextOrientation(ar.from);
-        nextOrientation(ar.to);
-        ar.t = rand(); // desynced phase
-        ar.dur = newDuration();
-        quat.slerp(ar.mesh.quaternion, ar.from, ar.to, ar.t);
-    }
-}
-reseed();
-scene.updateWorldMatrix();
+/* the glowing orb the arrows track — a bright unlit sphere */
+
+const orbGeometry = g.createSphereGeometry(0.22, 24, 16);
+const orbPos = g.attribute('position', d.vec3f);
+const orbWorld = g.mul(g.modelWorldMatrix, g.vec4(orbPos, g.f32(1)));
+const orbClip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, orbWorld));
+const orbMaterial = new g.Material({ vertex: orbClip, fragment: g.vec4f(1, 1, 1, 1) });
+const orb = new g.Mesh(orbGeometry, orbMaterial);
+scene.add(orb);
 
 /* ui */
 
-const panel = createPanel('random orientations');
+const settings = { speed: 1, height: 2.4, reach: 3 };
+const panel = createPanel('look at');
 panel.add(settings, 'speed', { min: 0, max: 3, step: 0.01, label: 'Speed' });
-panel.add(settings, 'naive', { label: 'Naive euler' }).onChange(reseed);
-panel.button('↻ Reshuffle', () => {
-    settings.seed = (Math.imul(settings.seed, 1664525) + 1013904223) >>> 0;
-    reseed();
-});
-panel.monitor(() => (settings.naive ? 'naive euler (biased)' : 'uniform quat'), { label: 'sampling' });
+panel.add(settings, 'height', { min: 0.5, max: 5, step: 0.01, label: 'Orb height' });
+panel.add(settings, 'reach', { min: 0.5, max: 5, step: 0.01, label: 'Orbit radius' });
 
 /* render loop */
 
@@ -206,24 +178,31 @@ const scenePass = g.pass(scene, camera);
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
+const target: Vec3 = [0, 0, 0];
+const dir = v3.create();
+let clock = 0;
 let lastT = performance.now();
 
 function frame() {
     const now = performance.now();
     const dt = Math.min(0.05, (now - lastT) / 1000);
     lastT = now;
+    clock += dt * settings.speed;
     time.value = now / 1000;
 
+    // orb drifts on a Lissajous path above the grid
+    target[0] = Math.cos(clock * 0.6) * settings.reach;
+    target[1] = settings.height + Math.sin(clock * 1.3) * 0.9;
+    target[2] = Math.sin(clock * 0.9) * settings.reach;
+    orb.position[0] = target[0];
+    orb.position[1] = target[1];
+    orb.position[2] = target[2];
+
+    // every arrow swings its +Y tip onto the orb
     for (const ar of arrows) {
-        ar.t += (dt * settings.speed) / ar.dur;
-        while (ar.t >= 1) {
-            ar.t -= 1;
-            quat.copy(ar.from, ar.to);
-            nextOrientation(ar.to);
-            ar.dur = newDuration();
-        }
-        const e = ar.t * ar.t * (3 - 2 * ar.t); // smoothstep ease
-        quat.slerp(ar.mesh.quaternion, ar.from, ar.to, e);
+        v3.subtract(dir, target, ar.pos);
+        v3.normalize(dir, dir);
+        quat.rotationTo(ar.mesh.quaternion, UP, dir);
     }
 
     controls.update();
