@@ -48,4 +48,36 @@ group('polygon2 ops 10k @shapes @polygon2', () => {
         };
         if (acc < 0) throw new Error('unreachable');
     });
+
+    bench('centroid', function* () {
+        const out: Vec2 = [0, 0];
+        let acc = 0;
+        yield () => {
+            for (let i = 0; i < N; i++) {
+                polygon2.centroid(out, poly, SIDES);
+                acc += out[0];
+            }
+        };
+        if (acc === Number.POSITIVE_INFINITY) throw new Error('unreachable');
+    });
+
+    bench('perimeter', function* () {
+        let acc = 0;
+        yield () => {
+            for (let i = 0; i < N; i++) {
+                acc += polygon2.perimeter(poly, SIDES);
+            }
+        };
+        if (acc < 0) throw new Error('unreachable');
+    });
+
+    bench('isConvex', function* () {
+        let acc = 0;
+        yield () => {
+            for (let i = 0; i < N; i++) {
+                if (polygon2.isConvex(poly, SIDES)) acc++;
+            }
+        };
+        if (acc < 0) throw new Error('unreachable');
+    });
 });
