@@ -1,18 +1,17 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { mat3, quat, type Vec3 } from 'math';
-import { box3, type Box3, obb3, type OBB3, sphere, type Sphere } from 'math/shapes';
+import { obb3, type OBB3 } from 'math/shapes';
 import { createPanel } from './common/dash';
 import { rainbowRGB, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
 
-// A lattice of points, and three shapes from math/shapes drifting through it: an
-// axis-aligned box (box3), a spinning oriented box (obb3), and a pulsing sphere.
-// Every frame each point asks the shapes `containsPoint` — inside points glow the
-// flowing rainbow, outside points fade to a faint lattice. The solids are never
-// drawn; you see them purely as the region of lit points they carve out. The
-// oriented box is the one to watch: its containsPoint projects each point onto
-// the box's own rotated axes, so the glowing slab tumbles with it.
+// A lattice of points, and an oriented box (obb3) tumbling through it. Every
+// frame each point asks obb3.containsPoint — inside points glow the flowing
+// rainbow, outside points fade to a faint lattice. The box itself is never
+// drawn; you see it purely as the region of lit points it carves out.
+// obb3.containsPoint projects each point onto the box's own rotated axes and
+// compares against its half-extents, so the glowing slab tumbles with it.
 
 const N = 20; // points per axis
 const EXTENT = 3.0; // half-width of the lattice cube
@@ -111,24 +110,19 @@ points.count = COUNT;
 scene.add(points);
 scene.updateWorldMatrix();
 
-/* the three shapes (never drawn — only their containsPoint matters) */
+/* the oriented box (never drawn — only its containsPoint matters) */
 
-const aabb: Box3 = box3.create();
 const obb: OBB3 = obb3.create();
-obb.halfExtents = [1.9, 0.6, 1.9]; // a slab, so the rotation reads clearly
-const sph: Sphere = sphere.create();
+obb.halfExtents = [2.1, 0.8, 1.3]; // a distinct, non-cube box so the rotation reads clearly
 const spin = quat.create();
 const SPIN_AXIS: Vec3 = [0.32, 0.9, 0.28];
 
-const settings = { speed: 1, box: true, obb: true, sphere: true };
+const settings = { speed: 1 };
 
 /* ui */
 
 const panel = createPanel('contains point');
 panel.add(settings, 'speed', { min: 0, max: 3, step: 0.01, label: 'Speed' });
-panel.add(settings, 'box', { label: 'AABB (box3)' });
-panel.add(settings, 'obb', { label: 'OBB (obb3)' });
-panel.add(settings, 'sphere', { label: 'Sphere' });
 let insideCount = 0;
 panel.monitor(() => insideCount, { label: 'inside' });
 
@@ -148,25 +142,16 @@ function frame() {
     clock += dt * settings.speed;
     time.value = now / 1000;
 
-    // animate the shapes along their own drifting paths
-    box3.setFromCenterAndSize(aabb, [Math.sin(clock * 0.5) * 1.7, Math.cos(clock * 0.37) * 1.4, Math.cos(clock * 0.6) * 1.7], [2.6, 2.6, 2.6]);
-
-    obb.center = [Math.cos(clock * 0.43) * 1.7, Math.sin(clock * 0.6) * 1.3, Math.sin(clock * 0.31) * 1.7];
+    // drift the box through the lattice while tumbling it about a tilted axis
+    obb.center = [Math.cos(clock * 0.43) * 1.6, Math.sin(clock * 0.6) * 1.2, Math.sin(clock * 0.31) * 1.6];
     quat.setAxisAngle(spin, SPIN_AXIS, clock * 0.9);
     mat3.fromQuat(obb.rotation, spin);
 
-    sph.center = [Math.sin(clock * 0.66) * 1.9, Math.sin(clock * 0.5 + 1) * 1.5, Math.cos(clock * 0.48) * 1.9];
-    sph.radius = 1.3 + Math.sin(clock * 1.1) * 0.4;
-
-    // every lattice point asks the shapes whether it's inside
+    // every lattice point asks the box whether it's inside
     const k = Math.min(1, dt * 9); // glow-fade rate
     insideCount = 0;
     for (let i = 0; i < COUNT; i++) {
-        const p = positions[i];
-        const inside =
-            (settings.box && box3.containsPoint(aabb, p)) ||
-            (settings.obb && obb3.containsPoint(obb, p)) ||
-            (settings.sphere && sphere.containsPoint(sph, p));
+        const inside = obb3.containsPoint(obb, positions[i]);
         if (inside) insideCount++;
         intensity[i] += ((inside ? 1 : 0) - intensity[i]) * k;
     }
