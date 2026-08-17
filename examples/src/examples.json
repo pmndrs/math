@@ -85,6 +85,17 @@
         ],
         "category": "color"
     },
+    "example-looping-noise": {
+        "title": "Looping Noise",
+        "description": "A grid of tiles whose heights come from math's simplex4d, animated so it loops seamlessly. The two extra axes trace a circle as the loop phase goes 0 to 1, so the field returns exactly to its start with no visible seam - something a 3D field animated by a sliding time offset can never do.",
+        "tags": [
+            "simplex4d",
+            "noise",
+            "looping",
+            "4d"
+        ],
+        "category": "noise"
+    },
     "example-simplex-2d-noise-terrain": {
         "title": "Simplex 2D Noise Terrain",
         "description": "A rolling terrain whose heights come from math's simplex2d noise, scrolling like a fly-over; lit and coloured by the flowing rainbow.",
