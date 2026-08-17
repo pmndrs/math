@@ -1,13 +1,13 @@
 import { bench, group } from "@pmndrs/labs";
 import * as mat3 from "../../src/core/mat3";
-import * as mat4 from "../../src/core/mat4";
 import type { Mat4 } from "../../src/core/mat4";
+import * as mat4 from "../../src/core/mat4";
 import * as quat from "../../src/core/quat";
 import type { Vec3 } from "../../src/core/vec3";
 import * as mulberry32 from "../../src/random/mulberry32";
 import type { Box3 } from "../../src/shapes/box3";
-import * as obb3 from "../../src/shapes/obb3";
 import type { OBB3 } from "../../src/shapes/obb3";
+import * as obb3 from "../../src/shapes/obb3";
 
 const N = 10_000;
 

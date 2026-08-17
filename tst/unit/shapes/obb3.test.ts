@@ -171,6 +171,42 @@ describe('obb3', () => {
 
             expect(obb3.intersectsOBB3(obb1, obb2)).toBe(false);
         });
+
+        it('returns true for overlapping parallel long-thin OBBs (all cross axes degenerate)', () => {
+            // Identical orientation => every edge pair is parallel, so all 9 edge-cross
+            // axes are ~zero and get skipped; the result must come from the face axes.
+            const obb1 = obb3.create();
+            obb3.setFromCenterHalfExtentsQuaternion(obb1, [0, 0, 0], [5, 0.5, 0.5], [0, 0, 0, 1]);
+            const obb2 = obb3.create();
+            obb3.setFromCenterHalfExtentsQuaternion(obb2, [1, 0, 0], [5, 0.5, 0.5], [0, 0, 0, 1]);
+
+            expect(obb3.intersectsOBB3(obb1, obb2)).toBe(true);
+        });
+
+        it('returns false for separated parallel OBBs (cross axes skipped, face axis separates)', () => {
+            // Parallel again (cross axes degenerate), but separated along Y: the skip must
+            // not hide the real separation, which the B1/A1 face axis still catches.
+            const obb1 = obb3.create();
+            obb3.setFromCenterHalfExtentsQuaternion(obb1, [0, 0, 0], [5, 0.5, 0.5], [0, 0, 0, 1]);
+            const obb2 = obb3.create();
+            obb3.setFromCenterHalfExtentsQuaternion(obb2, [0, 2, 0], [5, 0.5, 0.5], [0, 0, 0, 1]);
+
+            expect(obb3.intersectsOBB3(obb1, obb2)).toBe(false);
+        });
+
+        it('returns true for overlapping near-parallel long-thin OBBs', () => {
+            // A hair off parallel (1e-4 rad about Z): 1 - R^2 ~ 1e-8 < epsilon, so the
+            // near-degenerate cross axes are skipped rather than tested unstably.
+            const obb1 = obb3.create();
+            obb3.setFromCenterHalfExtentsQuaternion(obb1, [0, 0, 0], [5, 0.5, 0.5], [0, 0, 0, 1]);
+
+            const rotation = quat.create();
+            quat.fromEuler(rotation, euler.fromValues(0, 0, 1e-4, 'xyz'));
+            const obb2 = obb3.create();
+            obb3.setFromCenterHalfExtentsQuaternion(obb2, [1, 0, 0], [5, 0.5, 0.5], rotation);
+
+            expect(obb3.intersectsOBB3(obb1, obb2)).toBe(true);
+        });
     });
 
     describe('intersectsBox3', () => {
