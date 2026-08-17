@@ -1,8 +1,9 @@
-import { clamp, EPSILON } from './scalar';
 import type { Mat4 } from './mat4';
-import * as mat4 from './mat4';
 import type { Quat } from './quat';
 import * as quat from './quat';
+import { clamp, EPSILON } from './scalar';
+
+const DEG2RAD = Math.PI / 180;
 
 /** Euler orders */
 export type EulerOrder = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx';
@@ -55,9 +56,9 @@ export function set(out: Euler, x: number, y: number, z: number, order: EulerOrd
  * @returns The output Euler.
  */
 export function fromDegrees(out: Euler, x: number, y: number, z: number, order: EulerOrder): Euler {
-    out[0] = (x * Math.PI) / 180;
-    out[1] = (y * Math.PI) / 180;
-    out[2] = (z * Math.PI) / 180;
+    out[0] = x * DEG2RAD;
+    out[1] = y * DEG2RAD;
+    out[2] = z * DEG2RAD;
     out[3] = order;
 
     return out;
@@ -71,16 +72,38 @@ export function fromDegrees(out: Euler, x: number, y: number, z: number, order: 
  * @returns The output Euler.
  */
 export function fromRotationMat4(out: Euler, rotationMatrix: Mat4, order: EulerOrder = out[3] || 'xyz'): Euler {
-    const m11 = rotationMatrix[0];
-    const m12 = rotationMatrix[4];
-    const m13 = rotationMatrix[8];
-    const m21 = rotationMatrix[1];
-    const m22 = rotationMatrix[5];
-    const m23 = rotationMatrix[9];
-    const m31 = rotationMatrix[2];
-    const m32 = rotationMatrix[6];
-    const m33 = rotationMatrix[10];
+    return fromRotationMatrixValues(
+        out,
+        rotationMatrix[0],
+        rotationMatrix[4],
+        rotationMatrix[8],
+        rotationMatrix[1],
+        rotationMatrix[5],
+        rotationMatrix[9],
+        rotationMatrix[2],
+        rotationMatrix[6],
+        rotationMatrix[10],
+        order,
+    );
+}
 
+/**
+ * Sets the Euler angles from the elements of a rotation matrix (column-major, so `mNM` is row N, column M).
+ * Shared by {@link fromRotationMat4} and {@link fromQuat} so neither has to allocate or read back a scratch matrix.
+ */
+function fromRotationMatrixValues(
+    out: Euler,
+    m11: number,
+    m12: number,
+    m13: number,
+    m21: number,
+    m22: number,
+    m23: number,
+    m31: number,
+    m32: number,
+    m33: number,
+    order: EulerOrder,
+): Euler {
     switch (order) {
         case 'xyz':
             out[1] = Math.asin(clamp(m13, -1, 1));
@@ -202,18 +225,46 @@ export function equals(a: Euler, b: Euler): boolean {
     );
 }
 
-const _setFromQuaternionRotationMatrix = /*@__PURE__*/ mat4.create();
-
 /**
  * Sets the Euler angles from a quaternion.
  * @param out The output Euler.
- * @param q The input quaternion.
+ * @param q The input quaternion. Assumed to be normalized (unit length).
  * @param order The order of the Euler.
  * @returns The output Euler
  */
 export function fromQuat(out: Euler, q: Quat, order: EulerOrder): Euler {
-    mat4.fromQuat(_setFromQuaternionRotationMatrix, q);
-    return fromRotationMat4(out, _setFromQuaternionRotationMatrix, order);
+    // compute the rotation matrix elements directly from the quaternion
+    const x = q[0];
+    const y = q[1];
+    const z = q[2];
+    const w = q[3];
+    const x2 = x + x;
+    const y2 = y + y;
+    const z2 = z + z;
+
+    const xx = x * x2;
+    const yx = y * x2;
+    const yy = y * y2;
+    const zx = z * x2;
+    const zy = z * y2;
+    const zz = z * z2;
+    const wx = w * x2;
+    const wy = w * y2;
+    const wz = w * z2;
+
+    return fromRotationMatrixValues(
+        out,
+        1 - yy - zz,
+        yx - wz,
+        zx + wy,
+        yx + wz,
+        1 - xx - zz,
+        zy - wx,
+        zx - wy,
+        zy + wx,
+        1 - xx - yy,
+        order,
+    );
 }
 
 const _reorderQuaternion = /*@__PURE__*/ quat.create();

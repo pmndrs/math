@@ -1,6 +1,30 @@
 import { describe, expect, it } from 'vitest';
-import type { Euler, EulerOrder } from '../../../src';
+import type { Euler, EulerOrder, Quat } from '../../../src';
 import { euler, mat4, quat } from '../../../src';
+import * as mulberry32 from '../../../src/random/mulberry32';
+
+const ORDERS: EulerOrder[] = ['xyz', 'xzy', 'yxz', 'yzx', 'zxy', 'zyx'];
+
+// The axis whose ±90° rotation drives each order into its gimbal-lock (degenerate) branch,
+// i.e. the axis of the middle rotation that gates the asin() singularity for that order.
+const SINGULAR_AXIS: Record<EulerOrder, [number, number, number]> = {
+    xyz: [0, 1, 0],
+    zyx: [0, 1, 0],
+    yxz: [1, 0, 0],
+    zxy: [1, 0, 0],
+    yzx: [0, 0, 1],
+    xzy: [0, 0, 1],
+};
+
+/** A deterministic, uniformly-distributed random unit quaternion. */
+function randomQuat(rand: mulberry32.Mulberry32): Quat {
+    const ax = mulberry32.sample(rand) * 2 - 1;
+    const ay = mulberry32.sample(rand) * 2 - 1;
+    const az = mulberry32.sample(rand) * 2 - 1;
+    const len = Math.hypot(ax, ay, az) || 1;
+    const angle = mulberry32.sample(rand) * Math.PI * 2;
+    return quat.setAxisAngle(quat.create(), [ax / len, ay / len, az / len], angle);
+}
 
 describe('euler', () => {
     describe('create', () => {
@@ -254,6 +278,91 @@ describe('euler', () => {
             expect(result[1]).toBeCloseTo(originalEuler[1]);
             expect(result[2]).toBeCloseTo(originalEuler[2]);
             expect(result[3]).toBe('xyz');
+        });
+    });
+
+    describe('set', () => {
+        it('should set components and order, returning the same instance', () => {
+            const out = euler.create();
+            const result = euler.set(out, 1, 2, 3, 'zyx');
+
+            expect(result).toBe(out);
+            expect(out).toEqual([1, 2, 3, 'zyx']);
+        });
+    });
+
+    describe('fromQuat / fromRotationMat4 parity', () => {
+        // fromQuat computes the rotation-matrix elements inline instead of building a scratch
+        // mat4; this pins it to the matrix path it replaced, for every order.
+        it('fromQuat matches fromRotationMat4(mat4.fromQuat(q)) for all orders', () => {
+            const rand = mulberry32.create(12345);
+
+            for (let i = 0; i < 200; i++) {
+                const q = randomQuat(rand);
+                const m = mat4.fromQuat(mat4.create(), q);
+
+                for (const order of ORDERS) {
+                    const viaQuat = euler.fromQuat(euler.create(), q, order);
+                    const viaMat = euler.fromRotationMat4(euler.create(), m, order);
+
+                    expect(viaQuat[0]).toBeCloseTo(viaMat[0], 10);
+                    expect(viaQuat[1]).toBeCloseTo(viaMat[1], 10);
+                    expect(viaQuat[2]).toBeCloseTo(viaMat[2], 10);
+                    expect(viaQuat[3]).toBe(viaMat[3]);
+                }
+            }
+        });
+    });
+
+    describe('round-trip correctness (all orders)', () => {
+        it('fromQuat produces euler angles that reconstruct the original rotation', () => {
+            const rand = mulberry32.create(2024);
+
+            for (const order of ORDERS) {
+                for (let i = 0; i < 50; i++) {
+                    const q0 = randomQuat(rand);
+                    const e = euler.fromQuat(euler.create(), q0, order);
+                    const q1 = quat.fromEuler(quat.create(), e);
+
+                    // |dot| ≈ 1 tolerates the double-cover sign flip and equivalent angle sets
+                    expect(Math.abs(quat.dot(q0, q1))).toBeCloseTo(1, 5);
+                }
+            }
+        });
+
+        it('fromRotationMat4 produces euler angles that reconstruct the original rotation', () => {
+            const rand = mulberry32.create(4048);
+
+            for (const order of ORDERS) {
+                for (let i = 0; i < 50; i++) {
+                    const q0 = randomQuat(rand);
+                    const m = mat4.fromQuat(mat4.create(), q0);
+                    const e = euler.fromRotationMat4(euler.create(), m, order);
+                    const q1 = quat.fromEuler(quat.create(), e);
+
+                    expect(Math.abs(quat.dot(q0, q1))).toBeCloseTo(1, 5);
+                }
+            }
+        });
+    });
+
+    describe('gimbal lock (degenerate branch) per order', () => {
+        ORDERS.forEach((order) => {
+            [Math.PI / 2, -Math.PI / 2].forEach((angle) => {
+                it(`handles the singular ${angle > 0 ? '+' : '-'}90° case for ${order}`, () => {
+                    const q = quat.setAxisAngle(quat.create(), SINGULAR_AXIS[order], angle);
+                    const e = euler.fromQuat(euler.create(), q, order);
+
+                    expect(Number.isFinite(e[0])).toBe(true);
+                    expect(Number.isFinite(e[1])).toBe(true);
+                    expect(Number.isFinite(e[2])).toBe(true);
+                    expect(e[3]).toBe(order);
+
+                    // the degenerate decomposition must still represent the same rotation
+                    const q1 = quat.fromEuler(quat.create(), e);
+                    expect(Math.abs(quat.dot(q, q1))).toBeCloseTo(1, 5);
+                });
+            });
         });
     });
 
