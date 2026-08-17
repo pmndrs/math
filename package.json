@@ -28,27 +28,27 @@
       "types": "./dist/src/index.d.ts"
     },
     "./shapes": {
-      "import": "./dist/shapes.js",
+      "import": "./dist/shapes/index.js",
       "types": "./dist/src/shapes/index.d.ts"
     },
     "./geometry": {
-      "import": "./dist/geometry.js",
+      "import": "./dist/geometry/index.js",
       "types": "./dist/src/geometry/index.d.ts"
     },
     "./time": {
-      "import": "./dist/time.js",
+      "import": "./dist/time/index.js",
       "types": "./dist/src/time/index.d.ts"
     },
     "./random": {
-      "import": "./dist/random.js",
+      "import": "./dist/random/index.js",
       "types": "./dist/src/random/index.d.ts"
     },
     "./noise": {
-      "import": "./dist/noise.js",
+      "import": "./dist/noise/index.js",
       "types": "./dist/src/noise/index.d.ts"
     },
     "./color": {
-      "import": "./dist/color.js",
+      "import": "./dist/color/index.js",
       "types": "./dist/src/color/index.d.ts"
     }
   },
@@ -59,7 +59,7 @@
   ],
   "scripts": {
     "build": "rm -rf ./dist && pnpm run build:bundle && pnpm run build:dts",
-    "build:bundle": "rolldown --config rolldown.config.mjs",
+    "build:bundle": "rollup --config rollup.config.mjs",
     "build:dts": "tsc -p tsconfig.build.json && node scripts/add-js-extensions-dts.mjs",
     "build:examples": "pnpm --filter math-examples build",
     "build:website": "pnpm --filter website build",
@@ -76,7 +76,10 @@
   "packageManager": "pnpm@9.15.0",
   "devDependencies": {
     "@biomejs/biome": "^2.5.6",
-    "rolldown": "^1.2.1",
+    "@rollup/plugin-node-resolve": "^16",
+    "@rollup/plugin-typescript": "^12",
+    "rollup": "^4",
+    "tslib": "^2.8.1",
     "typedoc": "^0.28.16",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
