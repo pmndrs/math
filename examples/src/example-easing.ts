@@ -1,16 +1,10 @@
-import * as g from 'gpucat';
-import { d } from 'gpucat';
 import { easing } from 'math/time';
-import { rainbowRGB, time } from './common/rainbow';
-import { createRenderer } from './common/renderer';
 
-// An easing gallery: one track per math easing function. All dots start
-// together and race across, spreading apart as each follows its own pacing, then
-// ease back — the clearest way to feel the difference between the curves. A
-// playhead marks the linear time t; each dot leads or lags it by its easing.
-//
-// The tracks, playhead and labels are crisp DOM (hairline GPU lines fight FXAA);
-// only the rainbow dots are drawn, on a transparent canvas layered over the DOM.
+// A small-multiples gallery of math's easing functions: one card per curve,
+// drawn to a 2D canvas. Each card plots the easing (input t across, output
+// eased(t) up) against a faint linear reference, with a dot tracing the curve at
+// a shared, ping-ponging t so you can read each curve's shape and pacing at a
+// glance. The plotted line is the function itself, sampled over [0, 1].
 
 const EASINGS: [string, (t: number) => number][] = [
     ['linear', easing.linear],
@@ -28,170 +22,143 @@ const EASINGS: [string, (t: number) => number][] = [
 ];
 
 const N = EASINGS.length;
-const TRACK_LEFT = -1.5;
-const TRACK_RIGHT = 1.5;
-const TOP = 1.5;
-const BOTTOM = -1.5;
-const PLAYHEAD_TOP = TOP + 0.28;
-const PLAYHEAD_BOTTOM = BOTTOM - 0.28;
-const rowY = (i: number) => TOP + (BOTTOM - TOP) * (i / (N - 1));
 const PERIOD = 2.2; // seconds for one out-and-back
+const SAMPLES = 64; // curve resolution
 
-/* renderer */
+// card metrics (CSS pixels)
+const PLOT = 130;
+const PAD = 14;
+const NAME_GAP = 9;
+const NAME_H = 14;
+const GAP = 16;
+const MARGIN = 32;
+const CARD_W = PLOT + PAD * 2;
+const CARD_H = PAD + PLOT + NAME_GAP + NAME_H + PAD;
+const MONO = 'ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace';
 
-// alpha:true + a zero clear colour => transparent canvas, so the DOM shows through
-const renderer = await createRenderer({ antialias: true, alpha: true });
-renderer.clearColor = [0, 0, 0, 0];
+// brand palette stops (pink -> yellow -> blue -> purple), looped, for per-card hue
+const STOPS = [
+    [255, 62, 165],
+    [255, 210, 63],
+    [63, 167, 255],
+    [138, 43, 226],
+];
+function cardColor(u: number): string {
+    const x = (((u % 1) + 1) % 1) * 4;
+    const i = Math.floor(x) % 4;
+    const f = x - Math.floor(x);
+    const a = STOPS[i];
+    const b = STOPS[(i + 1) % 4];
+    const r = Math.round(a[0] + (b[0] - a[0]) * f);
+    const g = Math.round(a[1] + (b[1] - a[1]) * f);
+    const bl = Math.round(a[2] + (b[2] - a[2]) * f);
+    return `rgb(${r}, ${g}, ${bl})`;
+}
+const COLORS = EASINGS.map((_, i) => cardColor(i / N));
 
-const canvas = renderer.domElement as HTMLCanvasElement;
-canvas.style.position = 'absolute';
-canvas.style.inset = '0';
-canvas.style.zIndex = '1';
+/* canvas */
+
+const canvas = document.createElement('canvas');
+canvas.style.display = 'block';
 document.body.appendChild(canvas);
-renderer.setPixelRatio(devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
+const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-const scene = new g.Scene();
+let cols = 1;
+let startX = 0;
+let startY = 0;
 
-const camera = new g.PerspectiveCamera(Math.PI / 4, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position[2] = 4.2;
-camera.updateProjectionMatrix();
-scene.add(camera);
-
-// project a world (x, y) on the z=0 plane to screen pixels (camera looks down -z)
-const FOV = Math.PI / 4;
-function project(wx: number, wy: number): [number, number] {
+function resize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const halfH = camera.position[2] * Math.tan(FOV / 2);
-    const halfW = halfH * (w / h);
-    return [((wx / halfW) * 0.5 + 0.5) * w, (0.5 - (wy / halfH) * 0.5) * h];
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width = `${w}px`;
+    canvas.style.height = `${h}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // lay the cards out in a centred grid
+    const avail = w - MARGIN * 2;
+    cols = Math.max(1, Math.min(N, Math.floor((avail + GAP) / (CARD_W + GAP))));
+    const rows = Math.ceil(N / cols);
+    const blockW = cols * CARD_W + (cols - 1) * GAP;
+    const blockH = rows * CARD_H + (rows - 1) * GAP;
+    startX = (w - blockW) / 2;
+    startY = (h - blockH) / 2; // vertically centred
 }
+window.addEventListener('resize', resize);
+resize();
 
-/* dots (canvas) */
+/* draw */
 
-// racing dots — a single instanced mesh (one instance per easing). Each dot's
-// position lives in a storage buffer we rewrite each frame; colour is the
-// flowing rainbow sampled at the instance's world position.
-const dotGeometry = g.createSphereGeometry(0.05, 16, 12);
-// vec4 (not vec3) so the std430 storage stride matches our tightly-packed data
-const dotPositions = new Float32Array(N * 4);
-const dotPositionBuffer = new g.GpuBuffer(d.array(d.vec4f), { data: dotPositions, usage: 'storage' });
-const instancePosition = g.index(g.storage(dotPositionBuffer), g.instanceIndex);
+function drawCard(index: number, p: number) {
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+    const x = startX + col * (CARD_W + GAP);
+    const y = startY + row * (CARD_H + GAP);
+    const [name, fn] = EASINGS[index];
 
-const dotPos = g.attribute('position', d.vec3f);
-const dotWorld = g.add(dotPos, instancePosition.xyz);
-const dotClip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(dotWorld, g.f32(1))));
-const dotVWorld = g.varying(dotWorld, 'v_dworld');
-const dotMaterial = new g.Material({ vertex: dotClip, fragment: g.vec4(rainbowRGB(dotVWorld, 2.5), g.f32(1)) });
-const dots = new g.Mesh(dotGeometry, dotMaterial);
-dots.count = N;
-scene.add(dots);
+    // card background + border
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.09)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.rect(x + 0.5, y + 0.5, CARD_W - 1, CARD_H - 1);
+    ctx.fill();
+    ctx.stroke();
 
-/* tracks + labels (DOM) */
+    // plot origin (top-left of the square plot area)
+    const px = x + PAD;
+    const py = y + PAD;
+    const mapX = (t: number) => px + t * PLOT;
+    const mapY = (e: number) => py + (1 - e) * PLOT; // e=0 bottom, e=1 top
 
-// under-canvas layer: one hairline track per row + the sweeping playhead
-const overlay = document.createElement('div');
-overlay.style.cssText = 'position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden';
-document.body.appendChild(overlay);
+    // faint linear reference
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath();
+    ctx.moveTo(mapX(0), mapY(0));
+    ctx.lineTo(mapX(1), mapY(1));
+    ctx.stroke();
+    ctx.setLineDash([]);
 
-const trackEls = EASINGS.map(() => {
-    const el = document.createElement('div');
-    el.style.cssText = 'position:absolute;height:1px;background:rgba(150,162,184,0.5)';
-    overlay.appendChild(el);
-    return el;
-});
-
-const playheadEl = document.createElement('div');
-playheadEl.style.cssText = 'position:absolute;width:2px;border-radius:1px;background:rgba(238,242,252,0.85)';
-overlay.appendChild(playheadEl);
-
-// over-canvas layer: easing names, the 0/1 axis ends, and the floating t readout
-function mkLabel(text: string, transform: string): HTMLDivElement {
-    const el = document.createElement('div');
-    el.textContent = text;
-    el.className = 'mc-label';
-    el.style.transform = transform;
-    el.style.color = 'var(--mc-ink)';
-    el.style.zIndex = '10';
-    document.body.appendChild(el);
-    return el;
-}
-const labels = EASINGS.map(([name]) => mkLabel(name, 'translateY(-50%)'));
-for (const el of labels) el.style.left = '24px';
-const zeroEl = mkLabel('0', 'translate(-50%, 0)');
-const oneEl = mkLabel('1', 'translate(-50%, 0)');
-const tReadout = mkLabel('t 0.00', 'translate(-50%, -150%)');
-tReadout.style.zIndex = '11';
-
-// place everything that only moves on resize
-function layout() {
-    for (let i = 0; i < N; i++) {
-        const y = rowY(i);
-        const [lx, ly] = project(TRACK_LEFT, y);
-        const [rx] = project(TRACK_RIGHT, y);
-        trackEls[i].style.left = `${lx}px`;
-        trackEls[i].style.top = `${ly}px`;
-        trackEls[i].style.width = `${rx - lx}px`;
-        labels[i].style.top = `${ly}px`;
+    // the easing curve (the function itself, sampled)
+    ctx.strokeStyle = COLORS[index];
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (let s = 0; s <= SAMPLES; s++) {
+        const t = s / SAMPLES;
+        const cx = mapX(t);
+        const cy = mapY(fn(t));
+        if (s === 0) ctx.moveTo(cx, cy);
+        else ctx.lineTo(cx, cy);
     }
-    const topY = project(0, PLAYHEAD_TOP)[1];
-    const botY = project(0, PLAYHEAD_BOTTOM)[1];
-    playheadEl.style.top = `${topY}px`;
-    playheadEl.style.height = `${botY - topY}px`;
+    ctx.stroke();
 
-    const [zx, zy] = project(TRACK_LEFT, BOTTOM - 0.35);
-    zeroEl.style.left = `${zx}px`;
-    zeroEl.style.top = `${zy}px`;
-    const [ox, oy] = project(TRACK_RIGHT, BOTTOM - 0.35);
-    oneEl.style.left = `${ox}px`;
-    oneEl.style.top = `${oy}px`;
+    // the tracing dot at the shared t
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(mapX(p), mapY(fn(p)), 4.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // name below the plot
+    ctx.fillStyle = '#8ea3af';
+    ctx.font = `12px ${MONO}`;
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(name.toLowerCase(), px, py + PLOT + NAME_GAP + 11);
 }
-layout();
-
-window.addEventListener('resize', () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    layout();
-});
-
-/* render */
-
-scene.updateWorldMatrix();
-camera.updateViewMatrix();
-
-const scenePass = g.pass(scene, camera, { clearColor: [0, 0, 0, 0] });
-const outputNode = g.fxaa(scenePass.getTextureNode());
-const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
 function frame(tms: number) {
     const t = tms / 1000;
-    time.value = t;
-
-    // shared out-and-back linear time (0 -> 1 -> 0)
     const cyc = (t / PERIOD) % 2;
-    const p = cyc < 1 ? cyc : 2 - cyc;
+    const p = cyc < 1 ? cyc : 2 - cyc; // 0 -> 1 -> 0
 
-    for (let i = 0; i < N; i++) {
-        const eased = EASINGS[i][1](p);
-        dotPositions[i * 4] = TRACK_LEFT + (TRACK_RIGHT - TRACK_LEFT) * eased;
-        dotPositions[i * 4 + 1] = rowY(i);
-        dotPositions[i * 4 + 2] = 0;
-    }
-    dotPositionBuffer.needsUpdate = true;
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    for (let i = 0; i < N; i++) drawCard(i, p);
 
-    // playhead + t readout follow the linear time
-    const px = TRACK_LEFT + (TRACK_RIGHT - TRACK_LEFT) * p;
-    const [phx, phy] = project(px, PLAYHEAD_TOP);
-    playheadEl.style.left = `${phx - 1}px`;
-    tReadout.style.left = `${phx}px`;
-    tReadout.style.top = `${phy}px`;
-    tReadout.textContent = `t ${p.toFixed(2)}`;
-
-    scene.updateWorldMatrix();
-    camera.updateViewMatrix();
-    renderPipeline.render();
     requestAnimationFrame(frame);
 }
 
