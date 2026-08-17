@@ -18,7 +18,7 @@ const C2 = g.vec3(0.247, 0.655, 1.0);
 const C3 = g.vec3(0.541, 0.169, 0.886);
 
 // palette(t): wrap through the four stops, t in cycles
-function palette(t: g.Node<typeof d.f32>): g.Node<typeof d.vec3f> {
+export function palette(t: g.Node<typeof d.f32>): g.Node<typeof d.vec3f> {
     const x = g.mul(g.fract(t), g.f32(4));
     const i = g.floor(x);
     const f = g.sub(x, i);

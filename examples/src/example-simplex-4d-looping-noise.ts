@@ -2,7 +2,7 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { simplex4d } from 'math/noise';
 import { createPanel } from './common/dash';
-import { rainbowRGB, time } from './common/rainbow';
+import { palette, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
 
 // A grid of tiles whose heights come from math's simplex4d, animated so it loops
@@ -90,12 +90,14 @@ const world0 = g.mul(instanceTransform, g.vec4(pos, g.f32(1)));
 const worldPos = g.Var('world', g.add(world0.xyz, g.vec3(0, 1, 0).mul(instanceHeight.mul(amp))));
 const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(worldPos, g.f32(1))));
 const vNormal = g.varying(g.normalize(nrm), 'v_n');
-const vWorld = g.varying(worldPos, 'v_w');
+const vHeight = g.varying(instanceHeight, 'v_h');
 
 const lightDirection = g.vec3(0.4, 1.0, 0.6).normalize();
 const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
 const shade = g.Var('shade', g.f32(0.42).add(diffuse.mul(g.f32(0.62))));
-const base = g.Var('base', rainbowRGB(vWorld));
+// colour by height: elevation walks through the brand palette, so valleys and
+// peaks read as distinct rainbow bands (a topographic look)
+const base = g.Var('base', palette(g.add(vHeight.mul(g.f32(0.9)), g.f32(0.5))));
 const material = new g.Material({ vertex: clip, fragment: g.vec4(base.mul(shade), g.f32(1)) });
 
 const tiles = new g.Mesh(tileGeometry, material);
@@ -111,7 +113,7 @@ let phase = 0; // loop position in [0, 1)
 
 /* ui */
 
-const panel = createPanel('looping noise');
+const panel = createPanel('simplex 4d looping noise');
 panel.add(settings, 'loop', { min: 2, max: 20, step: 0.1, label: 'Loop (s)' });
 panel.add(settings, 'height', { min: 0, max: 3, step: 0.01, label: 'Height' });
 panel.add(settings, 'detail', { min: 0.15, max: 1, step: 0.01, label: 'Detail' });
