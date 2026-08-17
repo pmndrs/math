@@ -4,6 +4,7 @@ import { d } from 'gpucat';
 import { mat4, quat, vec3 as v3 } from 'math';
 import { quickhull3 } from 'math/geometry';
 import { mulberry32 } from 'math/random';
+import { pinTopRight } from './common/dash';
 import { rainbowRGB, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
 
@@ -258,13 +259,11 @@ function rebuild(rawPoints: number[]) {
 
 /* ui + stats */
 
-const stats = document.createElement('div');
-stats.className = 'mc-info';
-stats.style.top = '10px';
-stats.style.left = '10px';
-document.body.appendChild(stats);
+const stats = { points: 0, hullVerts: 0, hullMs: 0 };
 function updateStats(points: number, hullVerts: number, ms: number) {
-    stats.innerHTML = `points: ${points}<br>hull vertices: ${hullVerts}<br>quickhull3: ${ms.toFixed(2)}ms`;
+    stats.points = points;
+    stats.hullVerts = hullVerts;
+    stats.hullMs = ms;
 }
 
 const settings = { variation: 'bunny' };
@@ -274,8 +273,12 @@ async function select(name: string) {
 
 const dash = dashboard();
 const panel = dash.panel({ title: 'convex hull 3d' });
+pinTopRight(panel);
 panel.add(settings, 'variation', { options: Object.keys(VARIATIONS), label: 'Point set' }).onChange((v: string) => select(v));
 panel.button('↻ Regenerate', () => select(settings.variation));
+panel.monitor(() => stats.points, { label: 'points' });
+panel.monitor(() => stats.hullVerts, { label: 'hull vertices' });
+panel.monitor(() => stats.hullMs, { label: 'quickhull3', unit: 'duration' });
 
 await select(settings.variation);
 camera.updateViewMatrix();

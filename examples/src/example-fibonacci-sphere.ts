@@ -2,6 +2,7 @@ import { dashboard } from 'dashcat';
 import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { mat4, quat, type Spherical, spherical, vec3 as v3 } from 'math';
+import { pinTopRight } from './common/dash';
 import { rainbowRGB, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
 
@@ -123,20 +124,9 @@ function rebuild() {
     if (cloud) scene.remove(cloud);
     cloud = buildPoints(points);
     scene.add(cloud);
-    updateStats();
 }
 
-/* ui + stats */
-
-const stats = document.createElement('div');
-stats.className = 'mc-info';
-stats.style.top = '10px';
-stats.style.left = '10px';
-document.body.appendChild(stats);
-function updateStats() {
-    const turnDeg = 137.507764 + settings.twist;
-    stats.innerHTML = `points: ${settings.points}<br>turn: ${turnDeg.toFixed(3)}°<br>golden angle: 137.508°`;
-}
+/* ui */
 
 const settings = {
     points: 800,
@@ -146,9 +136,16 @@ const settings = {
 
 const dash = dashboard();
 const panel = dash.panel({ title: 'fibonacci sphere' });
+pinTopRight(panel);
 panel.add(settings, 'points', { min: 24, max: 3000, step: 1, label: 'Points' }).onChange(rebuild);
 panel.add(settings, 'twist', { min: -4, max: 4, step: 0.001, label: 'Twist off φ (°)' }).onChange(rebuild);
 panel.add(settings, 'spin', { label: 'Auto-spin' });
+panel.monitor(() => settings.points, { label: 'points' });
+panel.monitor(() => 137.507764 + settings.twist, {
+    label: 'turn',
+    format: (v) => `${v.toFixed(3)}°`,
+    hint: 'golden angle = 137.508°',
+});
 
 rebuild();
 camera.updateProjectionMatrix();
