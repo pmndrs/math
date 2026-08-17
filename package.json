@@ -55,7 +55,8 @@
   "files": [
     "dist",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "API.md"
   ],
   "scripts": {
     "build": "rm -rf ./dist && pnpm run build:bundle && pnpm run build:dts",

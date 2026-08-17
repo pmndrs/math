@@ -1,24 +1,15 @@
-```sh
-> npm install math@canary
-```
-
 # math
 
 math is a collection of math helpers for graphics and simulations.
 
-**Features:**
+- **High performance**: allocation-free, monomorphic, benchmarked
+- **Tiny**: mean and lean, tree-shakable, only pay for what you use
+- **Portable**: interops with WebGL, WebGPU, Wasm, your favourite renderer, more.
+- **Data-oriented**: data-in, data-out functions over caller-owned data, without owning the data lifecycle.
 
-- Vector, Quaternion, Euler, and Matrix math (`math`)
-- Shape primitives and spatial queries (`math/shapes`)
-- Computational geometry - convex hulls, circumcircle (`math/geometry`)
-- Easing and spring functions (`math/time`)
-- Seeded randomness utilities (`math/random`)
-- Perlin and simplex noise utilities (`math/noise`)
-- Color and colorspace utilities (`math/color`)
-- Simple JSON-serializable data structures (no classes or typed arrays)
-- Consistent output-argument-first API for allocation-free usage
-- TypeScript-first, great DX for both JavaScript and TypeScript projects
-- Excellent tree-shaking support, with a subpath entrypoint per module group
+```sh
+> npm install math@canary
+```
 
 ## Quick Start
 
@@ -32,9 +23,15 @@ The library is grouped by domain behind subpath entrypoints. All APIs are highly
 
 <Examples />
 
-## API Documentation
+## Documentation
 
-<RenderAPI />
+- **[API.md](./API.md)** — every export with its signature and a one-line description, grouped by module. Flat and greppable, so it's easy to search or hand to an AI coding assistant.
+- **[Online API docs](https://pmndrs.github.io/math/docs/)** — the full typedoc reference, with search and cross-links.
+- **[What's inside](#whats-inside)** — jump straight to a module or namespace.
+
+## What's inside
+
+<ApiGroups />
 
 ## Acknowledgements:
 
