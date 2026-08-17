@@ -26,7 +26,7 @@ describe('polar', () => {
     });
 
     describe('Cartesian conversion (standard 2D convention: +X, CCW)', () => {
-        it('toVec2 uses x = r·cosθ, y = r·sinθ', () => {
+        it('toVec2 uses x = r*cos(theta), y = r*sin(theta)', () => {
             const out: Vec2 = [0, 0];
             polar.toVec2(out, [2, 0]);
             expect(out[0]).toBeCloseTo(2);
@@ -85,7 +85,7 @@ describe('polar', () => {
             expect(out).toEqual([6, 1]);
         });
 
-        it('rotate adds to theta and wraps into (-π, π]', () => {
+        it('rotate adds to theta and wraps into (-pi, pi]', () => {
             const out: Polar = [0, 0];
             polar.rotate(out, [1, (3 * PI) / 4], PI / 2);
             expect(out[0]).toBe(1);
@@ -94,23 +94,23 @@ describe('polar', () => {
 
         it('lerp takes the shortest angular path', () => {
             const out: Polar = [0, 0];
-            // from -170° to 170° should cross ±180°, not sweep the long way
+            // from -170 deg to 170 deg should cross +/-180 deg, not sweep the long way
             polar.lerp(out, [1, (-170 * PI) / 180], [3, (170 * PI) / 180], 0.5);
             expect(out[0]).toBeCloseTo(2);
-            expect(Math.abs(out[1])).toBeCloseTo(PI); // midpoint at ±180°, not 0°
+            expect(Math.abs(out[1])).toBeCloseTo(PI); // midpoint at +/-180 deg, not 0 deg
         });
     });
 
     describe('queries', () => {
-        it('angleTo returns the wrapped magnitude in [0, π]', () => {
+        it('angleTo returns the wrapped magnitude in [0, pi]', () => {
             expect(polar.angleTo([1, (-170 * PI) / 180], [1, (170 * PI) / 180])).toBeCloseTo((20 * PI) / 180);
             expect(polar.angleTo([1, 0], [2, PI / 2])).toBeCloseTo(PI / 2);
         });
 
         it('distance is the chord length (law of cosines)', () => {
-            // two unit points 90° apart → chord = sqrt(2)
+            // two unit points 90 deg apart -> chord = sqrt(2)
             expect(polar.distance([1, 0], [1, PI / 2])).toBeCloseTo(Math.SQRT2);
-            // same direction → |r difference|
+            // same direction -> |r difference|
             expect(polar.distance([1, 0.7], [4, 0.7])).toBeCloseTo(3);
         });
     });

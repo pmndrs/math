@@ -4,7 +4,7 @@ import type { Vec2 } from './vec2';
 /**
  * A point in polar coordinates [r, theta]
  *   r     - radial distance from the origin (>= 0)
- *   theta - angle from the +X axis, counter-clockwise (radians, range (-π, π])
+ *   theta - angle from the +X axis, counter-clockwise (radians, range (-pi, pi])
  *
  * This is the standard 2D convention: Vec2 is (x, y) and theta = atan2(y, x).
  * It is deliberately NOT the ground-plane slice of [[spherical]] (which is
@@ -15,7 +15,7 @@ export type Polar = [r: number, theta: number];
 
 const TAU = Math.PI * 2;
 
-/** Wraps an angle (in radians) into the range (-π, π]. */
+/** Wraps an angle (in radians) into the range (-pi, pi]. */
 function wrapAngle(a: number): number {
     return a - TAU * Math.floor((a + Math.PI) / TAU);
 }
@@ -105,7 +105,7 @@ export function scale(out: Polar, a: Polar, s: number): Polar {
 }
 
 /**
- * Rotates a Polar by an angle (in radians), wrapping theta into (-π, π].
+ * Rotates a Polar by an angle (in radians), wrapping theta into (-pi, pi].
  *
  * @param out the receiving Polar
  * @param a the source Polar
@@ -136,7 +136,7 @@ export function lerp(out: Polar, a: Polar, b: Polar, t: number): Polar {
 
 /**
  * Sets a Polar from Cartesian Vec2 coordinates:
- *   r     = sqrt(x² + y²)
+ *   r     = sqrt(x^2 + y^2)
  *   theta = atan2(y, x)
  *
  * @param out the receiving Polar
@@ -173,11 +173,11 @@ export function toVec2(out: Vec2, a: Polar): Vec2 {
 
 /**
  * Returns the smallest angle (in radians) between two polar directions,
- * ignoring r. Range [0, π].
+ * ignoring r. Range [0, pi].
  *
  * @param a the first Polar
  * @param b the second Polar
- * @returns angle in radians in [0, π]
+ * @returns angle in radians in [0, pi]
  */
 export function angleTo(a: Polar, b: Polar): number {
     return Math.abs(wrapAngle(b[1] - a[1]));

@@ -7,17 +7,17 @@ import { createRenderer } from './common/renderer';
 
 // Points spread evenly over a sphere with the Fibonacci lattice, built directly
 // in math's spherical coordinates (spherical.toVec3). Each point steps one band
-// down in equal-area height while turning by the golden angle (~137.5°, the
-// "most irrational" turn) — so nothing ever lines up and the gaps stay even.
+// down in equal-area height while turning by the golden angle (~137.5 deg, the
+// "most irrational" turn) - so nothing ever lines up and the gaps stay even.
 // The interlocking spiral arms that emerge are the same phyllotaxis a sunflower
 // head uses; their counts are consecutive Fibonacci numbers. Nudge the twist
 // off the golden angle and watch the spirals shear into bare spokes.
 
-const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // ~137.507°
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // ~137.507 deg
 const SPHERE_RADIUS = 2.3;
 
 // N points on the unit sphere via the Fibonacci lattice. `turn` is the azimuthal
-// step per point (radians) — the golden angle gives the even spread; anything
+// step per point (radians) - the golden angle gives the even spread; anything
 // else collapses the arms into spokes.
 function fibonacciPoints(n: number, turn: number): number[] {
     const s: Spherical = spherical.create();
@@ -133,13 +133,13 @@ const settings = {
 
 const panel = createPanel('fibonacci sphere');
 panel.add(settings, 'points', { min: 24, max: 3000, step: 1, label: 'Points' }).onChange(rebuild);
-panel.add(settings, 'twist', { min: -4, max: 4, step: 0.001, label: 'Twist off φ (°)' }).onChange(rebuild);
+panel.add(settings, 'twist', { min: -4, max: 4, step: 0.001, label: 'Twist off phi (deg)' }).onChange(rebuild);
 panel.add(settings, 'spin', { label: 'Auto-spin' });
 panel.monitor(() => settings.points, { label: 'points' });
 panel.monitor(() => 137.507764 + settings.twist, {
     label: 'turn',
-    format: (v) => `${v.toFixed(3)}°`,
-    hint: 'golden angle = 137.508°',
+    format: (v) => `${v.toFixed(3)} deg`,
+    hint: 'golden angle = 137.508 deg',
 });
 
 rebuild();
