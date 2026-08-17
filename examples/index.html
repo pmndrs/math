@@ -41,7 +41,7 @@
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
             /* slim custom scrollbar (Firefox) */
             scrollbar-width: thin;
-            scrollbar-color: #3a464e transparent;
+            scrollbar-color: #555 transparent;
         }
 
         /* slim custom scrollbar (WebKit / Chromium) */
@@ -54,13 +54,13 @@
         }
 
         .sidebar::-webkit-scrollbar-thumb {
-            background: #3a464e;
+            background: #555;
             border-radius: 4px;
             border: 2px solid var(--color-background);
         }
 
         .sidebar::-webkit-scrollbar-thumb:hover {
-            background: #4a5b64;
+            background: #666;
         }
 
         .sidebar.open {
@@ -155,7 +155,7 @@
         }
 
         .example-item.active {
-            border-color: #0288d1;
+            border-color: #fff;
         }
 
         .example-preview {
@@ -174,11 +174,6 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: transform 0.4s ease;
-        }
-
-        .example-item:hover .example-screenshot {
-            transform: scale(1.05);
         }
 
         .example-overlay {
