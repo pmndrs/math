@@ -169,9 +169,9 @@ import { easing, spring } from 'math/time'; // easings & springs
 **vec3**
 
 <table><tr>
-<td><a href="#vec3create"><code>vec3.create</code></a></td><td><a href="#vec3clone"><code>vec3.clone</code></a></td><td><a href="#vec3length"><code>vec3.length</code></a></td>
+<td><a href="#vec3create"><code>vec3.create</code></a></td><td><a href="#vec3clone"><code>vec3.clone</code></a></td><td><a href="#vec3fromvalues"><code>vec3.fromValues</code></a></td>
 </tr><tr>
-<td><a href="#vec3fromvalues"><code>vec3.fromValues</code></a></td><td><a href="#vec3copy"><code>vec3.copy</code></a></td><td><a href="#vec3set"><code>vec3.set</code></a></td>
+<td><a href="#vec3length"><code>vec3.length</code></a></td><td><a href="#vec3copy"><code>vec3.copy</code></a></td><td><a href="#vec3set"><code>vec3.set</code></a></td>
 </tr><tr>
 <td><a href="#vec3setscalar"><code>vec3.setScalar</code></a></td><td><a href="#vec3frombuffer"><code>vec3.fromBuffer</code></a></td><td><a href="#vec3tobuffer"><code>vec3.toBuffer</code></a></td>
 </tr><tr>
@@ -1729,18 +1729,6 @@ export function create(): Vec3;
 export function clone(a: Vec3): Vec3;
 ```
 
-#### `vec3.length`
-
-```ts
-/**
- * Calculates the length of a vec3
- *
- * @param a vector to calculate length of
- * @returns length of a
- */
-export function length(a: Vec3): number;
-```
-
 #### `vec3.fromValues`
 
 ```ts
@@ -1753,6 +1741,18 @@ export function length(a: Vec3): number;
  * @returns a new 3D vector
  */
 export function fromValues(x: number, y: number, z: number): Vec3;
+```
+
+#### `vec3.length`
+
+```ts
+/**
+ * Calculates the length of a vec3
+ *
+ * @param a vector to calculate length of
+ * @returns length of a
+ */
+export function length(a: Vec3): number;
 ```
 
 #### `vec3.copy`
