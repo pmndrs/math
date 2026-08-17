@@ -1,7 +1,6 @@
 import { EPSILON } from '../core/scalar';
 import type { Mat4 } from '../core/mat4';
 import type { Vec3 } from '../core/vec3';
-import * as vec3 from '../core/vec3';
 import type { Plane3 } from './plane3';
 import type { Sphere } from './sphere';
 
@@ -166,10 +165,6 @@ export function equals(a: Box3, b: Box3): boolean {
     );
 }
 
-const _setFromCenterAndSize_halfSize = /*@__PURE__*/ vec3.create();
-const _setFromCenterAndSize_min = /*@__PURE__*/ vec3.create();
-const _setFromCenterAndSize_max = /*@__PURE__*/ vec3.create();
-
 /**
  * Sets the box from a center point and size
  * @param out - The output Box3
@@ -178,15 +173,15 @@ const _setFromCenterAndSize_max = /*@__PURE__*/ vec3.create();
  * @returns The updated Box3
  */
 export function setFromCenterAndSize(out: Box3, center: Vec3, size: Vec3): Box3 {
-    const halfSize = vec3.scale(_setFromCenterAndSize_halfSize, size, 0.5);
-    vec3.sub(_setFromCenterAndSize_min, center, halfSize);
-    vec3.add(_setFromCenterAndSize_max, center, halfSize);
-    out[0] = _setFromCenterAndSize_min[0];
-    out[1] = _setFromCenterAndSize_min[1];
-    out[2] = _setFromCenterAndSize_min[2];
-    out[3] = _setFromCenterAndSize_max[0];
-    out[4] = _setFromCenterAndSize_max[1];
-    out[5] = _setFromCenterAndSize_max[2];
+    const hx = size[0] * 0.5;
+    const hy = size[1] * 0.5;
+    const hz = size[2] * 0.5;
+    out[0] = center[0] - hx;
+    out[1] = center[1] - hy;
+    out[2] = center[2] - hz;
+    out[3] = center[0] + hx;
+    out[4] = center[1] + hy;
+    out[5] = center[2] + hz;
     return out;
 }
 
@@ -457,124 +452,123 @@ export function intersectsBox3(boxA: Box3, boxB: Box3): boolean {
     );
 }
 
-const _center: Vec3 = [0, 0, 0];
-const _extents: Vec3 = [0, 0, 0];
-const _v0: Vec3 = [0, 0, 0];
-const _v1: Vec3 = [0, 0, 0];
-const _v2: Vec3 = [0, 0, 0];
-const _f0: Vec3 = [0, 0, 0];
-const _f1: Vec3 = [0, 0, 0];
-const _f2: Vec3 = [0, 0, 0];
-const _triangleNormal: Vec3 = [0, 0, 0];
-const _closestPoint: Vec3 = [0, 0, 0];
-
-const _axesCross: number[] = new Array(27); // 9 axes * 3 components
-const _axesBoxFaces: number[] = [1, 0, 0, 0, 1, 0, 0, 0, 1];
-const _axisTriangle: number[] = [0, 0, 0];
-
-function _satForAxes(axes: number[], axisCount: number): boolean {
-    for (let i = 0; i < axisCount; i++) {
-        const ax = axes[i * 3 + 0];
-        const ay = axes[i * 3 + 1];
-        const az = axes[i * 3 + 2];
-        // Skip degenerate axis (may occur if triangle edges parallel to axes)
-        if (ax === 0 && ay === 0 && az === 0) continue;
-
-        // Project triangle vertices
-        const p0 = _v0[0] * ax + _v0[1] * ay + _v0[2] * az;
-        const p1 = _v1[0] * ax + _v1[1] * ay + _v1[2] * az;
-        const p2 = _v2[0] * ax + _v2[1] * ay + _v2[2] * az;
-        let minP = p0;
-        let maxP = p0;
-        if (p1 < minP) minP = p1;
-        else if (p1 > maxP) maxP = p1;
-        if (p2 < minP) minP = p2;
-        else if (p2 > maxP) maxP = p2;
-
-        // Project AABB (centered at origin) radius onto axis
-        const r = _extents[0] * Math.abs(ax) + _extents[1] * Math.abs(ay) + _extents[2] * Math.abs(az);
-        if (maxP < -r || minP > r) return false; // Separating axis found
-    }
-    return true;
-}
-
+/**
+ * Test whether an axis-aligned bounding box intersects a triangle, via the
+ * separating-axis theorem over 13 axes: the 3 box face normals, the triangle
+ * face normal, and the 9 box-axis × triangle-edge cross products.
+ *
+ * Fully inlined with local scalars — no scratch arrays or per-call allocations.
+ * Axes are tested cheapest-first (box faces, i.e. the triangle-vs-box AABB
+ * reject) so the common non-overlapping case exits before any edge or cross
+ * product is computed. On each edge-cross axis two of the three vertices project
+ * to the same value (the axis is perpendicular to that edge), so only two
+ * projections are needed. An all-zero cross axis (edge parallel to a box axis)
+ * collapses every projection and the radius to 0, passing automatically.
+ */
 export function intersectsTriangle3(box: Box3, a: Vec3, b: Vec3, c: Vec3): boolean {
     // Empty box quick reject
     if (box[0] > box[3] || box[1] > box[4] || box[2] > box[5]) return false;
 
-    // Center ( (min+max) * 0.5 ) and half-extents ( max - center )
-    _center[0] = (box[0] + box[3]) * 0.5;
-    _center[1] = (box[1] + box[4]) * 0.5;
-    _center[2] = (box[2] + box[5]) * 0.5;
-    _extents[0] = box[3] - _center[0];
-    _extents[1] = box[4] - _center[1];
-    _extents[2] = box[5] - _center[2];
+    // Box center and half-extents
+    const cx = (box[0] + box[3]) * 0.5;
+    const cy = (box[1] + box[4]) * 0.5;
+    const cz = (box[2] + box[5]) * 0.5;
+    const ex = box[3] - cx;
+    const ey = box[4] - cy;
+    const ez = box[5] - cz;
 
-    // Translate triangle vertices so box center = origin
-    _v0[0] = a[0] - _center[0];
-    _v0[1] = a[1] - _center[1];
-    _v0[2] = a[2] - _center[2];
-    _v1[0] = b[0] - _center[0];
-    _v1[1] = b[1] - _center[1];
-    _v1[2] = b[2] - _center[2];
-    _v2[0] = c[0] - _center[0];
-    _v2[1] = c[1] - _center[1];
-    _v2[2] = c[2] - _center[2];
+    // Triangle vertices relative to the box center
+    const v0x = a[0] - cx;
+    const v0y = a[1] - cy;
+    const v0z = a[2] - cz;
+    const v1x = b[0] - cx;
+    const v1y = b[1] - cy;
+    const v1z = b[2] - cz;
+    const v2x = c[0] - cx;
+    const v2y = c[1] - cy;
+    const v2z = c[2] - cz;
 
-    // Edge vectors f0 = v1 - v0, etc.
-    _f0[0] = _v1[0] - _v0[0];
-    _f0[1] = _v1[1] - _v0[1];
-    _f0[2] = _v1[2] - _v0[2];
-    _f1[0] = _v2[0] - _v1[0];
-    _f1[1] = _v2[1] - _v1[1];
-    _f1[2] = _v2[2] - _v1[2];
-    _f2[0] = _v0[0] - _v2[0];
-    _f2[1] = _v0[1] - _v2[1];
-    _f2[2] = _v0[2] - _v2[2];
+    // 3 box face normals first: this is the triangle-AABB vs box reject and
+    // knocks out most non-overlapping pairs before any further work.
+    if (Math.min(v0x, v1x, v2x) > ex || Math.max(v0x, v1x, v2x) < -ex) return false;
+    if (Math.min(v0y, v1y, v2y) > ey || Math.max(v0y, v1y, v2y) < -ey) return false;
+    if (Math.min(v0z, v1z, v2z) > ez || Math.max(v0z, v1z, v2z) < -ez) return false;
 
-    // 9 cross-product axes between AABB axes (x,y,z) and triangle edges
-    // First trio (x cross f) => components (0,-fz,fy)
-    _axesCross[0] = 0;
-    _axesCross[1] = -_f0[2];
-    _axesCross[2] = _f0[1];
-    _axesCross[3] = 0;
-    _axesCross[4] = -_f1[2];
-    _axesCross[5] = _f1[1];
-    _axesCross[6] = 0;
-    _axesCross[7] = -_f2[2];
-    _axesCross[8] = _f2[1];
-    // Second trio (y cross f) => (fz,0,-fx)
-    _axesCross[9] = _f0[2];
-    _axesCross[10] = 0;
-    _axesCross[11] = -_f0[0];
-    _axesCross[12] = _f1[2];
-    _axesCross[13] = 0;
-    _axesCross[14] = -_f1[0];
-    _axesCross[15] = _f2[2];
-    _axesCross[16] = 0;
-    _axesCross[17] = -_f2[0];
-    // Third trio (z cross f) => (-fy,fx,0)
-    _axesCross[18] = -_f0[1];
-    _axesCross[19] = _f0[0];
-    _axesCross[20] = 0;
-    _axesCross[21] = -_f1[1];
-    _axesCross[22] = _f1[0];
-    _axesCross[23] = 0;
-    _axesCross[24] = -_f2[1];
-    _axesCross[25] = _f2[0];
-    _axesCross[26] = 0;
+    // Triangle edge vectors
+    const f0x = v1x - v0x;
+    const f0y = v1y - v0y;
+    const f0z = v1z - v0z;
+    const f1x = v2x - v1x;
+    const f1y = v2y - v1y;
+    const f1z = v2z - v1z;
+    const f2x = v0x - v2x;
+    const f2y = v0y - v2y;
+    const f2z = v0z - v2z;
 
-    if (!_satForAxes(_axesCross, 9)) return false;
+    let pa: number;
+    let pb: number;
+    let r: number;
 
-    // AABB face normals
-    if (!_satForAxes(_axesBoxFaces, 3)) return false;
+    // Triangle face normal (all three vertices share one projection)
+    const nx = f0y * f1z - f0z * f1y;
+    const ny = f0z * f1x - f0x * f1z;
+    const nz = f0x * f1y - f0y * f1x;
+    const d = v0x * nx + v0y * ny + v0z * nz;
+    r = ex * Math.abs(nx) + ey * Math.abs(ny) + ez * Math.abs(nz);
+    if (d > r || d < -r) return false;
 
-    // Triangle face normal
-    vec3.cross(_triangleNormal, _f0, _f1);
-    _axisTriangle[0] = _triangleNormal[0];
-    _axisTriangle[1] = _triangleNormal[1];
-    _axisTriangle[2] = _triangleNormal[2];
-    return _satForAxes(_axisTriangle, 1);
+    // 9 axes: box axis × triangle edge. The axis is perpendicular to its edge,
+    // so the two vertices on that edge project equally — only two projections
+    // (pa, pb) differ.
+    // box X (1,0,0) × edge => (0, -fz, fy)
+    pa = v0z * f0y - v0y * f0z;
+    pb = v2z * f0y - v2y * f0z;
+    r = ey * Math.abs(f0z) + ez * Math.abs(f0y);
+    if (Math.min(pa, pb) > r || Math.max(pa, pb) < -r) return false;
+
+    pa = v0z * f1y - v0y * f1z;
+    pb = v1z * f1y - v1y * f1z;
+    r = ey * Math.abs(f1z) + ez * Math.abs(f1y);
+    if (Math.min(pa, pb) > r || Math.max(pa, pb) < -r) return false;
+
+    pa = v0z * f2y - v0y * f2z;
+    pb = v1z * f2y - v1y * f2z;
+    r = ey * Math.abs(f2z) + ez * Math.abs(f2y);
+    if (Math.min(pa, pb) > r || Math.max(pa, pb) < -r) return false;
+
+    // box Y (0,1,0) × edge => (fz, 0, -fx)
+    pa = v0x * f0z - v0z * f0x;
+    pb = v2x * f0z - v2z * f0x;
+    r = ex * Math.abs(f0z) + ez * Math.abs(f0x);
+    if (Math.min(pa, pb) > r || Math.max(pa, pb) < -r) return false;
+
+    pa = v0x * f1z - v0z * f1x;
+    pb = v1x * f1z - v1z * f1x;
+    r = ex * Math.abs(f1z) + ez * Math.abs(f1x);
+    if (Math.min(pa, pb) > r || Math.max(pa, pb) < -r) return false;
+
+    pa = v0x * f2z - v0z * f2x;
+    pb = v1x * f2z - v1z * f2x;
+    r = ex * Math.abs(f2z) + ez * Math.abs(f2x);
+    if (Math.min(pa, pb) > r || Math.max(pa, pb) < -r) return false;
+
+    // box Z (0,0,1) × edge => (-fy, fx, 0)
+    pa = v0y * f0x - v0x * f0y;
+    pb = v2y * f0x - v2x * f0y;
+    r = ex * Math.abs(f0y) + ey * Math.abs(f0x);
+    if (Math.min(pa, pb) > r || Math.max(pa, pb) < -r) return false;
+
+    pa = v0y * f1x - v0x * f1y;
+    pb = v1y * f1x - v1x * f1y;
+    r = ex * Math.abs(f1y) + ey * Math.abs(f1x);
+    if (Math.min(pa, pb) > r || Math.max(pa, pb) < -r) return false;
+
+    pa = v0y * f2x - v0x * f2y;
+    pb = v1y * f2x - v1x * f2y;
+    r = ex * Math.abs(f2y) + ey * Math.abs(f2x);
+    if (Math.min(pa, pb) > r || Math.max(pa, pb) < -r) return false;
+
+    return true;
 }
 
 /**
@@ -582,13 +576,13 @@ export function intersectsTriangle3(box: Box3, a: Vec3, b: Vec3, c: Vec3): boole
  */
 export function intersectsSphere(box: Box3, sphere: Sphere): boolean {
     const { center, radius } = sphere;
-    // Clamp center to box to obtain closest point
-    _closestPoint[0] = center[0] < box[0] ? box[0] : center[0] > box[3] ? box[3] : center[0];
-    _closestPoint[1] = center[1] < box[1] ? box[1] : center[1] > box[4] ? box[4] : center[1];
-    _closestPoint[2] = center[2] < box[2] ? box[2] : center[2] > box[5] ? box[5] : center[2];
-    const dx = _closestPoint[0] - center[0];
-    const dy = _closestPoint[1] - center[1];
-    const dz = _closestPoint[2] - center[2];
+    const cx = center[0];
+    const cy = center[1];
+    const cz = center[2];
+    // distance from the sphere centre to the box along each axis (0 when inside)
+    const dx = cx < box[0] ? box[0] - cx : cx > box[3] ? cx - box[3] : 0;
+    const dy = cy < box[1] ? box[1] - cy : cy > box[4] ? cy - box[4] : 0;
+    const dz = cz < box[2] ? box[2] - cz : cz > box[5] ? cz - box[5] : 0;
     return dx * dx + dy * dy + dz * dz <= radius * radius;
 }
 
@@ -597,33 +591,16 @@ export function intersectsSphere(box: Box3, sphere: Sphere): boolean {
  */
 export function intersectsPlane3(box: Box3, plane: Plane3): boolean {
     const { normal, constant } = plane;
+    const nx = normal[0];
+    const ny = normal[1];
+    const nz = normal[2];
 
-    // Select extreme points along plane normal
-    let minDot = 0;
-    let maxDot = 0;
-
-    if (normal[0] > 0) {
-        minDot = normal[0] * box[0];
-        maxDot = normal[0] * box[3];
-    } else {
-        minDot = normal[0] * box[3];
-        maxDot = normal[0] * box[0];
-    }
-    if (normal[1] > 0) {
-        minDot += normal[1] * box[1];
-        maxDot += normal[1] * box[4];
-    } else {
-        minDot += normal[1] * box[4];
-        maxDot += normal[1] * box[1];
-    }
-    if (normal[2] > 0) {
-        minDot += normal[2] * box[2];
-        maxDot += normal[2] * box[5];
-    } else {
-        minDot += normal[2] * box[5];
-        maxDot += normal[2] * box[2];
-    }
-
-    // Plane intersection occurs if the interval [minDot + constant, maxDot + constant] straddles zero
-    return minDot + constant <= 0 && maxDot + constant >= 0;
+    // Signed distance from the box centre to the plane, and the box's projected
+    // half-extent (radius) onto the normal. Branchless equivalent of picking the
+    // near/far corners per axis: the box straddles the plane iff |s| <= r.
+    // Everything is kept at 2x scale (centre*2, extent*2) so the per-axis 0.5
+    // factors drop out; the |s| <= r test is unaffected.
+    const s = nx * (box[0] + box[3]) + ny * (box[1] + box[4]) + nz * (box[2] + box[5]) + 2 * constant;
+    const r = Math.abs(nx) * (box[3] - box[0]) + Math.abs(ny) * (box[4] - box[1]) + Math.abs(nz) * (box[5] - box[2]);
+    return s <= r && s >= -r;
 }
