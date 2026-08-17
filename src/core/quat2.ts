@@ -29,16 +29,7 @@ export function create(): Quat2 {
  * @function
  */
 export function clone(a: Quat2): Quat2 {
-    const dq = create();
-    dq[0] = a[0];
-    dq[1] = a[1];
-    dq[2] = a[2];
-    dq[3] = a[3];
-    dq[4] = a[4];
-    dq[5] = a[5];
-    dq[6] = a[6];
-    dq[7] = a[7];
-    return dq;
+    return [a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]];
 }
 
 /**
@@ -65,16 +56,7 @@ export function fromValues(
     z2: number,
     w2: number,
 ): Quat2 {
-    const dq = create();
-    dq[0] = x1;
-    dq[1] = y1;
-    dq[2] = z1;
-    dq[3] = w1;
-    dq[4] = x2;
-    dq[5] = y2;
-    dq[6] = z2;
-    dq[7] = w2;
-    return dq;
+    return [x1, y1, z1, w1, x2, y2, z2, w2];
 }
 
 /**
