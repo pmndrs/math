@@ -39,6 +39,28 @@
             transition: transform 0.3s ease;
             z-index: 1000;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            /* slim custom scrollbar (Firefox) */
+            scrollbar-width: thin;
+            scrollbar-color: #3a464e transparent;
+        }
+
+        /* slim custom scrollbar (WebKit / Chromium) */
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #3a464e;
+            border-radius: 4px;
+            border: 2px solid var(--color-background);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #4a5b64;
         }
 
         .sidebar.open {
@@ -122,22 +144,18 @@
             text-decoration: none;
             cursor: pointer;
             border: 1px solid var(--color-border);
-            border-radius: 12px;
+            border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-            transition: transform 0.18s ease, box-shadow 0.18s ease,
-                border-color 0.18s ease;
+            transition: transform 0.18s ease, border-color 0.18s ease;
         }
 
         .example-item:hover {
             transform: translateY(-3px);
             border-color: #4a5b64;
-            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.38);
         }
 
         .example-item.active {
             border-color: #0288d1;
-            box-shadow: 0 0 0 1px #0288d1, 0 10px 24px rgba(2, 136, 209, 0.28);
         }
 
         .example-preview {
