@@ -2,6 +2,9 @@
 // computational-geometry algorithms (hull, circumcircle) live in math/geometry.
 export type * from '../core';
 
+export * as box2 from './box2';
+export type { Box2 } from './box2';
+
 export * as box3 from './box3';
 export type { Box3 } from './box3';
 
