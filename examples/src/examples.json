@@ -1,4 +1,15 @@
 {
+    "example-fibonacci-sphere": {
+        "title": "Fibonacci Sphere",
+        "description": "Points spread evenly over a sphere with the Fibonacci lattice, built in math's spherical coordinates (spherical.toVec3) — each steps one equal-area band down while turning by the golden angle, so sunflower-like spiral arms emerge. Nudge the twist off φ to shear them into spokes.",
+        "tags": [
+            "spherical",
+            "fibonacci",
+            "golden-angle",
+            "vec3"
+        ],
+        "category": "basics"
+    },
     "example-convex-hull-3d": {
         "title": "Convex Hull 3D",
         "description": "A point cloud (the Stanford bunny, primitives, or random) and its convex hull, computed with math's quickhull3 and drawn as a rainbow shell over the points.",
