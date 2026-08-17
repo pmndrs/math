@@ -176,13 +176,9 @@ describe('quat2', () => {
             const dq: Quat2 = [1, 2, 3, 4, 5, 6, 7, 8];
             const result: Quat = [0, 0, 0, 0];
 
-            // Extract real part manually since getReal may have type issues
-            result[0] = dq[0];
-            result[1] = dq[1];
-            result[2] = dq[2];
-            result[3] = dq[3];
-
+            const returned = quat2.getReal(result, dq);
             expect(result).toEqual([1, 2, 3, 4]);
+            expect(returned).toBe(result);
         });
     });
 
@@ -201,13 +197,9 @@ describe('quat2', () => {
             const dq: Quat2 = [0, 0, 0, 0, 5, 6, 7, 8];
             const realPart: Quat = [1, 2, 3, 4];
 
-            // Set real part manually since setReal may have type issues
-            dq[0] = realPart[0];
-            dq[1] = realPart[1];
-            dq[2] = realPart[2];
-            dq[3] = realPart[3];
-
+            const result = quat2.setReal(dq, realPart);
             expect(dq).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+            expect(result).toBe(dq);
         });
     });
 
@@ -448,7 +440,7 @@ describe('quat2', () => {
             const a: Quat2 = [1, 2, 3, 4, 5, 6, 7, 8];
             const b: Quat2 = [2, 3, 4, 5, 6, 7, 8, 9];
 
-            const result = quat2.dot(a as unknown as Quat, b as unknown as Quat);
+            const result = quat2.dot(a, b);
             expect(result).toBe(40); // 1*2 + 2*3 + 3*4 + 4*5 = 2 + 6 + 12 + 20 = 40
         });
     });
@@ -541,7 +533,7 @@ describe('quat2', () => {
     describe('length', () => {
         it('should calculate length of dual quaternion', () => {
             const dq: Quat2 = [3, 4, 0, 0, 0, 0, 0, 0];
-            const length = quat2.length(dq as unknown as Quat);
+            const length = quat2.length(dq);
 
             expect(length).toBe(5); // sqrt(3^2 + 4^2) = 5
         });
@@ -550,7 +542,7 @@ describe('quat2', () => {
             const dq = quat2.create();
             quat2.identity(dq);
 
-            const length = quat2.length(dq as unknown as Quat);
+            const length = quat2.length(dq);
             expect(length).toBe(1);
         });
     });
@@ -558,7 +550,7 @@ describe('quat2', () => {
     describe('squaredLength', () => {
         it('should calculate squared length of dual quaternion', () => {
             const dq: Quat2 = [3, 4, 0, 0, 0, 0, 0, 0];
-            const sqrLength = quat2.squaredLength(dq as unknown as Quat);
+            const sqrLength = quat2.squaredLength(dq);
 
             expect(sqrLength).toBe(25); // 3^2 + 4^2 = 25
         });
@@ -578,7 +570,7 @@ describe('quat2', () => {
             expect(result[3]).toBe(0);
 
             // Length should be 1
-            const length = quat2.length(result as unknown as Quat);
+            const length = quat2.length(result);
             expect(length).toBeCloseTo(1);
         });
 
@@ -686,7 +678,7 @@ describe('quat2', () => {
             dq = quat2.translate(dq, dq, [2, 1, 1]);
 
             // Should be a valid dual quaternion
-            const length = quat2.length(dq as unknown as Quat);
+            const length = quat2.length(dq);
             expect(length).toBeGreaterThan(0);
 
             // Should be able to extract meaningful components

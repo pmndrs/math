@@ -282,7 +282,13 @@ export function set(
  * @param  a Dual Quaternion
  * @return real part
  */
-export const getReal = quat.copy;
+export function getReal(out: Quat, a: Quat2): Quat {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+    out[3] = a[3];
+    return out;
+}
 
 /**
  * Gets the dual part of a dual quat
@@ -301,12 +307,17 @@ export function getDual(out: Quat, a: Quat2): Quat {
 /**
  * Set the real component of a dual quat to the given quaternion
  *
- * @param out the receiving quaternion
+ * @param out the receiving dual quaternion
  * @param q a quaternion representing the real part
  * @returns out
- * @function
  */
-export const setReal = quat.copy;
+export function setReal(out: Quat2, q: Quat): Quat2 {
+    out[0] = q[0];
+    out[1] = q[1];
+    out[2] = q[2];
+    out[3] = q[3];
+    return out;
+}
 
 /**
  * Set the dual component of a dual quat to the given quaternion
@@ -397,7 +408,18 @@ export function rotateX(out: Quat2, a: Quat2, rad: number): Quat2 {
     const ay1 = ay * bw + aw * by + az * bx - ax * bz;
     const az1 = az * bw + aw * bz + ax * by - ay * bx;
     const aw1 = aw * bw - ax * bx - ay * by - az * bz;
-    quat.rotateX(out as unknown as Quat, a as unknown as Quat, rad);
+    // rotate the real (rotation) part about X — inlined quat.rotateX on out[0..3]
+    const half = rad * 0.5;
+    const s = Math.sin(half);
+    const c = Math.cos(half);
+    const rx = a[0];
+    const ry = a[1];
+    const rz = a[2];
+    const rw = a[3];
+    out[0] = rx * c + rw * s;
+    out[1] = ry * c + rz * s;
+    out[2] = rz * c - ry * s;
+    out[3] = rw * c - rx * s;
     bx = out[0];
     by = out[1];
     bz = out[2];
@@ -430,7 +452,18 @@ export function rotateY(out: Quat2, a: Quat2, rad: number): Quat2 {
     const ay1 = ay * bw + aw * by + az * bx - ax * bz;
     const az1 = az * bw + aw * bz + ax * by - ay * bx;
     const aw1 = aw * bw - ax * bx - ay * by - az * bz;
-    quat.rotateY(out as unknown as Quat, a as unknown as Quat, rad);
+    // rotate the real (rotation) part about Y — inlined quat.rotateY on out[0..3]
+    const half = rad * 0.5;
+    const s = Math.sin(half);
+    const c = Math.cos(half);
+    const rx = a[0];
+    const ry = a[1];
+    const rz = a[2];
+    const rw = a[3];
+    out[0] = rx * c - rz * s;
+    out[1] = ry * c + rw * s;
+    out[2] = rz * c + rx * s;
+    out[3] = rw * c - ry * s;
     bx = out[0];
     by = out[1];
     bz = out[2];
@@ -463,7 +496,18 @@ export function rotateZ(out: Quat2, a: Quat2, rad: number): Quat2 {
     const ay1 = ay * bw + aw * by + az * bx - ax * bz;
     const az1 = az * bw + aw * bz + ax * by - ay * bx;
     const aw1 = aw * bw - ax * bx - ay * by - az * bz;
-    quat.rotateZ(out as unknown as Quat, a as unknown as Quat, rad);
+    // rotate the real (rotation) part about Z — inlined quat.rotateZ on out[0..3]
+    const half = rad * 0.5;
+    const s = Math.sin(half);
+    const c = Math.cos(half);
+    const rx = a[0];
+    const ry = a[1];
+    const rz = a[2];
+    const rw = a[3];
+    out[0] = rx * c + ry * s;
+    out[1] = ry * c - rx * s;
+    out[2] = rz * c + rw * s;
+    out[3] = rw * c - rz * s;
     bx = out[0];
     by = out[1];
     bz = out[2];
@@ -675,9 +719,10 @@ export function scale(out: Quat2, a: Quat2, b: number): Quat2 {
  * @param a the first operand
  * @param b the second operand
  * @returns dot product of a and b
- * @function
  */
-export const dot = quat.dot;
+export function dot(a: Quat2, b: Quat2): number {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+}
 
 /**
  * Performs a linear interpolation between two dual quats's
@@ -691,7 +736,8 @@ export const dot = quat.dot;
  */
 export function lerp(out: Quat2, a: Quat2, b: Quat2, t: number): Quat2 {
     const mt = 1 - t;
-    if (dot(a as unknown as Quat, b as unknown as Quat) < 0) t = -t;
+    // dot of the real (rotation) parts, matching quat2.dot
+    if (a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3] < 0) t = -t;
 
     out[0] = a[0] * mt + b[0] * t;
     out[1] = a[1] * mt + b[1] * t;
@@ -713,7 +759,7 @@ export function lerp(out: Quat2, a: Quat2, b: Quat2, t: number): Quat2 {
  * @returns out
  */
 export function invert(out: Quat2, a: Quat2): Quat2 {
-    const sqlen = squaredLength(a as unknown as Quat);
+    const sqlen = a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3];
     out[0] = -a[0] / sqlen;
     out[1] = -a[1] / sqlen;
     out[2] = -a[2] / sqlen;
@@ -746,13 +792,18 @@ export function conjugate(out: Quat2, a: Quat2): Quat2 {
 }
 
 /**
- * Calculates the length of a dual quat
+ * Calculates the length of a dual quat (the length of its real/rotation part)
  *
  * @param a dual quat to calculate length of
  * @returns length of a
- * @function
  */
-export const length = quat.length;
+export function length(a: Quat2): number {
+    const x = a[0];
+    const y = a[1];
+    const z = a[2];
+    const w = a[3];
+    return Math.sqrt(x * x + y * y + z * z + w * w);
+}
 
 /**
  * Alias for {@link quat2.length}
@@ -761,13 +812,18 @@ export const length = quat.length;
 export const len = length;
 
 /**
- * Calculates the squared length of a dual quat
+ * Calculates the squared length of a dual quat (the squared length of its real/rotation part)
  *
  * @param a dual quat to calculate squared length of
  * @returns squared length of a
- * @function
  */
-export const squaredLength = quat.squaredLength;
+export function squaredLength(a: Quat2): number {
+    const x = a[0];
+    const y = a[1];
+    const z = a[2];
+    const w = a[3];
+    return x * x + y * y + z * z + w * w;
+}
 
 /**
  * Alias for {@link quat2.squaredLength}
@@ -784,7 +840,7 @@ export const sqrLen = squaredLength;
  * @function
  */
 export function normalize(out: Quat2, a: Quat2): Quat2 {
-    let magnitude = squaredLength(a as unknown as Quat);
+    let magnitude = a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3];
     if (magnitude > 0) {
         magnitude = Math.sqrt(magnitude);
 
