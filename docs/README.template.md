@@ -11,6 +11,10 @@ math is a collection of math helpers for graphics and simulations.
 > npm install math@canary
 ```
 
+## What's inside
+
+<ApiGroups />
+
 ## Quick Start
 
 <Snippet source="./quick-start.ts" select="core" />
@@ -28,10 +32,6 @@ The library is grouped by domain behind subpath entrypoints. All APIs are highly
 - **[API.md](./API.md)** — every export with its signature and a one-line description, grouped by module. Flat and greppable, so it's easy to search or hand to an AI coding assistant.
 - **[Online API docs](https://pmndrs.github.io/math/docs/)** — the full typedoc reference, with search and cross-links.
 - **[What's inside](#whats-inside)** — jump straight to a module or namespace.
-
-## What's inside
-
-<ApiGroups />
 
 ## Acknowledgements:
 
