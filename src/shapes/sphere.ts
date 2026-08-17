@@ -10,3 +10,17 @@ export type Sphere = { center: Vec3; radius: number };
 export function create(): Sphere {
     return { center: [0, 0, 0], radius: 1 };
 }
+
+/**
+ * Returns true if a point lies inside (or on the surface of) the sphere.
+ *
+ * @param sphere the sphere
+ * @param point the point to test
+ * @returns true if the point is within the sphere's radius
+ */
+export function containsPoint(sphere: Sphere, point: Vec3): boolean {
+    const dx = point[0] - sphere.center[0];
+    const dy = point[1] - sphere.center[1];
+    const dz = point[2] - sphere.center[2];
+    return dx * dx + dy * dy + dz * dz <= sphere.radius * sphere.radius;
+}
