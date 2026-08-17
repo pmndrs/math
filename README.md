@@ -20,7 +20,6 @@ math is a collection of math helpers for graphics and simulations.
 - TypeScript-first, great DX for both JavaScript and TypeScript projects
 - Excellent tree-shaking support, with a subpath entrypoint per module group
 
-
 ## Quick Start
 
 ```ts
@@ -3050,7 +3049,7 @@ export function equals(a: Euler, b: Euler): boolean;
 /**
  * Sets the Euler angles from a quaternion.
  * @param out The output Euler.
- * @param q The input quaternion.
+ * @param q The input quaternion. Assumed to be normalized (unit length).
  * @param order The order of the Euler.
  * @returns The output Euler
  */
