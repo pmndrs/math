@@ -20,7 +20,6 @@ math is a collection of math helpers for graphics and simulations.
 - TypeScript-first, great DX for both JavaScript and TypeScript projects
 - Excellent tree-shaking support, with a subpath entrypoint per module group
 
-
 ## Quick Start
 
 <Snippet source="./quick-start.ts" select="core" />
