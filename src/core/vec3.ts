@@ -23,11 +23,19 @@ export function create(): Vec3 {
  * @returns a new 3D vector
  */
 export function clone(a: Vec3): Vec3 {
-    const out: Vec3 = [0, 0, 0];
-    out[0] = a[0];
-    out[1] = a[1];
-    out[2] = a[2];
-    return out;
+    return [a[0], a[1], a[2]];
+}
+
+/**
+ * Creates a new vec3 initialized with the given values
+ *
+ * @param x X component
+ * @param y Y component
+ * @param z Z component
+ * @returns a new 3D vector
+ */
+export function fromValues(x: number, y: number, z: number): Vec3 {
+    return [x, y, z];
 }
 
 /**
@@ -41,22 +49,6 @@ export function length(a: Vec3): number {
     const y = a[1];
     const z = a[2];
     return Math.sqrt(x * x + y * y + z * z);
-}
-
-/**
- * Creates a new vec3 initialized with the given values
- *
- * @param x X component
- * @param y Y component
- * @param z Z component
- * @returns a new 3D vector
- */
-export function fromValues(x: number, y: number, z: number): Vec3 {
-    const out: Vec3 = [0, 0, 0];
-    out[0] = x;
-    out[1] = y;
-    out[2] = z;
-    return out;
 }
 
 /**
