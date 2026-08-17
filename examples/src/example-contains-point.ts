@@ -7,7 +7,7 @@ import { rainbowRGB, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
 
 // A lattice of points, and an oriented box (obb3) tumbling through it. Every
-// frame each point asks obb3.containsPoint — inside points glow the flowing
+// frame each point asks obb3.containsPoint - inside points glow the flowing
 // rainbow, outside points fade to a faint lattice. The box itself is never
 // drawn; you see it purely as the region of lit points it carves out.
 // obb3.containsPoint projects each point onto the box's own rotated axes and
@@ -87,7 +87,7 @@ const instanceGlow = g.attribute(intensityBuffer, { stride: 4, offset: 0, instan
 
 const pos = g.attribute('position', d.vec3f);
 const nrm = g.attribute('normal', d.vec3f);
-// inside points swell, outside points shrink — so the lit region reads boldly
+// inside points swell, outside points shrink - so the lit region reads boldly
 const grow = g.mul(pos, g.f32(0.5).add(instanceGlow.mul(g.f32(1.2))));
 const world = g.mul(instanceTransform, g.vec4(grow, g.f32(1)));
 const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
@@ -110,7 +110,7 @@ points.count = COUNT;
 scene.add(points);
 scene.updateWorldMatrix();
 
-/* the oriented box (never drawn — only its containsPoint matters) */
+/* the oriented box (never drawn - only its containsPoint matters) */
 
 const obb: OBB3 = obb3.create();
 obb.halfExtents = [2.1, 0.8, 1.3]; // a distinct, non-cube box so the rotation reads clearly

@@ -6,7 +6,7 @@ import { rainbowRGB, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
 
 // A grid of arrows that all turn to point at a glowing orb as it wanders above
-// them — like sunflowers tracking the sun. Each arrow aims with a single call:
+// them - like sunflowers tracking the sun. Each arrow aims with a single call:
 // quat.rotationTo([0,1,0], normalize(target - position)) gives the shortest
 // rotation that swings its +Y tip onto the target. The orb drifts on a Lissajous
 // path, so the field sweeps and fans out in unison. The arrow geometry (cylinder
@@ -38,7 +38,7 @@ function buildArrowGeometry(): { positions: Float32Array; normals: Float32Array;
         return vi++;
     };
 
-    // shaft side — smooth radial normals
+    // shaft side - smooth radial normals
     const shaftBot: number[] = [];
     const shaftTopR: number[] = [];
     for (let i = 0; i < R; i++) {
@@ -71,7 +71,7 @@ function buildArrowGeometry(): { positions: Float32Array; normals: Float32Array;
     }
     for (let i = 0; i < R; i++) indices.push(cbCenter, cbRing[i], cbRing[(i + 1) % R]);
 
-    // cone side — faceted, one flat normal per segment
+    // cone side - faceted, one flat normal per segment
     const h = headTip - headBase;
     for (let i = 0; i < R; i++) {
         const a0 = (i / R) * TAU;
@@ -154,7 +154,7 @@ for (let ix = 0; ix < GRID; ix++) {
     }
 }
 
-/* the glowing orb the arrows track — a bright unlit sphere */
+/* the glowing orb the arrows track - a bright unlit sphere */
 
 const orbGeometry = g.createSphereGeometry(0.22, 24, 16);
 const orbPos = g.attribute('position', d.vec3f);

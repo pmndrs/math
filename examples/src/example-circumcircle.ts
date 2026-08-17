@@ -9,7 +9,7 @@ import { createRenderer } from './common/renderer';
 
 // A triangle that morphs between shapes, with its circumcircle (math's
 // circumcircle) recomputed every frame. As the triangle flattens toward
-// degenerate the circumcircle balloons — watch the circumradius readout. The
+// degenerate the circumcircle balloons - watch the circumradius readout. The
 // ring is drawn with the flowing brand rainbow (see common/rainbow).
 
 /* shapes */
@@ -115,7 +115,7 @@ const centerDot = makeDot([1.0, 0.243, 0.647]);
 
 // a picker-style column of the shape names (DOM overlay). the column scrolls so
 // the active shape sits at the vertical centre, dimming and shrinking with
-// distance — driven from the same eased morph index as the triangle.
+// distance - driven from the same eased morph index as the triangle.
 const ROW_HEIGHT = 46;
 const wheel = document.createElement('div');
 wheel.style.cssText = 'position:absolute;left:40px;top:50%;width:220px;height:0;pointer-events:none;font-family:var(--mc-mono)';
