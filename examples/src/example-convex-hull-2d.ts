@@ -63,8 +63,6 @@ controls.dampingFactor = 0.1;
 controls.enableRotate = false;
 controls.enablePan = false;
 
-renderer.setInspector(new g.Inspector());
-
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -180,7 +178,7 @@ canvas.addEventListener('pointerleave', () => {
 const readout = document.createElement('div');
 readout.className = 'mc-info';
 readout.style.left = '16px';
-readout.style.top = '14px';
+readout.style.bottom = '16px';
 document.body.appendChild(readout);
 
 /* render */

@@ -39,8 +39,6 @@ const controls = new g.OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.1;
 
-renderer.setInspector(new g.Inspector());
-
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -146,7 +144,7 @@ scene.add(new g.Mesh(geometry, material));
 const readout = document.createElement('div');
 readout.className = 'mc-info';
 readout.style.left = '16px';
-readout.style.top = '16px';
+readout.style.bottom = '16px';
 readout.textContent = `${GRID} × ${GRID} grid · simplex2d`;
 document.body.appendChild(readout);
 

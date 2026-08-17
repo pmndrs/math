@@ -6,9 +6,18 @@ import { dashboard, type Panel } from 'dashcat';
  * survives window resizes (until the user drags the panel, which restores left).
  */
 export function pinTopRight(panel: Panel, margin = 16): void {
-    panel.root.style.left = 'auto';
-    panel.root.style.right = `${margin}px`;
-    panel.root.style.top = `${margin}px`;
+    const apply = () => {
+        panel.root.style.left = 'auto';
+        panel.root.style.right = `${margin}px`;
+        panel.root.style.top = `${margin}px`;
+    };
+    apply();
+    // dashcat clamps every panel back inside the viewport on resize by writing an
+    // explicit `left`, which overrides our right-anchoring — the panel drifts
+    // inward as the window shrinks and never returns when it grows again. Our
+    // listener is registered after dashcat's, so re-applying here wins and keeps
+    // the panel pinned to the top-right through any resize.
+    window.addEventListener('resize', apply);
 }
 
 /**

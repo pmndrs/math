@@ -51,8 +51,6 @@ const controls = new g.OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.1;
 
-renderer.setInspector(new g.Inspector());
-
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -102,7 +100,7 @@ scene.add(eulerBox);
 const readout = document.createElement('div');
 readout.className = 'mc-info';
 readout.style.left = '16px';
-readout.style.top = '16px';
+readout.style.bottom = '16px';
 document.body.appendChild(readout);
 
 /* render */
