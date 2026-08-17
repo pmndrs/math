@@ -1,6 +1,6 @@
+import { dashboard } from 'dashcat';
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import GUI from 'lil-gui';
 import { mat4, quat, vec3 as v3 } from 'math';
 import { quickhull3 } from 'math/geometry';
 import { mulberry32 } from 'math/random';
@@ -272,11 +272,10 @@ async function select(name: string) {
     rebuild(await VARIATIONS[name]());
 }
 
-const gui = new GUI();
-gui.add(settings, 'variation', Object.keys(VARIATIONS))
-    .name('Point set')
-    .onChange((v: string) => select(v));
-gui.add({ regenerate: () => select(settings.variation) }, 'regenerate').name('↻ Regenerate');
+const dash = dashboard();
+const panel = dash.panel({ title: 'convex hull 3d' });
+panel.add(settings, 'variation', { options: Object.keys(VARIATIONS), label: 'Point set' }).onChange((v: string) => select(v));
+panel.button('↻ Regenerate', () => select(settings.variation));
 
 await select(settings.variation);
 camera.updateViewMatrix();
