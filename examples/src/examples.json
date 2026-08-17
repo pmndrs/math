@@ -21,6 +21,18 @@
         ],
         "category": "basics"
     },
+    "example-contains-point": {
+        "title": "Contains Point",
+        "description": "A lattice of points with three math/shapes solids drifting through it — an AABB (box3), a spinning oriented box (obb3), and a pulsing sphere. Each point asks the shapes containsPoint every frame; inside points glow the rainbow, so the never-drawn solids are revealed as the region of lit points they carve out.",
+        "tags": [
+            "shapes",
+            "containsPoint",
+            "box3",
+            "obb3",
+            "sphere"
+        ],
+        "category": "shapes"
+    },
     "example-convex-hull-3d": {
         "title": "Convex Hull 3D",
         "description": "A point cloud (the Stanford bunny, primitives, or random) and its convex hull, computed with math's quickhull3 and drawn as a rainbow shell over the points.",
