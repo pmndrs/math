@@ -11,9 +11,9 @@ import { createRenderer } from './common/renderer';
 // polygon morphs and points light up (rainbow markers) when they join it.
 // One point is yours: move the mouse (or drag a finger) and it steers to the
 // pointer, so you can push it onto the hull and watch quickhull2 re-solve live.
-// Nothing special about that point's look — it's driven by data, so it goes grey
+// Nothing special about that point's look - it's driven by data, so it goes grey
 // like the rest when off the hull and lights up like the rest when on it. The
-// screen point is unprojected onto the z=0 plane with math (inverse view·proj).
+// screen point is unprojected onto the z=0 plane with math (inverse view*proj).
 
 const POINT_COUNT = 16;
 const CONTROLLED = 0; // this point follows the pointer while you interact
@@ -71,10 +71,10 @@ window.addEventListener('resize', () => {
 
 /* objects */
 
-// hull outline (rainbow, closed) — allocated for the worst case (all points on hull)
+// hull outline (rainbow, closed) - allocated for the worst case (all points on hull)
 const hullPoints = new Float32Array(POINT_COUNT * 3);
 const hullGeometry = new g.LineGeometry(hullPoints, true, POINT_COUNT);
-const hullLine = new g.Line(hullGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2.5), lineWidth: 3 }));
+const hullLine = new g.Line(hullGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2.5), lineWidth: 10 }));
 scene.add(hullLine);
 
 // two shared materials: grey for interior points, rainbow for hull vertices
@@ -114,7 +114,7 @@ const steerTarget: [number, number] = [0, 0];
 let steering = false; // is the pointer currently driving the point?
 let touchDown = false; // a finger is held (touch has no hover to steer with)
 
-// unproject a screen point onto the z=0 plane using math (inverse of proj·view)
+// unproject a screen point onto the z=0 plane using math (inverse of proj*view)
 const invVP = mat4.create();
 const rayNear = vec4.create();
 const rayFar = vec4.create();
@@ -170,7 +170,7 @@ canvas.addEventListener('pointercancel', () => {
 });
 canvas.addEventListener('pointerleave', () => {
     touchDown = false;
-    steering = false; // mouse left the canvas — ease the point back into its drift
+    steering = false; // mouse left the canvas - ease the point back into its drift
 });
 
 /* readout */
@@ -238,8 +238,8 @@ function frame(tms: number) {
 
     const onHull = hull.includes(CONTROLLED);
     readout.innerHTML =
-        `points ${POINT_COUNT} · hull ${hull.length} · quickhull2 ${hullMs.toFixed(2)}ms` +
-        `<br><span class="mc-dim">steer a point with the pointer — ${onHull ? 'yours is on the hull' : 'push it onto the hull'}</span>`;
+        `points ${POINT_COUNT} | hull ${hull.length} | quickhull2 ${hullMs.toFixed(2)}ms` +
+        `<br><span class="mc-dim">steer a point with the pointer - ${onHull ? 'yours is on the hull' : 'push it onto the hull'}</span>`;
 
     scene.updateWorldMatrix();
     camera.updateViewMatrix();

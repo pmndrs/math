@@ -7,7 +7,7 @@ import { createRenderer } from './common/renderer';
 // A flow field: hundreds of particles advected along an angle field derived from
 // math's simplex2d noise, leaving fading rainbow trails. Each particle reads
 // the noise at its position to pick a heading, drifts along it, and respawns when
-// it wanders off or ages out — so the field is continuously traced by streams.
+// it wanders off or ages out - so the field is continuously traced by streams.
 
 const PARTICLES = 2200;
 const TRAIL = 20; // positions kept per particle
@@ -76,7 +76,7 @@ window.addEventListener('resize', () => {
 const SEGMENTS = PARTICLES * (TRAIL - 1);
 const segmentPoints = new Float32Array(SEGMENTS * 2 * 3);
 const trailsGeometry = new g.LineSegmentsGeometry(segmentPoints, SEGMENTS * 2);
-const trails = new g.LineSegments(trailsGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2.5), lineWidth: 2.5 }));
+const trails = new g.LineSegments(trailsGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2.5), lineWidth: 5 }));
 scene.add(trails);
 
 /* render */
