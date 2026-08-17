@@ -4,7 +4,6 @@ import type { Mat4 } from '../core/mat4';
 import type { Quat } from '../core/quat';
 import { EPSILON } from '../core/scalar';
 import type { Vec3 } from '../core/vec3';
-import * as vec3 from '../core/vec3';
 import type { Box3 } from './box3';
 
 /** An oriented bounding box in 3D space */
@@ -515,49 +514,85 @@ export function intersectsBox3(obb: OBB3, aabb: Box3): boolean {
  * @param matrix - The 4x4 transformation matrix
  * @returns out
  */
-const _applyMatrix4_rotationMat = /*@__PURE__*/ mat3.create();
-
 export function applyMatrix4(out: OBB3, obb: OBB3, matrix: Mat4): OBB3 {
-    const e = matrix;
+    // read the upper-left 3x3 (the affine linear part) into locals once. Columns
+    // m0*, m1*, m2* correspond to mat4 columns 0, 1, 2.
+    const m00 = matrix[0];
+    const m01 = matrix[1];
+    const m02 = matrix[2];
+    const m10 = matrix[4];
+    const m11 = matrix[5];
+    const m12 = matrix[6];
+    const m20 = matrix[8];
+    const m21 = matrix[9];
+    const m22 = matrix[10];
 
-    // Extract scale from matrix
-    let sx = Math.sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
-    const sy = Math.sqrt(e[4] * e[4] + e[5] * e[5] + e[6] * e[6]);
-    const sz = Math.sqrt(e[8] * e[8] + e[9] * e[9] + e[10] * e[10]);
+    // extract scale as the length of each column (always non-negative).
+    const sx = Math.sqrt(m00 * m00 + m01 * m01 + m02 * m02);
+    const sy = Math.sqrt(m10 * m10 + m11 * m11 + m12 * m12);
+    const sz = Math.sqrt(m20 * m20 + m21 * m21 + m22 * m22);
 
-    // Handle negative scale (reflection). For an affine matrix the 4x4 determinant
-    // equals the upper-left 3x3 determinant, so we only need that (and only its sign).
-    const det = e[0] * (e[5] * e[10] - e[9] * e[6]) - e[4] * (e[1] * e[10] - e[9] * e[2]) + e[8] * (e[1] * e[6] - e[5] * e[2]);
-    if (det < 0) sx = -sx;
-
-    // Extract rotation
-    mat3.fromMat4(_applyMatrix4_rotationMat, matrix);
-
-    // Remove scale from rotation
-    const invSX = 1 / sx;
+    // handle negative scale (reflection).
+    // for an affine matrix the 4x4 determinant equals the upper-left 3x3 determinant, so we only need that (and only its sign).
+    // the reflection is folded into the first rotation column via invSX so that the extracted basis stays right-handed while the half extents remain positive.
+    const det = m00 * (m11 * m22 - m21 * m12) - m10 * (m01 * m22 - m21 * m02) + m20 * (m01 * m12 - m11 * m02);
+    const invSX = (det < 0 ? -1 : 1) / sx;
     const invSY = 1 / sy;
     const invSZ = 1 / sz;
 
-    _applyMatrix4_rotationMat[0] *= invSX;
-    _applyMatrix4_rotationMat[1] *= invSX;
-    _applyMatrix4_rotationMat[2] *= invSX;
-    _applyMatrix4_rotationMat[3] *= invSY;
-    _applyMatrix4_rotationMat[4] *= invSY;
-    _applyMatrix4_rotationMat[5] *= invSY;
-    _applyMatrix4_rotationMat[6] *= invSZ;
-    _applyMatrix4_rotationMat[7] *= invSZ;
-    _applyMatrix4_rotationMat[8] *= invSZ;
+    // normalized rotation columns (scale removed).
+    const r00 = m00 * invSX;
+    const r01 = m01 * invSX;
+    const r02 = m02 * invSX;
+    const r10 = m10 * invSY;
+    const r11 = m11 * invSY;
+    const r12 = m12 * invSY;
+    const r20 = m20 * invSZ;
+    const r21 = m21 * invSZ;
+    const r22 = m22 * invSZ;
 
-    // Combine rotations: out.rotation = extractedRotation * obb.rotation
-    mat3.multiply(out.rotation, _applyMatrix4_rotationMat, obb.rotation);
+    // cache the obb's rotation before writing to out.rotation (supports out === obb).
+    const q = obb.rotation;
+    const q0 = q[0];
+    const q1 = q[1];
+    const q2 = q[2];
+    const q3 = q[3];
+    const q4 = q[4];
+    const q5 = q[5];
+    const q6 = q[6];
+    const q7 = q[7];
+    const q8 = q[8];
 
-    // Scale half extents
-    out.halfExtents[0] = obb.halfExtents[0] * Math.abs(sx);
-    out.halfExtents[1] = obb.halfExtents[1] * Math.abs(sy);
-    out.halfExtents[2] = obb.halfExtents[2] * Math.abs(sz);
+    // combine rotations: out.rotation = extractedRotation * obb.rotation (inlined mat3.multiply).
+    const outRotation = out.rotation;
+    outRotation[0] = q0 * r00 + q1 * r10 + q2 * r20;
+    outRotation[1] = q0 * r01 + q1 * r11 + q2 * r21;
+    outRotation[2] = q0 * r02 + q1 * r12 + q2 * r22;
+    outRotation[3] = q3 * r00 + q4 * r10 + q5 * r20;
+    outRotation[4] = q3 * r01 + q4 * r11 + q5 * r21;
+    outRotation[5] = q3 * r02 + q4 * r12 + q5 * r22;
+    outRotation[6] = q6 * r00 + q7 * r10 + q8 * r20;
+    outRotation[7] = q6 * r01 + q7 * r11 + q8 * r21;
+    outRotation[8] = q6 * r02 + q7 * r12 + q8 * r22;
 
-    // Transform center through the full matrix (rotation + translation)
-    vec3.transformMat4(out.center, obb.center, matrix);
+    // scale half extents (sx/sy/sz are already the positive scale magnitudes).
+    const he = obb.halfExtents;
+    const outHalfExtents = out.halfExtents;
+    outHalfExtents[0] = he[0] * sx;
+    outHalfExtents[1] = he[1] * sy;
+    outHalfExtents[2] = he[2] * sz;
+
+    // transform center through the full matrix (rotation + translation, inlined transformMat4).
+    const c = obb.center;
+    const cx = c[0];
+    const cy = c[1];
+    const cz = c[2];
+    let w = matrix[3] * cx + matrix[7] * cy + matrix[11] * cz + matrix[15];
+    w = w || 1.0;
+    const outCenter = out.center;
+    outCenter[0] = (m00 * cx + m10 * cy + m20 * cz + matrix[12]) / w;
+    outCenter[1] = (m01 * cx + m11 * cy + m21 * cz + matrix[13]) / w;
+    outCenter[2] = (m02 * cx + m12 * cy + m22 * cz + matrix[14]) / w;
 
     return out;
 }
