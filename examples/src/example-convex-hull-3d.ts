@@ -1,10 +1,9 @@
-import { dashboard } from 'dashcat';
 import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { mat4, quat, vec3 as v3 } from 'math';
 import { quickhull3 } from 'math/geometry';
 import { mulberry32 } from 'math/random';
-import { pinTopRight } from './common/dash';
+import { createPanel } from './common/dash';
 import { rainbowRGB, time } from './common/rainbow';
 import { createRenderer } from './common/renderer';
 
@@ -271,9 +270,7 @@ async function select(name: string) {
     rebuild(await VARIATIONS[name]());
 }
 
-const dash = dashboard();
-const panel = dash.panel({ title: 'convex hull 3d' });
-pinTopRight(panel);
+const panel = createPanel('convex hull 3d');
 panel.add(settings, 'variation', { options: Object.keys(VARIATIONS), label: 'Point set' }).onChange((v: string) => select(v));
 panel.button('↻ Regenerate', () => select(settings.variation));
 panel.monitor(() => stats.points, { label: 'points' });
