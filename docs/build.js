@@ -2,10 +2,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 
-// Generates the root README.md from ./README.template.md, expanding a handful
-// of custom tags:
-//   <RenderAPI />                                    - the complete API reference, generated
-//                                                      from every package entrypoint (main + subpaths)
+// Generates two files from the sources:
+//   README.md - the human landing page, from ./README.template.md (tags below)
+//   API.md    - the complete, LLM-greppable API reference, generated from every
+//               package entrypoint (main + subpaths); one bullet per export
+//
+// README.template.md tags:
+//   <ApiGroups />                                    - clickable overview of every entrypoint group,
+//                                                      deep-linking into the generated API.md
 //   <TOC />                                          - table of contents from ## headings
 //   <Snippet source="./file.ts" select="group" />   - a marked snippet from a doc source file
 //   <Snippet source="./file.ts" />                   - the entire doc source file
@@ -170,23 +174,7 @@ function collectEntrypointApi(indexFile, acc) {
     return acc;
 }
 
-/* Shared anchor generation and collision tracking */
-const usedAnchors = new Map();
-
-function generateUniqueHeading(headingText, itemType = 'function') {
-    const baseAnchor = generateAnchor(headingText);
-    if (usedAnchors.has(baseAnchor)) {
-        if (itemType === 'type') {
-            if (headingText.startsWith('`') && headingText.endsWith('`')) {
-                return `\`${headingText.slice(1, -1)}\` (type)`;
-            }
-            return `${headingText} (type)`;
-        }
-    }
-    usedAnchors.set(baseAnchor, { type: itemType });
-    return headingText;
-}
-
+// GitHub-style anchor slug for a heading/name, e.g. "`fbm`" -> "fbm"
 function generateAnchor(text) {
     return text
         .toLowerCase()
@@ -195,91 +183,238 @@ function generateAnchor(text) {
         .replace(/-+/g, '-');
 }
 
-// render a responsive-ish HTML grid of links for the table of contents
-function renderGrid(items) {
-    if (items.length === 0) return '';
-    const maxCols = 4;
-    const maxNameLen = items.reduce((m, it) => Math.max(m, it.display.length), 0);
-    const perColWidth = Math.max(12, maxNameLen + 6);
-    let cols = Math.floor(90 / perColWidth) || 1;
-    cols = Math.min(maxCols, Math.max(1, cols));
-    const itemsPerRow = Math.min(cols, items.length);
-
-    let s = '<table><tr>\n';
-    for (let i = 0; i < items.length; i++) {
-        s += `<td><a href="#${items[i].anchor}"><code>${items[i].display}</code></a></td>`;
-        if ((i + 1) % itemsPerRow === 0 && i < items.length - 1) s += '\n</tr><tr>\n';
-    }
-    if (items.length > 1) {
-        const remainder = items.length % itemsPerRow;
-        if (remainder !== 0) for (let i = 0; i < itemsPerRow - remainder; i++) s += '<td></td>';
-    }
-    s += '\n</tr></table>\n\n';
-    return s;
+// a stable, collision-free HTML anchor id for an entrypoint group, e.g.
+// "math" -> "api-math", "math/shapes" -> "api-math-shapes". Used so the
+// <ApiGroups /> overview can link to each group's section in the API docs.
+function apiGroupSlug(specifier) {
+    return `api-${specifier.replace(/[^\w]+/g, '-')}`;
 }
 
-/* <RenderAPI /> - render the complete api reference, grouped by entrypoint */
+// a stable HTML anchor id for a namespace group within an entrypoint, e.g.
+// (math, vec3) -> "api-math-vec3". Lets the <ApiGroups /> chips deep-link to a
+// namespace's function grid in the API docs.
+function namespaceSlug(specifier, label) {
+    return `${apiGroupSlug(specifier)}-${label.toLowerCase()}`;
+}
+
+// one-line description for each entrypoint, shown in the <ApiGroups /> overview.
+// The exhaustive per-module contents (namespaces + top-level functions) are
+// generated; only this prose is authored. Keyed by import specifier.
+const API_GROUP_DESCRIPTIONS = {
+    math: 'Vectors, quaternions, euler angles & matrices',
+    'math/shapes': 'Shape primitives & spatial queries',
+    'math/geometry': 'Convex hulls & circumcircle',
+    'math/time': 'Easing & spring animation',
+    'math/random': 'Seeded random number generators',
+    'math/noise': 'Perlin, simplex & worley noise, plus fractal helpers',
+    'math/color': 'Color & colorspace utilities',
+};
+
+// the generated full reference lives in a separate file so the README stays a
+// landing page; <ApiGroups /> chips deep-link into it (e.g. API.md#api-math-vec3).
+const API_DOC_FILE = 'API.md';
+
+/* <ApiGroups /> - an exhaustive, clickable overview of every entrypoint in the
+ * README: a prose description plus a chip for every namespace and top-level
+ * function it exports, each deep-linking into the generated API.md reference. */
+function renderApiGroups() {
+    let rows = '';
+    for (const { specifier, indexFile } of entrypoints()) {
+        const description = API_GROUP_DESCRIPTIONS[specifier];
+        if (!description) console.warn(`no <ApiGroups /> description for entrypoint ${specifier}`);
+
+        // exhaustive contents: every namespace, then every top-level function/const
+        // (types are omitted — they mirror the namespaces, e.g. `Vec3` ~ `vec3`)
+        const api = collectEntrypointApi(indexFile, { namespaces: [], topItems: [], topTypeNames: new Set() });
+        const contents = [
+            ...api.namespaces.map((ns) => ({ name: ns.name, anchor: namespaceSlug(specifier, ns.name) })),
+            ...api.topItems
+                .filter((it) => it.kind === 'value')
+                .map((it) => ({ name: it.name, anchor: generateAnchor(`\`${it.name}\``) })),
+        ];
+        const chips = contents.map((c) => `[\`${c.name}\`](${API_DOC_FILE}#${c.anchor})`).join(' ');
+
+        rows += `| [\`${specifier}\`](${API_DOC_FILE}#${apiGroupSlug(specifier)}) | ${description ?? ''} | ${chips} |\n`;
+    }
+    return `| Import | Description | Contents |\n| --- | --- | --- |\n${rows}`;
+}
+
+/* Semantic buckets for the members of a namespace, in display order. Keeps the
+ * per-namespace reference scannable instead of a flat source-order dump. The
+ * classifier below is heuristic (name-based); tweak it or the source names if a
+ * function lands in the wrong bucket. */
+const VALUE_CATEGORY_ORDER = ['Create', 'Operations', 'Transform', 'Query', 'Aliases'];
+
+function classifyMember(name, nsLabel, isAlias) {
+    if (isAlias) return 'Aliases';
+    // predicates, comparisons & accessors
+    if (/^(equals|exactEquals|finite|angle|angleTo|luminance)$/.test(name)) return 'Query';
+    if (/^(is|get|contains|intersects)[A-Z]/.test(name)) return 'Query';
+    // construction, conversion & setters
+    if (/^(create|clone|copy|set|identity|zero|str|reorder|makeSafe|fromValues|setAxes|setAxisAngle|calculateW)$/.test(name))
+        return 'Create';
+    if (/^(from|to|set)[A-Z]/.test(name)) return 'Create';
+    if (/^(lookAt|targetTo|perspective|ortho|frustum|projection)/.test(name)) return 'Create';
+    // spatial transforms
+    if (/^(transform|rotate)/.test(name)) return 'Transform';
+    if (/^(translate|applyMatrix4|crossProductMatrix)$/.test(name)) return 'Transform';
+    if (name === 'scale' && /^mat/.test(nsLabel)) return 'Transform';
+    // everything else: arithmetic & vector/matrix math
+    return 'Operations';
+}
+
+// render one member as a single greppable bullet: `qualified.signature — summary`.
+// Types keep their global name (e.g. `type Vec3 = ...`); functions/aliases are
+// qualified with the namespace prefix so `vec3.add` is findable by grep.
+// `anchorId`, when set, emits an inline <a id> for deep-linking.
+function memberLine(member, prefix, anchorId) {
+    const anchor = anchorId ? `<a id="${anchorId}"></a>` : '';
+    const signature = member.kind === 'type' ? member.signature : `${prefix}${member.signature}`;
+    const summary = member.summary ? ` — ${member.summary}` : '';
+    return `- ${anchor}\`${signature}\`${summary}\n`;
+}
+
+// render a list of resolved members, grouped into semantic categories. A single
+// populated category renders without a label; several get bold `**Category**`
+// dividers. `anchorFor` maps a member to an optional deep-link id.
+function renderMemberSections(members, { prefix, anchorFor }) {
+    const sections = [];
+    const push = (title, list) => list.length > 0 && sections.push({ title, list });
+
+    push('Types', members.filter((m) => m.kind === 'type'));
+    for (const category of VALUE_CATEGORY_ORDER) {
+        push(
+            category,
+            members.filter((m) => m.kind !== 'type' && classifyMember(m.name, m.nsLabel, m.kind === 'alias') === category),
+        );
+    }
+
+    const labelled = sections.length > 1;
+    let out = '';
+    for (const section of sections) {
+        if (labelled) out += `**${section.title}**\n\n`;
+        for (const member of section.list) out += memberLine(member, prefix, anchorFor(member));
+        out += '\n';
+    }
+    return out;
+}
+
+/* The complete API reference body for API.md: one section per entrypoint (h2),
+ * one per namespace (h3, fronted with an import snippet), and one greppable
+ * bullet per function/type. Anchors here are the deep-link targets for the
+ * README's <ApiGroups /> chips (which point at API.md#...). */
 function generateApiDocs() {
-    // Pass 1: build a model of every entrypoint, assigning stable headings/anchors.
-    const model = [];
+    let out = '';
     for (const { specifier, indexFile } of entrypoints()) {
         const api = collectEntrypointApi(indexFile, { namespaces: [], topItems: [], topTypeNames: new Set() });
 
-        const groups = [];
+        out += `<a id="${apiGroupSlug(specifier)}"></a>\n\n## \`${specifier}\`\n\n`;
 
-        // top-level items (flat re-exports and named type/value re-exports)
-        if (api.topItems.length > 0) {
-            groups.push({
-                label: null,
-                items: api.topItems.map((it) => makeItem(it.name, '', it.kind, it.file)),
+        // top-level members (types + flat re-exported functions). Value items get a
+        // stable anchor so <ApiGroups /> chips (e.g. `fbm`, `circumcircle`) resolve.
+        const topMembers = api.topItems.map((it) => resolveMember(it.name, it.kind, it.file, null));
+        if (topMembers.length > 0) {
+            out += renderMemberSections(topMembers, {
+                prefix: '',
+                anchorFor: (m) => (m.kind === 'type' ? null : generateAnchor(`\`${m.name}\``)),
             });
         }
 
-        // one group per namespace; skip type members already surfaced at the top level
+        // one section per namespace; skip type members already surfaced at the top level
         for (const ns of api.namespaces) {
-            const items = ns.members
+            const members = ns.members
                 .filter((m) => !(m.kind === 'type' && api.topTypeNames.has(m.name)))
-                .map((m) => makeItem(m.name, `${ns.name}.`, m.kind, ns.file));
-            if (items.length > 0) groups.push({ label: ns.name, items });
-        }
-
-        model.push({ specifier, groups });
-    }
-
-    // Pass 2: table of contents (bold labels, no headings — avoids polluting the anchor space).
-    let toc = '';
-    for (const entry of model) {
-        toc += `**\`${entry.specifier}\`**\n\n`;
-        for (const group of entry.groups) {
-            if (group.label) toc += `**${group.label}**\n\n`;
-            toc += renderGrid(group.items);
+                .map((m) => resolveMember(m.name, m.kind, ns.file, ns.name));
+            if (members.length === 0) continue;
+            out += `<a id="${namespaceSlug(specifier, ns.name)}"></a>\n\n### \`${ns.name}\`\n\n`;
+            out += `\`\`\`ts\nimport { ${ns.name} } from '${specifier}';\n\`\`\`\n\n`;
+            out += renderMemberSections(members, { prefix: `${ns.name}.`, anchorFor: () => null });
         }
     }
+    return out.trimEnd();
 
-    // Pass 3: detailed reference (headings drive the anchors the TOC links to).
-    let detail = '';
-    for (const entry of model) {
-        detail += `### \`${entry.specifier}\`\n\n`;
-        for (const group of entry.groups) {
-            if (group.label) detail += `**${group.label}**\n\n`;
-            for (const item of group.items) {
-                const sig = getType(item.name, item.file);
-                if (!sig) {
-                    console.warn(`no signature for ${item.display} (${item.file ?? 'unknown file'})`);
-                    continue;
+    // resolve a member's compact signature + summary, attaching its namespace label
+    function resolveMember(name, kind, file, nsLabel) {
+        const doc = getCompactMember(name, file) ?? { kind: kind === 'type' ? 'type' : 'value', signature: name, summary: '' };
+        return { name, nsLabel, ...doc };
+    }
+}
+
+// a member's one-line signature and JSDoc summary, for the compact reference.
+// Returns { kind: 'value'|'type'|'alias', signature, summary }.
+function getCompactMember(name, file) {
+    const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed, removeComments: true });
+    const oneLine = (node, sf) => printer.printNode(ts.EmitHint.Unspecified, node, sf).replace(/\s+/g, ' ').trim();
+    const summaryOf = (node) => {
+        const symbol = node.name && checker.getSymbolAtLocation(node.name);
+        if (!symbol) return '';
+        // keep only the first line — later lines are usually param/return or legend prose
+        const doc = ts.displayPartsToString(symbol.getDocumentationComment(checker));
+        return (
+            doc
+                .split('\n')[0]
+                // resolve `{@link target}` / `{@link target|text}` to plain text, and [[wiki]] links
+                .replace(/\{@link\s+([^}|]+?)(?:\s*\|[^}]*)?\}/g, '$1')
+                .replace(/\[\[([^\]]+)\]\]/g, '$1')
+                .replace(/\s+/g, ' ')
+                .trim()
+                // drop a trailing dangling comma/colon left by cutting a wrapped sentence
+                .replace(/[,:;]$/, '')
+        );
+    };
+    const typeParamsOf = (node) =>
+        node.typeParameters ? `<${node.typeParameters.map((p) => p.getText(node.getSourceFile())).join(', ')}>` : '';
+    const fnSignature = (nameNode, fn, sf) => {
+        const sigNode = ts.factory.createFunctionDeclaration(
+            undefined,
+            fn.asteriskToken,
+            nameNode,
+            fn.typeParameters,
+            fn.parameters,
+            fn.type,
+            undefined,
+        );
+        return oneLine(sigNode, sf).replace(/^function /, '').replace(/;$/, '');
+    };
+
+    let found = null;
+    function visit(node, sf) {
+        if (found) return;
+        if (ts.isFunctionDeclaration(node) && node.name?.text === name && hasExport(node)) {
+            found = { kind: 'value', signature: fnSignature(node.name, node, sf), summary: summaryOf(node) };
+        } else if (ts.isVariableStatement(node) && hasExport(node)) {
+            for (const decl of node.declarationList.declarations) {
+                if (!ts.isIdentifier(decl.name) || decl.name.text !== name) continue;
+                if (decl.initializer && (ts.isArrowFunction(decl.initializer) || ts.isFunctionExpression(decl.initializer))) {
+                    found = { kind: 'value', signature: fnSignature(decl.name, decl.initializer, sf), summary: summaryOf(decl) };
+                } else if (decl.initializer && ts.isIdentifier(decl.initializer)) {
+                    // `export const len = length` — an alias
+                    found = { kind: 'alias', signature: `${name} = ${decl.initializer.text}`, summary: `Alias for \`${decl.initializer.text}\`` };
+                } else if (decl.initializer && (ts.isNumericLiteral(decl.initializer) || ts.isStringLiteralLike(decl.initializer))) {
+                    found = { kind: 'value', signature: `${name} = ${decl.initializer.getText(sf)}`, summary: summaryOf(decl) };
+                } else {
+                    const type = decl.type ? `: ${oneLine(decl.type, sf)}` : '';
+                    found = { kind: 'value', signature: `${name}${type}`, summary: summaryOf(decl) };
                 }
-                detail += `#### ${item.heading}\n\n\`\`\`ts\n${sig.trim()}\n\`\`\`\n\n`;
             }
+        } else if (
+            (ts.isTypeAliasDeclaration(node) || ts.isInterfaceDeclaration(node) || ts.isClassDeclaration(node)) &&
+            node.name?.text === name &&
+            hasExport(node)
+        ) {
+            const signature = ts.isTypeAliasDeclaration(node)
+                ? `type ${name}${typeParamsOf(node)} = ${oneLine(node.type, sf)}`
+                : `${ts.isInterfaceDeclaration(node) ? 'interface' : 'class'} ${name}${typeParamsOf(node)}`;
+            found = { kind: 'type', signature, summary: summaryOf(node) };
         }
+        ts.forEachChild(node, (child) => visit(child, sf));
     }
-
-    return `${toc}\n---\n\n## Reference\n\n${detail}`;
-
-    function makeItem(name, prefix, kind, file) {
-        const display = `${prefix}${name}`;
-        const heading = generateUniqueHeading(`\`${display}\``, kind === 'type' ? 'type' : 'function');
-        return { name, display, kind, file, heading, anchor: generateAnchor(heading) };
+    for (const f of filesToSearch(file)) {
+        const sf = tsProgram.getSourceFile(f);
+        if (sf) visit(sf, sf);
+        if (found) break;
     }
+    return found;
 }
 
 /* Example galleries read from examples/src/examples.json, screenshots from
@@ -343,14 +478,14 @@ const readmeTemplatePath = path.join(here, './README.template.md');
 const readmeOutPath = path.join(here, '../README.md');
 let readmeText = fs.readFileSync(readmeTemplatePath, 'utf-8');
 
+/* <ApiGroups /> - clickable overview of every entrypoint group */
+readmeText = readmeText.replace(/<ApiGroups\s*\/>/g, () => renderApiGroups());
+
 /* <Examples /> - gallery grid of every example */
 readmeText = readmeText.replace(/<Examples\s*\/>/g, () => renderExamples());
 
 /* <ExamplesTable ids="a,b,c" /> - inline one-row table for a section */
 readmeText = readmeText.replace(/<ExamplesTable\s+ids=["'](.+?)["']\s*\/>/g, (_full, ids) => renderExamplesTable(ids));
-
-/* <RenderAPI /> */
-readmeText = readmeText.replace(/<RenderAPI\s*\/>/g, () => generateApiDocs());
 
 /* <TOC /> */
 const tocLines = [];
@@ -436,9 +571,53 @@ readmeText = readmeText.replace(/<Snippet\s+source=["'](.+?)["']\s*\/>/g, (fullM
     return `\`\`\`ts\n${sourceText}\n\`\`\``;
 });
 
-/* write result */
+/* write README */
 fs.writeFileSync(readmeOutPath, readmeText, 'utf-8');
 console.log(`wrote ${path.relative(projectRoot, readmeOutPath)}`);
+
+/* write API.md - the generated, LLM-greppable full reference */
+fs.writeFileSync(path.join(projectRoot, API_DOC_FILE), buildApiMd(), 'utf-8');
+console.log(`wrote ${API_DOC_FILE}`);
+
+// assemble API.md: a conventions preamble + module map + the full reference body
+function buildApiMd() {
+    const moduleList = entrypoints()
+        .map(({ specifier }) => {
+            const blurb = (API_GROUP_DESCRIPTIONS[specifier] ?? '').split(' — ')[0];
+            return `- [\`${specifier}\`](#${apiGroupSlug(specifier)})${blurb ? ` — ${blurb}` : ''}`;
+        })
+        .join('\n');
+
+    const preamble = `# math — API reference
+
+Complete reference for every export in \`${packageName}\`, grouped by module. For an
+overview, installation, and examples, see the [README](./README.md).
+
+## Conventions
+
+- **Plain data** — every type is a plain array or object (e.g. \`Vec3 = [x, y, z]\`); no
+  classes, no typed arrays, all JSON-serializable.
+- **Output-argument first** — functions write their result into the first argument
+  (\`out\`) and return it, so nothing is allocated: \`vec3.add(out, a, b)\`. Aliasing
+  arguments is safe, e.g. \`vec3.normalize(out, out)\`.
+- **Tree-shakeable subpaths** — import each group from its own entrypoint:
+
+  \`\`\`ts
+  import { vec3, mat4, quat } from '${packageName}';
+  import { box3 } from '${packageName}/shapes';
+  import { simplex3d } from '${packageName}/noise';
+  \`\`\`
+
+## Modules
+
+${moduleList}
+
+---
+
+`;
+
+    return `${preamble}${generateApiDocs()}\n`;
+}
 
 /* utils */
 
