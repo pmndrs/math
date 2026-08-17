@@ -311,5 +311,101 @@ describe('obb3', () => {
             expect(result.halfExtents[1]).toBeCloseTo(6);
             expect(result.halfExtents[2]).toBeCloseTo(12);
         });
+
+        it('handles combined rotation, non-uniform scale, and translation', () => {
+            const obbRotation = quat.create();
+            quat.fromEuler(obbRotation, euler.fromValues(0.3, -0.7, 1.1, 'xyz'));
+            const obb = obb3.create();
+            obb3.setFromCenterHalfExtentsQuaternion(obb, [2, -1, 4], [1, 2, 3], obbRotation);
+
+            const matRotation = quat.create();
+            quat.fromEuler(matRotation, euler.fromValues(-0.5, 0.9, 0.2, 'xyz'));
+            const matrix = mat4.create();
+            mat4.fromRotationTranslationScale(matrix, matRotation, [5, -2, 1], [2, 0.5, 3]);
+
+            const result = obb3.create();
+            obb3.applyMatrix4(result, obb, matrix);
+            expectMatchesReference(result, obb, matrix);
+        });
+
+        it('handles reflection (negative determinant)', () => {
+            const obb = obb3.create();
+            obb3.setFromCenterHalfExtentsQuaternion(obb, [1, 2, 3], [1, 1, 1], [0, 0, 0, 1]);
+
+            // Negative scale on X makes the determinant negative.
+            const matrix = mat4.create();
+            mat4.fromScaling(matrix, [-2, 3, 4]);
+
+            const result = obb3.create();
+            obb3.applyMatrix4(result, obb, matrix);
+
+            // Half extents stay positive.
+            expect(result.halfExtents[0]).toBeCloseTo(2);
+            expect(result.halfExtents[1]).toBeCloseTo(3);
+            expect(result.halfExtents[2]).toBeCloseTo(4);
+            expectMatchesReference(result, obb, matrix);
+        });
+
+        it('supports transforming in place (out === obb)', () => {
+            const obbRotation = quat.create();
+            quat.fromEuler(obbRotation, euler.fromValues(0.2, 0.4, -0.6, 'xyz'));
+            const obb = obb3.create();
+            obb3.setFromCenterHalfExtentsQuaternion(obb, [1, 1, 1], [1, 2, 3], obbRotation);
+            const reference = obb3.clone(obb);
+
+            const matRotation = quat.create();
+            quat.fromEuler(matRotation, euler.fromValues(0.5, -0.3, 0.8, 'xyz'));
+            const matrix = mat4.create();
+            mat4.fromRotationTranslationScale(matrix, matRotation, [3, -1, 2], [1.5, 2, 0.5]);
+
+            obb3.applyMatrix4(obb, obb, matrix);
+            expectMatchesReference(obb, reference, matrix);
+        });
     });
 });
+
+/**
+ * Independent reference implementation of applyMatrix4 used to guard the
+ * optimized (inlined) production version against regressions.
+ */
+function expectMatchesReference(result: obb3.OBB3, obb: obb3.OBB3, matrix: mat4.Mat4): void {
+    // Extract scale via column lengths.
+    const sx = Math.hypot(matrix[0], matrix[1], matrix[2]);
+    const sy = Math.hypot(matrix[4], matrix[5], matrix[6]);
+    const sz = Math.hypot(matrix[8], matrix[9], matrix[10]);
+
+    const rotation = mat3.create();
+    mat3.fromMat4(rotation, matrix);
+
+    const det =
+        matrix[0] * (matrix[5] * matrix[10] - matrix[9] * matrix[6]) -
+        matrix[4] * (matrix[1] * matrix[10] - matrix[9] * matrix[2]) +
+        matrix[8] * (matrix[1] * matrix[6] - matrix[5] * matrix[2]);
+    const signedSX = det < 0 ? -sx : sx;
+
+    rotation[0] /= signedSX;
+    rotation[1] /= signedSX;
+    rotation[2] /= signedSX;
+    rotation[3] /= sy;
+    rotation[4] /= sy;
+    rotation[5] /= sy;
+    rotation[6] /= sz;
+    rotation[7] /= sz;
+    rotation[8] /= sz;
+
+    const expectedRotation = mat3.create();
+    mat3.multiply(expectedRotation, rotation, obb.rotation);
+
+    const expectedCenter = vec3.create();
+    vec3.transformMat4(expectedCenter, obb.center, matrix);
+
+    for (let i = 0; i < 9; i++) {
+        expect(result.rotation[i]).toBeCloseTo(expectedRotation[i]);
+    }
+    expect(result.center[0]).toBeCloseTo(expectedCenter[0]);
+    expect(result.center[1]).toBeCloseTo(expectedCenter[1]);
+    expect(result.center[2]).toBeCloseTo(expectedCenter[2]);
+    expect(result.halfExtents[0]).toBeCloseTo(obb.halfExtents[0] * sx);
+    expect(result.halfExtents[1]).toBeCloseTo(obb.halfExtents[1] * sy);
+    expect(result.halfExtents[2]).toBeCloseTo(obb.halfExtents[2] * sz);
+}
