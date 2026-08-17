@@ -33,3 +33,6 @@ export type { Mat4 } from './mat4';
 
 export * as spherical from './spherical';
 export type { Spherical } from './spherical';
+
+export * as polar from './polar';
+export type { Polar } from './polar';
