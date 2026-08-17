@@ -3,6 +3,7 @@ import * as perlin2d from "../../src/noise/perlin2d";
 import * as perlin3d from "../../src/noise/perlin3d";
 import * as simplex2d from "../../src/noise/simplex2d";
 import * as simplex3d from "../../src/noise/simplex3d";
+import * as simplex4d from "../../src/noise/simplex4d";
 
 const N = 10_000;
 
@@ -50,6 +51,18 @@ group("noise sample 10k @noise", () => {
       let sum = 0;
       for (let i = 0; i < N; i++) {
         sum += simplex3d.sample(gen, i * 0.01, i * 0.013, i * 0.017);
+      }
+      return sum;
+    };
+  });
+
+  bench("simplex4d", function* () {
+    const gen = simplex4d.create(42);
+
+    yield () => {
+      let sum = 0;
+      for (let i = 0; i < N; i++) {
+        sum += simplex4d.sample(gen, i * 0.01, i * 0.013, i * 0.017, i * 0.019);
       }
       return sum;
     };
