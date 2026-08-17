@@ -144,3 +144,83 @@ export function domainWarp3(
     out[2] = z + amount * sample(x + 1.7, y + 9.2, z + 3.5);
     return out;
 }
+
+/**
+ * Curl of a 2D scalar noise potential - a divergence-free (incompressible) flow
+ * field. Particles advected through it swirl like a fluid and never converge to
+ * sinks or fly apart, which is why it's the cheap go-to for procedural smoke /
+ * flow. Given a scalar potential psi(x, y), the flow is (d psi/dy, -d psi/dx),
+ * with the derivatives taken by central differences of step `eps`.
+ *
+ * @param out the receiving Vec2 (the flow velocity)
+ * @param sample the scalar potential noise, sampled at (x, y)
+ * @param x x coordinate
+ * @param y y coordinate
+ * @param eps finite-difference step (default 1e-4)
+ * @returns out
+ */
+export function curl2(out: Vec2, sample: (x: number, y: number) => number, x: number, y: number, eps = 1e-4): Vec2 {
+    const inv = 1 / (2 * eps);
+    const dpdx = (sample(x + eps, y) - sample(x - eps, y)) * inv;
+    const dpdy = (sample(x, y + eps) - sample(x, y - eps)) * inv;
+    out[0] = dpdy;
+    out[1] = -dpdx;
+    return out;
+}
+
+// large, arbitrary offsets that decorrelate the three potential components in curl3
+const C3_O2X = 123.4;
+const C3_O2Y = 55.7;
+const C3_O2Z = -19.2;
+const C3_O3X = -73.1;
+const C3_O3Y = 218.9;
+const C3_O3Z = 90.3;
+
+/**
+ * Curl of a 3D noise vector potential - a divergence-free 3D flow field for
+ * volumetric smoke / fluid motion. The three potential components reuse a single
+ * `sample` at large, decorrelating offsets, and the flow is their curl,
+ * `∇ × psi`, with derivatives taken by central differences of step `eps`.
+ *
+ * @param out the receiving Vec3 (the flow velocity)
+ * @param sample the scalar potential noise, sampled at (x, y, z)
+ * @param x x coordinate
+ * @param y y coordinate
+ * @param z z coordinate
+ * @param eps finite-difference step (default 1e-4)
+ * @returns out
+ */
+export function curl3(
+    out: Vec3,
+    sample: (x: number, y: number, z: number) => number,
+    x: number,
+    y: number,
+    z: number,
+    eps = 1e-4,
+): Vec3 {
+    const inv = 1 / (2 * eps);
+
+    // potential 1 at (x, y, z): partials in y and z
+    const dp1dy = (sample(x, y + eps, z) - sample(x, y - eps, z)) * inv;
+    const dp1dz = (sample(x, y, z + eps) - sample(x, y, z - eps)) * inv;
+
+    // potential 2 at the +O2 offset: partials in x and z
+    const x2 = x + C3_O2X;
+    const y2 = y + C3_O2Y;
+    const z2 = z + C3_O2Z;
+    const dp2dx = (sample(x2 + eps, y2, z2) - sample(x2 - eps, y2, z2)) * inv;
+    const dp2dz = (sample(x2, y2, z2 + eps) - sample(x2, y2, z2 - eps)) * inv;
+
+    // potential 3 at the +O3 offset: partials in x and y
+    const x3 = x + C3_O3X;
+    const y3 = y + C3_O3Y;
+    const z3 = z + C3_O3Z;
+    const dp3dx = (sample(x3 + eps, y3, z3) - sample(x3 - eps, y3, z3)) * inv;
+    const dp3dy = (sample(x3, y3 + eps, z3) - sample(x3, y3 - eps, z3)) * inv;
+
+    // curl = ( dp3/dy - dp2/dz, dp1/dz - dp3/dx, dp2/dx - dp1/dy )
+    out[0] = dp3dy - dp2dz;
+    out[1] = dp1dz - dp3dx;
+    out[2] = dp2dx - dp1dy;
+    return out;
+}
