@@ -1,5 +1,5 @@
 import { bench, group } from "@pmndrs/labs";
-import { fbm } from "../../src/noise/fractal";
+import { curl2, fbm } from "../../src/noise/fractal";
 import * as perlin2d from "../../src/noise/perlin2d";
 import * as perlin3d from "../../src/noise/perlin3d";
 import * as simplex2d from "../../src/noise/simplex2d";
@@ -102,6 +102,21 @@ group("noise sample 10k @noise", () => {
       let sum = 0;
       for (let i = 0; i < N; i++) {
         sum += fbm((f) => simplex2d.sample(gen, i * 0.01 * f, i * 0.013 * f), { octaves: 5 });
+      }
+      return sum;
+    };
+  });
+
+  bench("curl2(simplex2d)", function* () {
+    const gen = simplex2d.create(42);
+    const out: [number, number] = [0, 0];
+    const s = (x: number, y: number) => simplex2d.sample(gen, x, y);
+
+    yield () => {
+      let sum = 0;
+      for (let i = 0; i < N; i++) {
+        curl2(out, s, i * 0.01, i * 0.013);
+        sum += out[0];
       }
       return sum;
     };
