@@ -1,12 +1,12 @@
 {
-    "example-random-orientations": {
-        "title": "Random Orientations",
-        "description": "A grid of hand-built arrows slerping between uniform random rotations (math's random.quat) — every direction equally likely, so the field stays evenly stirred. Toggle naive euler to watch the sampling bias pull them toward the poles.",
+    "example-look-at": {
+        "title": "Look At",
+        "description": "A grid of hand-built arrows that all turn to point at a glowing orb as it drifts overhead — like sunflowers tracking the sun. Each aims with math's quat.rotationTo, the shortest rotation from its +Y tip onto the target direction.",
         "tags": [
-            "random",
             "quaternion",
-            "slerp",
-            "uniform-sampling"
+            "rotationTo",
+            "look-at",
+            "vec3"
         ],
         "category": "basics"
     },
