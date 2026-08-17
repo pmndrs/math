@@ -12,16 +12,20 @@
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                 sans-serif;
-            background: #131519;
+            background: var(--color-background);
             height: 100vh;
             display: flex;
             overflow: hidden;
 
             /* vars */
-            --color-background: #1a1d23;
-            --color-card: #23272e;
-            --color-border: #383e47;
-            --color-glass: rgba(19, 22, 28, 0.66);
+            --color-background: #131518;
+            --color-card: #1c1f25;
+            --color-border: rgba(255, 255, 255, 0.1);
+            --color-viewer: #000;
+            --color-ink: #e8eaed;
+            --color-glass: rgba(22, 25, 31, 0.72);
+            --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas,
+                monospace;
         }
 
         /* sidebar - mobile first (hidden by default) */
@@ -33,95 +37,82 @@
             width: 100%;
             max-width: 320px;
             background: var(--color-background);
-            color: #fff;
+            color: var(--color-ink);
             overflow-y: auto;
-            border-right: 1px solid var(--color-border);
             transform: translateX(-100%);
             transition: transform 0.3s ease;
             z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-            /* slim custom scrollbar (Firefox) */
-            scrollbar-width: thin;
-            scrollbar-color: #555 transparent;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+            /* hidden scrollbar */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
-        /* slim custom scrollbar (WebKit / Chromium) */
         .sidebar::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 4px;
-            border: 2px solid var(--color-background);
-        }
-
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: #666;
+            display: none;
         }
 
         .sidebar.open {
             transform: translateX(0);
         }
 
-        .sidebar-header {
-            padding: 18px 16px 12px;
-            background: var(--color-glass);
-            -webkit-backdrop-filter: blur(18px);
-            backdrop-filter: blur(18px);
+        /* title + search scroll together as one sticky unit */
+        .sidebar-top {
             position: sticky;
             top: 0;
             z-index: 2;
+            background: var(--color-background);
+        }
+
+        .sidebar-header {
+            padding: 18px 14px 10px;
         }
 
         .sidebar-header h1 {
             margin: 0;
-            font-size: 22px;
-            font-weight: 600;
+            font-size: 27px;
+            font-weight: 700;
             letter-spacing: 0.01em;
+            color: var(--color-ink);
         }
 
         .search-container {
             margin: 0;
-            padding: 0 16px 12px;
-            position: relative;
+            padding: 0 14px 12px;
         }
 
         .search-input {
             width: 100%;
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 0;
             padding: 9px 12px;
-            background: rgba(255, 255, 255, 0.04);
-            color: #fff;
-            font-size: 12px;
-            font-family: inherit;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--color-ink);
+            font-size: 11px;
+            font-family: var(--mono);
+            text-transform: lowercase;
             box-sizing: border-box;
             transition: border-color 0.18s ease, background 0.18s ease;
         }
 
         .search-input::placeholder {
-            color: #90a4ae;
+            color: #7d848c;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #5a6470;
-            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .examples-list {
-            padding: 16px;
+            padding: 10px 14px 16px;
             margin: 0;
             list-style: none;
         }
 
         .examples-list li {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .examples-list li:last-child {
@@ -129,19 +120,20 @@
         }
 
         .category-header {
-            font-size: 10.5px;
-            font-weight: 600;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: lowercase;
             color: #8a95a1;
-            margin: 0 0 12px 0;
+            margin: 0 0 10px 0;
             padding-bottom: 8px;
-            border-bottom: 1px solid var(--color-border);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             list-style: none;
         }
 
         .category-group {
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
 
         .category-group.hidden {
@@ -154,20 +146,18 @@
             background-color: var(--color-card);
             text-decoration: none;
             cursor: pointer;
-            border: 1px solid var(--color-border);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 0;
             overflow: hidden;
-            transition: transform 0.18s ease, border-color 0.18s ease;
+            transition: border-color 0.16s ease;
         }
 
         .example-item:hover {
-            transform: translateY(-3px);
-            border-color: #4a5b64;
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         .example-item.active {
-            outline: 2px solid #fff;
-            outline-offset: -2px;
+            border-color: #fff;
         }
 
         .example-preview {
@@ -186,6 +176,8 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            -webkit-user-drag: none;
+            user-select: none;
         }
 
         .example-overlay {
@@ -202,14 +194,17 @@
             padding: 4px 9px;
             background: #fff;
             color: #111;
-            font-weight: 600;
-            font-size: 15px;
+            font-family: var(--mono);
+            font-weight: 500;
+            font-size: 13px;
             line-height: 1.2;
             letter-spacing: 0.01em;
+            text-transform: lowercase;
         }
 
         .content {
-            width: 100%;
+            flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
         }
@@ -218,7 +213,6 @@
             background: var(--color-background);
             border-bottom: 1px solid var(--color-border);
             padding: 12px 15px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -231,20 +225,106 @@
             font-size: 18px;
             cursor: pointer;
             padding: 4px;
-            color: #fff;
+            color: var(--color-ink);
         }
 
         .content-header h2 {
             margin: 0;
             font-size: 16px;
-            color: #fff;
+            color: var(--color-ink);
             flex: 1;
         }
 
-        .example-frame {
+        /* the demo lives inside its own rounded container floating on the page */
+        .viewer {
+            position: relative;
             flex: 1;
+            overflow: hidden;
+            background: var(--color-viewer);
+        }
+
+        .example-frame {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             border: none;
-            background: #fff;
+            background: var(--color-viewer);
+        }
+
+        /* title overlaid top-left of the demo (desktop) */
+        .viewer-title {
+            position: absolute;
+            top: 18px;
+            left: 20px;
+            z-index: 3;
+            pointer-events: none;
+            display: none;
+        }
+
+        .viewer-title h2 {
+            margin: 0;
+            font-family: var(--mono);
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-transform: lowercase;
+            color: #fff;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        .viewer-desc {
+            margin: 7px 0 0;
+            max-width: 360px;
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1.55;
+            letter-spacing: 0.01em;
+            text-transform: lowercase;
+            color: rgba(255, 255, 255, 0.68);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+        }
+
+        /* source / open / fullscreen buttons, bottom-right of the demo */
+        .viewer-toolbar {
+            position: absolute;
+            right: 14px;
+            bottom: 14px;
+            z-index: 3;
+            display: flex;
+            gap: 8px;
+        }
+
+        .viewer-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 11px;
+            background: var(--color-glass);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 0;
+            color: #e8eaed;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: lowercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .viewer-btn:hover {
+            background: rgba(35, 39, 47, 0.92);
+            border-color: rgba(255, 255, 255, 0.28);
+        }
+
+        .viewer-btn svg {
+            width: 13px;
+            height: 13px;
         }
 
         .sidebar-overlay {
@@ -265,33 +345,33 @@
         /* tablet and up - enhance the mobile design */
         @media (min-width: 769px) {
             .sidebar {
-                position: fixed;
+                position: static;
                 transform: none;
-                top: 16px;
-                left: 16px;
-                bottom: 16px;
-                width: 340px;
-                min-width: 0;
+                width: 300px;
+                min-width: 300px;
                 max-width: none;
-                border: 1px solid var(--color-border);
-                border-right: 1px solid var(--color-border);
-                border-radius: 14px;
-                background: var(--color-glass);
-                -webkit-backdrop-filter: blur(20px) saturate(1.2);
-                backdrop-filter: blur(20px) saturate(1.2);
-                box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+                box-shadow: none;
+            }
+
+            .content {
+                padding: 12px 12px 12px 0;
+            }
+
+            .viewer {
+                border-radius: 0;
+                box-shadow: 0 12px 34px rgba(0, 0, 0, 0.16);
+            }
+
+            .viewer-title {
+                display: block;
             }
 
             .content-header {
                 display: none;
             }
 
-            .examples-list {
-                padding: 20px;
-            }
-
             .example-title {
-                font-size: 16px;
+                font-size: 13px;
             }
 
             .hamburger {
@@ -309,11 +389,13 @@
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h1>math</h1>
-        </div>
-        <div class="search-container">
-            <input type="text" id="search-input" class="search-input" placeholder="Search examples..." />
+        <div class="sidebar-top">
+            <div class="sidebar-header">
+                <h1>math</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="search examples..." />
+            </div>
         </div>
         <ul class="examples-list" id="examples-list"></ul>
     </div>
@@ -323,7 +405,23 @@
             <button class="hamburger" id="hamburger">☰</button>
             <h2 id="example-title">Select an example</h2>
         </div>
-        <iframe class="example-frame" id="example-frame"></iframe>
+        <div class="viewer" id="viewer">
+            <iframe class="example-frame" id="example-frame"></iframe>
+            <div class="viewer-title">
+                <h2 id="viewer-title-text"></h2>
+                <p id="viewer-desc-text" class="viewer-desc"></p>
+            </div>
+            <div class="viewer-toolbar">
+                <a class="viewer-btn" id="btn-source" target="_blank" rel="noopener" title="View source on GitHub">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18v-6h6v6M9 6h6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    source
+                </a>
+                <a class="viewer-btn" id="btn-open" target="_blank" rel="noopener" title="Open in a new tab">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                    open
+                </a>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -357,7 +455,7 @@
                 <li class="example-card" data-example="${key}">
                     <div class="example-item" data-example="${key}">
                         <div class="example-preview">
-                            <img src="./screenshots/${key}.png" alt="${example.title}" class="example-screenshot" onerror="this.style.display='none'">
+                            <img src="./screenshots/${key}.png" alt="${example.title}" class="example-screenshot" draggable="false" onerror="this.style.display='none'">
                             <div class="example-overlay">
                                 <h3 class="example-title">${example.title}</h3>
                             </div>
@@ -400,7 +498,11 @@
         addExamplesToSidebar();
 
         const titleElement = document.getElementById("example-title");
+        const viewerTitleText = document.getElementById("viewer-title-text");
+        const viewerDescText = document.getElementById("viewer-desc-text");
         const frameElement = document.getElementById("example-frame");
+        const btnSource = document.getElementById("btn-source");
+        const btnOpen = document.getElementById("btn-open");
         const hamburger = document.getElementById("hamburger");
         const sidebar = document.getElementById("sidebar");
         const sidebarOverlay = document.getElementById("sidebar-overlay");
@@ -467,7 +569,11 @@
             if (!example) return;
 
             titleElement.textContent = example.title;
+            viewerTitleText.textContent = example.title;
+            viewerDescText.textContent = example.description;
             frameElement.src = `./${exampleKey}.html`;
+            btnSource.href = `https://github.com/pmndrs/math/blob/main/examples/src/${exampleKey}.ts`;
+            btnOpen.href = `./${exampleKey}.html`;
 
             // update active item
             const exampleItems = document.querySelectorAll(".example-item");
