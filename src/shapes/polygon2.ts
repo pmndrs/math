@@ -100,3 +100,115 @@ export function containsPoint(verts: number[], n: number, point: Vec2): boolean 
 
     return inside;
 }
+
+/**
+ * Computes the area-weighted centroid (center of mass) of the polygon.
+ * For a degenerate (zero-area) polygon this falls back to the average of the
+ * vertices.
+ *
+ * @param out the vector to store the centroid
+ * @param verts polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `verts`
+ * @returns out
+ */
+export function centroid(out: Vec2, verts: number[], n: number): Vec2 {
+    let cx = 0;
+    let cy = 0;
+    let a2 = 0; // twice the signed area
+
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+        const xi = verts[i * 2];
+        const yi = verts[i * 2 + 1];
+        const xj = verts[j * 2];
+        const yj = verts[j * 2 + 1];
+        const cross = xj * yi - xi * yj;
+        a2 += cross;
+        cx += (xj + xi) * cross;
+        cy += (yj + yi) * cross;
+    }
+
+    if (a2 === 0) {
+        // Degenerate polygon (collinear vertices): use the vertex average.
+        let sx = 0;
+        let sy = 0;
+        for (let i = 0; i < n; i++) {
+            sx += verts[i * 2];
+            sy += verts[i * 2 + 1];
+        }
+        out[0] = sx / n;
+        out[1] = sy / n;
+        return out;
+    }
+
+    const inv = 1 / (3 * a2);
+    out[0] = cx * inv;
+    out[1] = cy * inv;
+    return out;
+}
+
+/**
+ * Returns the perimeter (sum of edge lengths) of the polygon.
+ *
+ * @param verts polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `verts`
+ * @returns the perimeter
+ */
+export function perimeter(verts: number[], n: number): number {
+    let total = 0;
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+        const dx = verts[i * 2] - verts[j * 2];
+        const dy = verts[i * 2 + 1] - verts[j * 2 + 1];
+        total += Math.sqrt(dx * dx + dy * dy);
+    }
+    return total;
+}
+
+/**
+ * Returns the winding order of the polygon from the sign of its signed area:
+ * `1` for counter-clockwise, `-1` for clockwise, and `0` for a degenerate
+ * (zero-area) polygon.
+ *
+ * @param verts polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `verts`
+ * @returns 1 (CCW), -1 (CW), or 0 (degenerate)
+ */
+export function winding(verts: number[], n: number): number {
+    const a = signedArea(verts, n);
+    if (a > 0) return 1;
+    if (a < 0) return -1;
+    return 0;
+}
+
+/**
+ * Tests whether the polygon is convex. Works for both winding orders. Assumes a
+ * simple (non-self-intersecting) polygon; collinear vertices are allowed.
+ *
+ * @param verts polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `verts`
+ * @returns true if the polygon is convex
+ */
+export function isConvex(verts: number[], n: number): boolean {
+    if (n < 3) return false;
+
+    let sign = 0;
+    for (let i = 0; i < n; i++) {
+        const p = ((i - 1 + n) % n) * 2;
+        const c = i * 2;
+        const q = ((i + 1) % n) * 2;
+
+        // Cross product of the incoming and outgoing edges at vertex i.
+        const ax = verts[c] - verts[p];
+        const ay = verts[c + 1] - verts[p + 1];
+        const bx = verts[q] - verts[c];
+        const by = verts[q + 1] - verts[c + 1];
+        const cross = ax * by - ay * bx;
+
+        if (cross !== 0) {
+            const s = cross > 0 ? 1 : -1;
+            if (sign === 0) sign = s;
+            else if (s !== sign) return false;
+        }
+    }
+
+    return true;
+}
