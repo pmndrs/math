@@ -1,9 +1,9 @@
 import type { MutableArrayLike } from './arrays';
-import { EPSILON } from './scalar';
 import type { Euler, EulerOrder } from './euler';
 import type { Mat3 } from './mat3';
 import * as mat3 from './mat3';
 import type { Mat4 } from './mat4';
+import { EPSILON } from './scalar';
 import type { Vec3 } from './vec3';
 import * as vec3 from './vec3';
 import * as vec4 from './vec4';

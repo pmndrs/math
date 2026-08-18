@@ -1,4 +1,5 @@
 export * from './scalar';
+export * from './angle';
 export type { MutableArrayLike } from './arrays';
 
 export * as vec2 from './vec2';

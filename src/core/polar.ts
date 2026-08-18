@@ -1,4 +1,5 @@
 import * as scalar from './scalar';
+import { wrapAngle } from './angle';
 import type { Vec2 } from './vec2';
 
 /**
@@ -12,13 +13,6 @@ import type { Vec2 } from './vec2';
  * horizontal projection use spherical.fromVec2 / spherical.toVec2 instead.
  */
 export type Polar = [r: number, theta: number];
-
-const TAU = Math.PI * 2;
-
-/** Wraps an angle (in radians) into the range (-pi, pi]. */
-function wrapAngle(a: number): number {
-    return a - TAU * Math.floor((a + Math.PI) / TAU);
-}
 
 /**
  * Creates a new polar coordinate at r=1, theta=0

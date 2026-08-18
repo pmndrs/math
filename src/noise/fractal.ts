@@ -7,20 +7,8 @@ import type { Vec3 } from '../core/vec3';
 // noise at your coordinates scaled by it, so the same helper works with any
 // generator at any dimension:
 //
-//   fbm((f) => simplex2d.sample(gen, x * f, y * f), { octaves: 5 })
-//   fbm((f) => simplex3d.sample(gen, x * f, y * f, z * f))
-
-/** Options for the fractal (multi-octave) noise helpers. */
-export type FractalOptions = {
-    /** number of octaves to sum (default 4) */
-    octaves?: number;
-    /** frequency of the first octave (default 1) */
-    frequency?: number;
-    /** frequency multiplier between octaves (default 2) */
-    lacunarity?: number;
-    /** amplitude multiplier between octaves (default 0.5) */
-    gain?: number;
-};
+//   fbm((f) => simplex2d.sample(gen, x * f, y * f), 5, 2, 0.5)
+//   fbm((f) => simplex3d.sample(gen, x * f, y * f, z * f), 5, 2, 0.5)
 
 /**
  * Fractional Brownian motion: sums octaves of a noise source at increasing
@@ -28,14 +16,13 @@ export type FractalOptions = {
  * heightmaps and clouds. Given a source in [-1, 1], returns a value in [-1, 1].
  *
  * @param sample receives an octave frequency, returns the base noise scaled by it
- * @param options octave count and per-octave frequency/amplitude falloff
+ * @param octaves number of octaves to sum
+ * @param lacunarity frequency multiplier between octaves
+ * @param gain amplitude multiplier between octaves
  * @returns the summed, normalized noise value
  */
-export function fbm(sample: (frequency: number) => number, options?: FractalOptions): number {
-    const octaves = options?.octaves ?? 4;
-    const lacunarity = options?.lacunarity ?? 2;
-    const gain = options?.gain ?? 0.5;
-    let frequency = options?.frequency ?? 1;
+export function fbm(sample: (frequency: number) => number, octaves: number, lacunarity: number, gain: number): number {
+    let frequency = 1;
     let amplitude = 1;
     let sum = 0;
     let norm = 0;
@@ -54,14 +41,18 @@ export function fbm(sample: (frequency: number) => number, options?: FractalOpti
  * range / canyon look. Given a source in [-1, 1], returns a value in [0, 1].
  *
  * @param sample receives an octave frequency, returns the base noise scaled by it
- * @param options octave count and per-octave frequency/amplitude falloff
+ * @param octaves number of octaves to sum
+ * @param lacunarity frequency multiplier between octaves
+ * @param gain amplitude multiplier between octaves
  * @returns the summed, normalized ridged value
  */
-export function ridged(sample: (frequency: number) => number, options?: FractalOptions): number {
-    const octaves = options?.octaves ?? 4;
-    const lacunarity = options?.lacunarity ?? 2;
-    const gain = options?.gain ?? 0.5;
-    let frequency = options?.frequency ?? 1;
+export function ridged(
+    sample: (frequency: number) => number,
+    octaves: number,
+    lacunarity: number,
+    gain: number,
+): number {
+    let frequency = 1;
     let amplitude = 1;
     let sum = 0;
     let norm = 0;
@@ -80,14 +71,18 @@ export function ridged(sample: (frequency: number) => number, options?: FractalO
  * value in [-1, 1].
  *
  * @param sample receives an octave frequency, returns the base noise scaled by it
- * @param options octave count and per-octave frequency/amplitude falloff
+ * @param octaves number of octaves to sum
+ * @param lacunarity frequency multiplier between octaves
+ * @param gain amplitude multiplier between octaves
  * @returns the summed, normalized billow value
  */
-export function billow(sample: (frequency: number) => number, options?: FractalOptions): number {
-    const octaves = options?.octaves ?? 4;
-    const lacunarity = options?.lacunarity ?? 2;
-    const gain = options?.gain ?? 0.5;
-    let frequency = options?.frequency ?? 1;
+export function billow(
+    sample: (frequency: number) => number,
+    octaves: number,
+    lacunarity: number,
+    gain: number,
+): number {
+    let frequency = 1;
     let amplitude = 1;
     let sum = 0;
     let norm = 0;
