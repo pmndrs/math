@@ -215,6 +215,56 @@ export function isConvex(vertices: number[], n: number): boolean {
 }
 
 /**
+ * Tests whether vertex `i` is a reflex (concave) vertex of the polygon — the
+ * interior angle at that vertex exceeds 180°. Assumes the polygon is wound
+ * counter-clockwise and that `0 <= i < n`.
+ *
+ * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `vertices`
+ * @param i index of the vertex to test
+ * @returns true if vertex `i` is reflex
+ */
+export function isReflexVertex(vertices: number[], n: number, i: number): boolean {
+    const p = ((i - 1 + n) % n) * 2;
+    const c = i * 2;
+    const q = ((i + 1) % n) * 2;
+
+    // Cross product of the incoming and outgoing edges; negative = right turn = reflex (CCW).
+    const ax = vertices[c] - vertices[p];
+    const ay = vertices[c + 1] - vertices[p + 1];
+    const bx = vertices[q] - vertices[c];
+    const by = vertices[q + 1] - vertices[c + 1];
+    return ax * by - ay * bx < 0;
+}
+
+/**
+ * Reverses the winding order of the polygon, writing the result into `out`.
+ * `out` may be the same array as `vertices` to reverse in place.
+ *
+ * @param out the array to write the reversed polygon into
+ * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `vertices`
+ * @returns out
+ */
+export function reverse(out: number[], vertices: number[], n: number): number[] {
+    for (let lo = 0, hi = n - 1; lo < hi; lo++, hi--) {
+        const x = vertices[lo * 2];
+        const y = vertices[lo * 2 + 1];
+        out[lo * 2] = vertices[hi * 2];
+        out[lo * 2 + 1] = vertices[hi * 2 + 1];
+        out[hi * 2] = x;
+        out[hi * 2 + 1] = y;
+    }
+    // Copy the untouched middle vertex when writing to a different buffer.
+    if (out !== vertices && n % 2 === 1) {
+        const mid = (n >> 1) * 2;
+        out[mid] = vertices[mid];
+        out[mid + 1] = vertices[mid + 1];
+    }
+    return out;
+}
+
+/**
  * Writes the axis-aligned bounding box of the polygon into `out` as a Box2
  * `[minX, minY, maxX, maxY]`.
  *

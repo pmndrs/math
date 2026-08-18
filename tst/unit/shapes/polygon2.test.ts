@@ -178,6 +178,54 @@ describe('polygon2', () => {
         });
     });
 
+    describe('isReflexVertex', () => {
+        // CCW L-shape; vertex 3 = (1,1) is the single reflex corner.
+        const lShape = [0, 0, 4, 0, 4, 1, 1, 1, 1, 3, 0, 3];
+
+        it('is true at a reflex (concave) vertex', () => {
+            expect(polygon2.isReflexVertex(lShape, 6, 3)).toBe(true);
+        });
+
+        it('is false at convex vertices', () => {
+            for (const i of [0, 1, 2, 4, 5]) {
+                expect(polygon2.isReflexVertex(lShape, 6, i)).toBe(false);
+            }
+        });
+
+        it('is false for every vertex of a convex polygon', () => {
+            const square = [0, 0, 1, 0, 1, 1, 0, 1];
+            for (let i = 0; i < 4; i++) {
+                expect(polygon2.isReflexVertex(square, 4, i)).toBe(false);
+            }
+        });
+    });
+
+    describe('reverse', () => {
+        it('reverses winding into a separate buffer', () => {
+            const square = [0, 0, 1, 0, 1, 1, 0, 1];
+            const out = [0, 0, 0, 0, 0, 0, 0, 0];
+            const result = polygon2.reverse(out, square, 4);
+            expect(result).toBe(out);
+            expect(out).toEqual([0, 1, 1, 1, 1, 0, 0, 0]);
+            // Source is untouched, and winding is flipped.
+            expect(polygon2.winding(square, 4)).toBe(1);
+            expect(polygon2.winding(out, 4)).toBe(-1);
+        });
+
+        it('reverses in place (out === vertices)', () => {
+            const poly = [0, 0, 1, 0, 1, 1, 0, 1];
+            polygon2.reverse(poly, poly, 4);
+            expect(poly).toEqual([0, 1, 1, 1, 1, 0, 0, 0]);
+        });
+
+        it('handles an odd vertex count into a separate buffer', () => {
+            const tri = [0, 0, 4, 0, 0, 3];
+            const out = [0, 0, 0, 0, 0, 0];
+            polygon2.reverse(out, tri, 3);
+            expect(out).toEqual([0, 3, 4, 0, 0, 0]);
+        });
+    });
+
     describe('bounds', () => {
         it('computes the AABB of a polygon', () => {
             const out: [number, number, number, number] = [0, 0, 0, 0];
