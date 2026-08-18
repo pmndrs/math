@@ -80,4 +80,64 @@ group('polygon2 ops 10k @shapes @polygon2', () => {
         };
         if (acc < 0) throw new Error('unreachable');
     });
+
+    bench('bounds', function* () {
+        const out: [number, number, number, number] = [0, 0, 0, 0];
+        let acc = 0;
+        yield () => {
+            for (let i = 0; i < N; i++) {
+                polygon2.bounds(out, poly, SIDES);
+                acc += out[0];
+            }
+        };
+        if (acc === Number.POSITIVE_INFINITY) throw new Error('unreachable');
+    });
+
+    bench('closestPoint', function* () {
+        const points = makePoints(1);
+        const out: Vec2 = [0, 0];
+        let acc = 0;
+        yield () => {
+            for (let i = 0; i < N; i++) {
+                polygon2.closestPoint(out, poly, SIDES, points[i]);
+                acc += out[0];
+            }
+        };
+        if (acc === Number.POSITIVE_INFINITY) throw new Error('unreachable');
+    });
+
+    bench('signedDistance', function* () {
+        const points = makePoints(1);
+        let acc = 0;
+        yield () => {
+            for (let i = 0; i < N; i++) {
+                acc += polygon2.signedDistance(poly, SIDES, points[i]);
+            }
+        };
+        if (acc === Number.POSITIVE_INFINITY) throw new Error('unreachable');
+    });
+
+    bench('overlapConvex', function* () {
+        // A second polygon translated so it partially overlaps the first.
+        const other = poly.map((v, i) => (i % 2 === 0 ? v + 4 : v));
+        let acc = 0;
+        yield () => {
+            for (let i = 0; i < N; i++) {
+                if (polygon2.overlapConvex(poly, SIDES, other, SIDES)) acc++;
+            }
+        };
+        if (acc < 0) throw new Error('unreachable');
+    });
+
+    bench('intersectsSegment', function* () {
+        const points = makePoints(1);
+        const points2 = makePoints(2);
+        let acc = 0;
+        yield () => {
+            for (let i = 0; i < N; i++) {
+                if (polygon2.intersectsSegment(poly, SIDES, points[i], points2[i])) acc++;
+            }
+        };
+        if (acc < 0) throw new Error('unreachable');
+    });
 });

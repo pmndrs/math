@@ -177,4 +177,105 @@ describe('polygon2', () => {
             expect(polygon2.isConvex([0, 0, 1, 1], 2)).toBe(false);
         });
     });
+
+    describe('bounds', () => {
+        it('computes the AABB of a polygon', () => {
+            const out: [number, number, number, number] = [0, 0, 0, 0];
+            polygon2.bounds(out, concave, 4);
+            expect(out).toEqual([0, 0, 4, 4]);
+        });
+
+        it('ignores trailing vertices beyond n', () => {
+            const out: [number, number, number, number] = [0, 0, 0, 0];
+            const scratch = [0, 0, 1, 0, 1, 1, 0, 1, 999, 999, -999, -999];
+            polygon2.bounds(out, scratch, 4);
+            expect(out).toEqual([0, 0, 1, 1]);
+        });
+
+        it('returns out', () => {
+            const out: [number, number, number, number] = [0, 0, 0, 0];
+            expect(polygon2.bounds(out, square, 4)).toBe(out);
+        });
+    });
+
+    describe('closestPoint', () => {
+        it('projects an exterior point onto the nearest edge', () => {
+            const out: [number, number] = [0, 0];
+            polygon2.closestPoint(out, square, 4, [2, 0.5]);
+            expect(out[0]).toBeCloseTo(1);
+            expect(out[1]).toBeCloseTo(0.5);
+        });
+
+        it('projects an interior point onto the nearest edge', () => {
+            const out: [number, number] = [0, 0];
+            polygon2.closestPoint(out, square, 4, [0.5, 0.2]);
+            expect(out[0]).toBeCloseTo(0.5);
+            expect(out[1]).toBeCloseTo(0);
+        });
+
+        it('works when out === point (aliased)', () => {
+            const p: [number, number] = [2, 0.5];
+            polygon2.closestPoint(p, square, 4, p);
+            expect(p[0]).toBeCloseTo(1);
+            expect(p[1]).toBeCloseTo(0.5);
+        });
+    });
+
+    describe('signedDistance', () => {
+        it('is positive outside', () => {
+            expect(polygon2.signedDistance(square, 4, [2, 0.5])).toBeCloseTo(1);
+        });
+
+        it('is negative inside', () => {
+            expect(polygon2.signedDistance(square, 4, [0.5, 0.2])).toBeCloseTo(-0.2);
+            expect(polygon2.signedDistance(square, 4, [0.5, 0.5])).toBeCloseTo(-0.5);
+        });
+
+        it('is ~0 on the boundary', () => {
+            expect(polygon2.signedDistance(square, 4, [0.5, 0])).toBeCloseTo(0);
+        });
+    });
+
+    describe('overlapConvex', () => {
+        const a = [0, 0, 2, 0, 2, 2, 0, 2];
+
+        it('is true for overlapping polygons', () => {
+            const b = [1, 1, 3, 1, 3, 3, 1, 3];
+            expect(polygon2.overlapConvex(a, 4, b, 4)).toBe(true);
+        });
+
+        it('is false for disjoint polygons', () => {
+            const b = [5, 5, 6, 5, 6, 6, 5, 6];
+            expect(polygon2.overlapConvex(a, 4, b, 4)).toBe(false);
+        });
+
+        it('treats edge-touching polygons as overlapping', () => {
+            const b = [2, 0, 4, 0, 4, 2, 2, 2];
+            expect(polygon2.overlapConvex(a, 4, b, 4)).toBe(true);
+        });
+
+        it('detects containment (one inside the other)', () => {
+            const inner = [0.5, 0.5, 1.5, 0.5, 1.5, 1.5, 0.5, 1.5];
+            expect(polygon2.overlapConvex(a, 4, inner, 4)).toBe(true);
+        });
+    });
+
+    describe('intersectsSegment', () => {
+        it('is true when the segment crosses the polygon', () => {
+            expect(polygon2.intersectsSegment(square, 4, [-1, 0.5], [2, 0.5])).toBe(true);
+        });
+
+        it('is true when the segment lies fully inside', () => {
+            expect(polygon2.intersectsSegment(square, 4, [0.3, 0.3], [0.7, 0.7])).toBe(true);
+        });
+
+        it('is true when one endpoint is inside', () => {
+            expect(polygon2.intersectsSegment(square, 4, [-1, 0.5], [0.5, 0.5])).toBe(true);
+        });
+
+        it('is false when the segment is fully outside', () => {
+            expect(polygon2.intersectsSegment(square, 4, [2, 2], [3, 3])).toBe(false);
+            expect(polygon2.intersectsSegment(square, 4, [-1, -1], [-2, -2])).toBe(false);
+        });
+    });
 });
