@@ -12,28 +12,6 @@ export function round(a: number): number {
     return a % 0.5 === 0 ? Math.floor(a) : Math.round(a);
 }
 
-const DEGREES_TO_RADIANS = Math.PI / 180;
-
-const RADIANS_TO_DEGREES = 180 / Math.PI;
-
-/**
- * Converts Degrees To Radians
- *
- * @param a Angle in Degrees
- */
-export function degreesToRadians(degrees: number): number {
-    return degrees * DEGREES_TO_RADIANS;
-}
-
-/**
- * Converts Radians To Degrees
- *
- * @param a Angle in Radians
- */
-export function radiansToDegrees(radians: number): number {
-    return radians * RADIANS_TO_DEGREES;
-}
-
 /**
  * Tests whether or not the arguments have approximately the same value, within an absolute
  * or relative tolerance of glMatrix.EPSILON (an absolute tolerance is used for values less
@@ -84,15 +62,6 @@ export const clamp = (value: number, min: number, max: number): number => {
  */
 export function repeat(t: number, length: number): number {
     return clamp(t - Math.floor(t / length) * length, 0, length);
-}
-
-/**
- * Calculates the shortest signed difference between two angles (in radians).
- */
-export function deltaAngle(current: number, target: number): number {
-    let delta = repeat(target - current, Math.PI * 2);
-    if (delta > Math.PI) delta -= Math.PI * 2;
-    return delta;
 }
 
 /**

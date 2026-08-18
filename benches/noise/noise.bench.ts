@@ -101,7 +101,7 @@ group("noise sample 10k @noise", () => {
     yield () => {
       let sum = 0;
       for (let i = 0; i < N; i++) {
-        sum += fbm((f) => simplex2d.sample(gen, i * 0.01 * f, i * 0.013 * f), { octaves: 5 });
+        sum += fbm((f) => simplex2d.sample(gen, i * 0.01 * f, i * 0.013 * f), 5, 2, 0.5);
       }
       return sum;
     };

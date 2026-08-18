@@ -13,7 +13,7 @@ import { createRenderer } from './common/renderer';
 // obb3.containsPoint projects each point onto the box's own rotated axes and
 // compares against its half-extents, so the glowing slab tumbles with it.
 
-const N = 20; // points per axis
+const N = 30; // points per axis
 const EXTENT = 3.0; // half-width of the lattice cube
 const MARKER = 0.05;
 const COUNT = N * N * N;
@@ -100,10 +100,21 @@ const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
 const shade = g.Var('shade', g.f32(0.55).add(diffuse.mul(g.f32(0.55))));
 const rainbow = g.Var('rainbow', rainbowRGB(vWorld));
 // outside: a faint lattice; inside: full rainbow, lit and glowing
-const dim = g.Var('dim', rainbow.mul(g.f32(0.08)));
+const dim = g.Var('dim', rainbow.mul(g.f32(0.5)));
 const lit = g.Var('lit', rainbow.mul(shade));
 const color = g.Var('color', g.mix(dim, lit, vGlow));
-const material = new g.Material({ vertex: clip, fragment: g.vec4(color, g.f32(1)) });
+// non-active points stay faint, active points fade up to solid
+const alpha = g.Var('alpha', g.f32(0.2).add(vGlow.mul(g.f32(0.8))));
+const material = new g.Material({
+    vertex: clip,
+    fragment: g.vec4(color, alpha),
+    transparent: true,
+    depthWrite: false,
+    blend: {
+        color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha', operation: 'add' },
+        alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' },
+    },
+});
 
 const points = new g.Mesh(sphereGeometry, material);
 points.count = COUNT;

@@ -1,4 +1,4 @@
-import { deltaAngle } from '../core';
+import { deltaAngle } from '../core/angle';
 import { coef, coefficients, type Spring } from './spring-core';
 
 // A scalar spring (damped harmonic oscillator), integrated with the exact

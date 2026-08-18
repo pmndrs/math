@@ -1,9 +1,9 @@
 import type { MutableArrayLike } from './arrays';
-import * as scalar from './scalar';
 import type { Mat2 } from './mat2';
 import type { Mat2d } from './mat2d';
 import type { Mat3 } from './mat3';
 import type { Mat4 } from './mat4';
+import * as scalar from './scalar';
 import type { Vec3 } from './vec3';
 
 /** A 2D vector */

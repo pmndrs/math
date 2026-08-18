@@ -10,21 +10,23 @@ describe('fractal', () => {
                     freqs.push(f);
                     return 0;
                 },
-                { octaves: 4, frequency: 1, lacunarity: 2 },
+                4,
+                2,
+                0.5,
             );
             expect(freqs).toEqual([1, 2, 4, 8]);
         });
 
         it('normalizes a constant source back to that constant', () => {
-            expect(fbm(() => 1)).toBeCloseTo(1);
-            expect(fbm(() => 0)).toBe(0);
-            expect(fbm(() => -1)).toBeCloseTo(-1);
+            expect(fbm(() => 1, 4, 2, 0.5)).toBeCloseTo(1);
+            expect(fbm(() => 0, 4, 2, 0.5)).toBe(0);
+            expect(fbm(() => -1, 4, 2, 0.5)).toBeCloseTo(-1);
         });
 
         it('stays within [-1, 1] for a bounded source', () => {
             const gen = simplex2d.create(3);
             for (let i = 0; i < 500; i++) {
-                const v = fbm((f) => simplex2d.sample(gen, i * 0.1 * f, i * 0.13 * f), { octaves: 5 });
+                const v = fbm((f) => simplex2d.sample(gen, i * 0.1 * f, i * 0.13 * f), 5, 2, 0.5);
                 expect(v).toBeGreaterThanOrEqual(-1);
                 expect(v).toBeLessThanOrEqual(1);
             }
@@ -33,21 +35,21 @@ describe('fractal', () => {
         it('changes with octave count', () => {
             const gen = simplex2d.create(3);
             const s = (f: number) => simplex2d.sample(gen, 1.5 * f, 2.5 * f);
-            expect(fbm(s, { octaves: 1 })).not.toBe(fbm(s, { octaves: 4 }));
+            expect(fbm(s, 1, 2, 0.5)).not.toBe(fbm(s, 4, 2, 0.5));
         });
     });
 
     describe('ridged', () => {
         it('folds each octave to 1 - abs(noise)', () => {
-            expect(ridged(() => 0)).toBeCloseTo(1);
-            expect(ridged(() => 1)).toBeCloseTo(0);
-            expect(ridged(() => -1)).toBeCloseTo(0);
+            expect(ridged(() => 0, 4, 2, 0.5)).toBeCloseTo(1);
+            expect(ridged(() => 1, 4, 2, 0.5)).toBeCloseTo(0);
+            expect(ridged(() => -1, 4, 2, 0.5)).toBeCloseTo(0);
         });
 
         it('stays within [0, 1]', () => {
             const gen = simplex2d.create(5);
             for (let i = 0; i < 300; i++) {
-                const v = ridged((f) => simplex2d.sample(gen, i * 0.2 * f, i * 0.1 * f), { octaves: 4 });
+                const v = ridged((f) => simplex2d.sample(gen, i * 0.2 * f, i * 0.1 * f), 4, 2, 0.5);
                 expect(v).toBeGreaterThanOrEqual(0);
                 expect(v).toBeLessThanOrEqual(1);
             }
@@ -56,15 +58,15 @@ describe('fractal', () => {
 
     describe('billow', () => {
         it('folds each octave to 2*abs(noise) - 1', () => {
-            expect(billow(() => 0)).toBeCloseTo(-1);
-            expect(billow(() => 1)).toBeCloseTo(1);
-            expect(billow(() => -1)).toBeCloseTo(1);
+            expect(billow(() => 0, 4, 2, 0.5)).toBeCloseTo(-1);
+            expect(billow(() => 1, 4, 2, 0.5)).toBeCloseTo(1);
+            expect(billow(() => -1, 4, 2, 0.5)).toBeCloseTo(1);
         });
 
         it('stays within [-1, 1]', () => {
             const gen = simplex2d.create(5);
             for (let i = 0; i < 300; i++) {
-                const v = billow((f) => simplex2d.sample(gen, i * 0.15 * f, i * 0.11 * f), { octaves: 4 });
+                const v = billow((f) => simplex2d.sample(gen, i * 0.15 * f, i * 0.11 * f), 4, 2, 0.5);
                 expect(v).toBeGreaterThanOrEqual(-1);
                 expect(v).toBeLessThanOrEqual(1);
             }

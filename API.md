@@ -40,15 +40,18 @@ overview, installation, and examples, see the [README](./README.md).
 
 - <a id="epsilon"></a>`EPSILON = 0.000001`
 - <a id="round"></a>`round(a: number): number` — Symmetric round
-- <a id="degreestoradians"></a>`degreesToRadians(degrees: number): number` — Converts Degrees To Radians
-- <a id="radianstodegrees"></a>`radiansToDegrees(radians: number): number` — Converts Radians To Degrees
 - <a id="fade"></a>`fade(t: number)` — Ease-in-out, goes to -Infinite before 0 and Infinite after 1
 - <a id="lerp"></a>`lerp(v0: number, v1: number, t: number)`
 - <a id="clamp"></a>`clamp(value: number, min: number, max: number): number` — Clamp a value between min and max
 - <a id="repeat"></a>`repeat(t: number, length: number): number` — Loops `t` so that it is never larger than `length` and never smaller than 0.
-- <a id="deltaangle"></a>`deltaAngle(current: number, target: number): number` — Calculates the shortest signed difference between two angles (in radians).
 - <a id="remap"></a>`remap(number: number, inLow: number, inHigh: number, outLow: number, outHigh: number): number` — Remaps a number from one range to another.
 - <a id="remapclamp"></a>`remapClamp(value: number, inLow: number, inHigh: number, outLow: number, outHigh: number): number` — Remaps a number from one range to another, clamping the result to the output range.
+- <a id="degrees_to_radians"></a>`DEGREES_TO_RADIANS`
+- <a id="radians_to_degrees"></a>`RADIANS_TO_DEGREES`
+- <a id="degreestoradians"></a>`degreesToRadians(degrees: number): number` — Converts Degrees To Radians
+- <a id="radianstodegrees"></a>`radiansToDegrees(radians: number): number` — Converts Radians To Degrees
+- <a id="wrapangle"></a>`wrapAngle(a: number): number` — Wraps an angle (in radians) into the range (-π, π].
+- <a id="deltaangle"></a>`deltaAngle(current: number, target: number): number` — Calculates the shortest signed difference between two angles (in radians).
 
 **Query**
 
@@ -1253,14 +1256,13 @@ import { random } from 'math/random';
 
 **Types**
 
-- `type FractalOptions = { octaves?: number; frequency?: number; lacunarity?: number; gain?: number; }` — Options for the fractal (multi-octave) noise helpers.
 - `type Permutation = { perm: number[]; gradP: Vec3[]; gradP4: Vec4[]; }` — Seeded permutation and gradient tables that back a noise generator.
 
 **Operations**
 
-- <a id="fbm"></a>`fbm(sample: (frequency: number) => number, options?: FractalOptions): number` — Fractional Brownian motion: sums octaves of a noise source at increasing
-- <a id="ridged"></a>`ridged(sample: (frequency: number) => number, options?: FractalOptions): number` — Ridged multifractal: like fbm, but each octave is folded to
-- <a id="billow"></a>`billow(sample: (frequency: number) => number, options?: FractalOptions): number` — Billow noise: like fbm, but each octave is folded to `2*abs(noise) - 1`
+- <a id="fbm"></a>`fbm(sample: (frequency: number) => number, octaves: number, lacunarity: number, gain: number): number` — Fractional Brownian motion: sums octaves of a noise source at increasing
+- <a id="ridged"></a>`ridged(sample: (frequency: number) => number, octaves: number, lacunarity: number, gain: number): number` — Ridged multifractal: like fbm, but each octave is folded to
+- <a id="billow"></a>`billow(sample: (frequency: number) => number, octaves: number, lacunarity: number, gain: number): number` — Billow noise: like fbm, but each octave is folded to `2*abs(noise) - 1`
 - <a id="domainwarp2"></a>`domainWarp2(out: Vec2, sample: (x: number, y: number) => number, x: number, y: number, amount = 1): Vec2` — Domain warping (2D): offsets a point by a noise-derived vector, so feeding the
 - <a id="domainwarp3"></a>`domainWarp3(out: Vec3, sample: (x: number, y: number, z: number) => number, x: number, y: number, z: number, amount = 1): Vec3` — Domain warping (3D): offsets a point by a noise-derived vector so a noise
 - <a id="curl2"></a>`curl2(out: Vec2, sample: (x: number, y: number) => number, x: number, y: number, eps = 1e-4): Vec2` — Curl of a 2D scalar noise potential - a divergence-free (incompressible) flow

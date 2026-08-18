@@ -40,7 +40,7 @@ function buildSolid(seed: number, height: number, detail: number): Uint8Array {
 
     for (let x = 0; x < GX; x++) {
         for (let z = 0; z < GZ; z++) {
-            const r = ridged((f) => simplex2d.sample(hgen, x * H_FREQ * detail * f, z * H_FREQ * detail * f), { octaves: 4 });
+            const r = ridged((f) => simplex2d.sample(hgen, x * H_FREQ * detail * f, z * H_FREQ * detail * f), 4, 2, 0.5);
             const h = BASE + height * r;
             for (let y = 0; y < GY && y < h; y++) {
                 solid[idx(x, y, z)] = 1;

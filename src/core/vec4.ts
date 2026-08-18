@@ -1,7 +1,7 @@
 import type { MutableArrayLike } from './arrays';
-import * as scalar from './scalar';
 import type { Mat4 } from './mat4';
 import type { Quat } from './quat';
+import * as scalar from './scalar';
 
 /** A 4D vector */
 export type Vec4 = [x: number, y: number, z: number, w: number];

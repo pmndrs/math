@@ -1,6 +1,6 @@
-import { EPSILON } from './scalar';
 import type { Mat4 } from './mat4';
 import type { Quat } from './quat';
+import { EPSILON } from './scalar';
 import type { Vec3 } from './vec3';
 
 /** A dual quaternion that represents both rotation and translation */
@@ -14,9 +14,9 @@ export type Quat2 = [x: number, y: number, z: number, w: number, x2: number, y2:
 export function create(): Quat2 {
     // biome-ignore format:skip
     return [
-		0, 0, 0, 1, // real part
-		0, 0, 0, 0, // dual part
-	];
+        0, 0, 0, 1, // real part
+        0, 0, 0, 0, // dual part
+    ];
 }
 
 /**

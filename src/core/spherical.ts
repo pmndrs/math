@@ -1,3 +1,4 @@
+import { wrapAngle } from './angle';
 import * as scalar from './scalar';
 import type { Vec2 } from './vec2';
 import type { Vec3 } from './vec3';
@@ -98,15 +99,6 @@ export function scale(out: Spherical, a: Spherical, s: number): Spherical {
     out[1] = a[1];
     out[2] = a[2];
     return out;
-}
-
-const TAU = Math.PI * 2;
-
-/**
- * Wraps an angle (in radians) into the range [-π, π].
- */
-function wrapAngle(a: number): number {
-    return a - TAU * Math.floor((a + Math.PI) / TAU);
 }
 
 /**
