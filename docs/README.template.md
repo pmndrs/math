@@ -37,3 +37,4 @@ The library is grouped by domain behind subpath entrypoints. All APIs are highly
 
 - The vec*, quat*, mat* code started life as a port of mathcat, which started as a TypeScript port of glMatrix (https://glmatrix.net/)
 - The simplex noise is adapted from https://github.com/josephg/noisejs
+- Thank you [@kaleb](https://github.com/kaleb) for the npm package name!
