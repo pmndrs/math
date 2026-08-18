@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import type { Vec2 } from '../../../src/core/vec2';
 import * as vec2 from '../../../src/core/vec2';
-import { circumcircle, type Vec2 } from '../../../src/geometry';
+import { circumcircle } from '../../../src/geometry';
 import * as mulberry32 from '../../../src/random/mulberry32';
 import { circle } from '../../../src/shapes';
 
