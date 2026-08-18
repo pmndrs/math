@@ -22,7 +22,7 @@ overview, installation, and examples, see the [README](./README.md).
 
 - [`math`](#api-math) — Vectors, quaternions, euler angles & matrices
 - [`math/shapes`](#api-math-shapes) — Shape primitives & spatial queries
-- [`math/geometry`](#api-math-geometry) — Convex hulls & circumcircle
+- [`math/geometry`](#api-math-geometry) — Geometric algorithms
 - [`math/time`](#api-math-time) — Easing & spring animation
 - [`math/random`](#api-math-random) — Seeded random number generators
 - [`math/noise`](#api-math-noise) — Perlin, simplex & worley noise, plus fractal helpers
@@ -868,7 +868,7 @@ import { obb3 } from 'math/shapes';
 
 **Transform**
 
-- `obb3.applyMatrix4(out: OBB3, obb: OBB3, matrix: Mat4): OBB3`
+- `obb3.applyMatrix4(out: OBB3, obb: OBB3, matrix: Mat4): OBB3` — Applies a 4x4 transformation matrix to an OBB.
 
 **Query**
 
@@ -947,6 +947,55 @@ import { segment2 } from 'math/shapes';
 ```
 
 - `segment2.closestPoint(out: Vec2, point: Vec2, a: Vec2, b: Vec2): Vec2` — Calculates the closest point on a line segment to a given point
+- `segment2.intersects(a: Vec2, b: Vec2, c: Vec2, d: Vec2): boolean` — Tests whether the two closed segments a-b and c-d intersect. Collinear
+- `segment2.intersection(out: Vec2, a: Vec2, b: Vec2, c: Vec2, d: Vec2): Vec2 | null` — Computes the intersection point of the two closed segments a-b and c-d
+
+<a id="api-math-shapes-polygon2"></a>
+
+### `polygon2`
+
+```ts
+import { polygon2 } from 'math/shapes';
+```
+
+**Operations**
+
+- `polygon2.signedArea(vertices: number[], n: number): number` — Returns the signed area of the polygon using the shoelace formula.
+- `polygon2.area(vertices: number[], n: number): number` — Returns the (non-negative) area of the polygon.
+- `polygon2.centroid(out: Vec2, vertices: number[], n: number): Vec2` — Computes the area-weighted centroid (center of mass) of the polygon.
+- `polygon2.perimeter(vertices: number[], n: number): number` — Returns the perimeter (sum of edge lengths) of the polygon.
+- `polygon2.winding(vertices: number[], n: number): number` — Returns the winding order of the polygon from the sign of its signed area
+- `polygon2.reverse(out: number[], vertices: number[], n: number): number[]` — Reverses the winding order of the polygon, writing the result into `out`.
+- `polygon2.bounds(out: Box2, vertices: number[], n: number): Box2` — Writes the axis-aligned bounding box of the polygon into `out` as a Box2
+- `polygon2.closestPoint(out: Vec2, vertices: number[], n: number, point: Vec2): Vec2` — Finds the point on the polygon's boundary closest to `point` and writes it to
+- `polygon2.signedDistance(vertices: number[], n: number, point: Vec2): number` — Returns the distance from `point` to the polygon's boundary, signed so that
+- `polygon2.overlapConvex(verticesA: number[], numA: number, verticesB: number[], numB: number): boolean` — Tests whether two convex polygons overlap, using the separating axis theorem.
+
+**Query**
+
+- `polygon2.containsPoint(vertices: number[], n: number, point: Vec2): boolean` — Tests whether a point lies inside the polygon. Works for both convex and
+- `polygon2.isConvex(vertices: number[], n: number): boolean` — Tests whether the polygon is convex. Works for both winding orders. Assumes a
+- `polygon2.isReflexVertex(vertices: number[], n: number, i: number): boolean` — Tests whether vertex `i` is a reflex (concave) vertex of the polygon — the
+- `polygon2.intersectsSegment(vertices: number[], n: number, a: Vec2, b: Vec2): boolean` — Tests whether the segment `a`-`b` intersects the polygon, i.e. it has an
+
+<a id="api-math-shapes-triangle2"></a>
+
+### `triangle2`
+
+```ts
+import { triangle2 } from 'math/shapes';
+```
+
+**Operations**
+
+- `triangle2.signedArea(a: Vec2, b: Vec2, c: Vec2): number` — Returns the signed area of the triangle (a, b, c). The result is positive when
+- `triangle2.area(a: Vec2, b: Vec2, c: Vec2): number` — Returns the (non-negative) area of the triangle (a, b, c).
+- `triangle2.centroid(out: Vec2, a: Vec2, b: Vec2, c: Vec2): Vec2` — Computes the centroid of the triangle (a, b, c).
+- `triangle2.bounds(out: Box2, a: Vec2, b: Vec2, c: Vec2): Box2` — Computes the axis-aligned bounding box of the triangle (a, b, c).
+
+**Query**
+
+- `triangle2.containsPoint(a: Vec2, b: Vec2, c: Vec2, point: Vec2): boolean` — Tests whether a point lies inside the triangle (a, b, c). Works for either
 
 <a id="api-math-shapes-triangle3"></a>
 
@@ -986,6 +1035,9 @@ import { raycast3 } from 'math/shapes';
 ## `math/geometry`
 
 - <a id="circumcircle"></a>`circumcircle(out: Circle, a: Vec2, b: Vec2, c: Vec2): Circle` — Calculates the circumcircle of three points and stores the center in the output parameter.
+- <a id="decomposepolygon2quick"></a>`decomposePolygon2Quick(vertices: number[], n: number): number[][]` — Decomposes a simple polygon into convex sub-polygons using Bayazit's fast
+- <a id="decomposepolygon2quality"></a>`decomposePolygon2Quality(vertices: number[], n: number): number[][]` — Decomposes a simple polygon into the (near-)minimum number of convex
+- <a id="triangulatepolygon2"></a>`triangulatePolygon2(out: number[], vertices: number[], n: number): number` — Triangulates a simple polygon by ear clipping, writing triangle indices into
 - <a id="quickhull2"></a>`quickhull2(points: number[]): number[]` — Computes the convex hull of a set of 2D points using the QuickHull algorithm.
 - <a id="quickhull3"></a>`quickhull3(points: number[]): number[]` — Computes the convex hull of a set of 3D points using an incremental QuickHull algorithm.
 
