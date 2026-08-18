@@ -16,8 +16,8 @@ math is a collection of math helpers for graphics and simulations.
 | Import | Description | Contents |
 | --- | --- | --- |
 | [`math`](API.md#api-math) | Vectors, quaternions, euler angles & matrices | [`vec2`](API.md#api-math-vec2) [`vec3`](API.md#api-math-vec3) [`vec4`](API.md#api-math-vec4) [`euler`](API.md#api-math-euler) [`quat`](API.md#api-math-quat) [`quat2`](API.md#api-math-quat2) [`mat2`](API.md#api-math-mat2) [`mat2d`](API.md#api-math-mat2d) [`mat3`](API.md#api-math-mat3) [`mat4`](API.md#api-math-mat4) [`spherical`](API.md#api-math-spherical) [`polar`](API.md#api-math-polar) [`EPSILON`](API.md#epsilon) [`round`](API.md#round) [`degreesToRadians`](API.md#degreestoradians) [`radiansToDegrees`](API.md#radianstodegrees) [`equals`](API.md#equals) [`fade`](API.md#fade) [`lerp`](API.md#lerp) [`clamp`](API.md#clamp) [`repeat`](API.md#repeat) [`deltaAngle`](API.md#deltaangle) [`remap`](API.md#remap) [`remapClamp`](API.md#remapclamp) |
-| [`math/shapes`](API.md#api-math-shapes) | Shape primitives & spatial queries | [`box2`](API.md#api-math-shapes-box2) [`box3`](API.md#api-math-shapes-box3) [`obb3`](API.md#api-math-shapes-obb3) [`plane3`](API.md#api-math-shapes-plane3) [`sphere`](API.md#api-math-shapes-sphere) [`circle`](API.md#api-math-shapes-circle) [`segment2`](API.md#api-math-shapes-segment2) [`triangle3`](API.md#api-math-shapes-triangle3) [`raycast3`](API.md#api-math-shapes-raycast3) |
-| [`math/geometry`](API.md#api-math-geometry) | Convex hulls & circumcircle | [`circumcircle`](API.md#circumcircle) [`quickhull2`](API.md#quickhull2) [`quickhull3`](API.md#quickhull3) |
+| [`math/shapes`](API.md#api-math-shapes) | Shape primitives & spatial queries | [`box2`](API.md#api-math-shapes-box2) [`box3`](API.md#api-math-shapes-box3) [`obb3`](API.md#api-math-shapes-obb3) [`plane3`](API.md#api-math-shapes-plane3) [`sphere`](API.md#api-math-shapes-sphere) [`circle`](API.md#api-math-shapes-circle) [`segment2`](API.md#api-math-shapes-segment2) [`polygon2`](API.md#api-math-shapes-polygon2) [`triangle2`](API.md#api-math-shapes-triangle2) [`triangle3`](API.md#api-math-shapes-triangle3) [`raycast3`](API.md#api-math-shapes-raycast3) |
+| [`math/geometry`](API.md#api-math-geometry) | Geometric algorithms | [`circumcircle`](API.md#circumcircle) [`decomposePolygon2Quick`](API.md#decomposepolygon2quick) [`decomposePolygon2Quality`](API.md#decomposepolygon2quality) [`triangulatePolygon2`](API.md#triangulatepolygon2) [`quickhull2`](API.md#quickhull2) [`quickhull3`](API.md#quickhull3) |
 | [`math/time`](API.md#api-math-time) | Easing & spring animation | [`easing`](API.md#api-math-time-easing) [`spring`](API.md#api-math-time-spring) [`spring2`](API.md#api-math-time-spring2) [`spring3`](API.md#api-math-time-spring3) [`spring4`](API.md#api-math-time-spring4) |
 | [`math/random`](API.md#api-math-random) | Seeded random number generators | [`isaac32`](API.md#api-math-random-isaac32) [`isaac64`](API.md#api-math-random-isaac64) [`mulberry32`](API.md#api-math-random-mulberry32) [`random`](API.md#api-math-random-random) |
 | [`math/noise`](API.md#api-math-noise) | Perlin, simplex & worley noise, plus fractal helpers | [`perlin2d`](API.md#api-math-noise-perlin2d) [`perlin3d`](API.md#api-math-noise-perlin3d) [`simplex2d`](API.md#api-math-noise-simplex2d) [`simplex3d`](API.md#api-math-noise-simplex3d) [`simplex4d`](API.md#api-math-noise-simplex4d) [`worley2d`](API.md#api-math-noise-worley2d) [`worley3d`](API.md#api-math-noise-worley3d) [`fbm`](API.md#fbm) [`ridged`](API.md#ridged) [`billow`](API.md#billow) [`domainWarp2`](API.md#domainwarp2) [`domainWarp3`](API.md#domainwarp3) [`curl2`](API.md#curl2) [`curl3`](API.md#curl3) |
@@ -86,19 +86,33 @@ import { easing, spring } from 'math/time'; // easings & springs
       </a>
     </td>
     <td align="center">
+      <a href="https://pmndrs.github.io/math/examples/#example-polygon2-decomposition">
+        <img src="./examples/public/screenshots/example-polygon2-decomposition.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Polygon2 Decomposition
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://pmndrs.github.io/math/examples/#example-polygon2-triangulation">
+        <img src="./examples/public/screenshots/example-polygon2-triangulation.png" width="180" height="120" style="object-fit:cover;"/><br/>
+        Polygon2 Triangulation
+      </a>
+    </td>
+    <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-circumcircle">
         <img src="./examples/public/screenshots/example-circumcircle.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Circumcircle
       </a>
     </td>
-  </tr>
-  <tr>
     <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-flow-field">
         <img src="./examples/public/screenshots/example-flow-field.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Flow Field
       </a>
     </td>
+  </tr>
+  <tr>
     <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-color-wheel">
         <img src="./examples/public/screenshots/example-color-wheel.png" width="180" height="120" style="object-fit:cover;"/><br/>
@@ -111,14 +125,14 @@ import { easing, spring } from 'math/time'; // easings & springs
         Ridged Noise Voxel Terrain
       </a>
     </td>
-  </tr>
-  <tr>
     <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-simplex-4d-looping-noise">
         <img src="./examples/public/screenshots/example-simplex-4d-looping-noise.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Simplex 4D Looping Noise
       </a>
     </td>
+  </tr>
+  <tr>
     <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-simplex-2d-noise-terrain">
         <img src="./examples/public/screenshots/example-simplex-2d-noise-terrain.png" width="180" height="120" style="object-fit:cover;"/><br/>
@@ -131,14 +145,14 @@ import { easing, spring } from 'math/time'; // easings & springs
         Quaternion Slerp
       </a>
     </td>
-  </tr>
-  <tr>
     <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-spring">
         <img src="./examples/public/screenshots/example-spring.png" width="180" height="120" style="object-fit:cover;"/><br/>
         Spring
       </a>
     </td>
+  </tr>
+  <tr>
     <td align="center">
       <a href="https://pmndrs.github.io/math/examples/#example-easing">
         <img src="./examples/public/screenshots/example-easing.png" width="180" height="120" style="object-fit:cover;"/><br/>
