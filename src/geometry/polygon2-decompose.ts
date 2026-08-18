@@ -69,7 +69,10 @@ function lineIntersection(
 /**
  * True if the closed segments (p1,p2) and (q1,q2) intersect. Inlined,
  * coordinate-form counterpart of `segment2.intersects`, kept local to avoid
- * Vec2 allocations in the visibility loops.
+ * Vec2 allocations in the visibility loops. Division-free: instead of computing
+ * the parameters `u = numU/denom` and `v = numV/denom`, it normalises the sign
+ * of `denom` and range-checks the numerators, which avoids two divisions per
+ * call in the hot visibility loop.
  */
 function segmentsIntersect(
     p1x: number,
@@ -86,15 +89,22 @@ function segmentsIntersect(
     const ex = q2x - q1x;
     const ey = q2y - q1y;
 
-    const denom = rx * ey - ry * ex;
+    let denom = rx * ey - ry * ex;
     if (denom === 0) return false; // parallel or collinear
 
     const wx = q1x - p1x;
     const wy = q1y - p1y;
-    const u = (wx * ey - wy * ex) / denom;
-    const v = (wx * ry - wy * rx) / denom;
+    let numU = wx * ey - wy * ex; // u = numU / denom
+    let numV = wx * ry - wy * rx; // v = numV / denom
 
-    return u >= 0 && u <= 1 && v >= 0 && v <= 1;
+    // Make denom positive so the [0,1] range test is a plain comparison.
+    if (denom < 0) {
+        denom = -denom;
+        numU = -numU;
+        numV = -numV;
+    }
+
+    return numU >= 0 && numU <= denom && numV >= 0 && numV <= denom;
 }
 
 /** Appends vertices `from..to-1` of `src` onto `dst` (both flat arrays). */
