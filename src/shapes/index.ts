@@ -24,6 +24,8 @@ export * as segment2 from './segment2';
 
 export * as polygon2 from './polygon2';
 
+export * as triangle2 from './triangle2';
+
 export * as triangle3 from './triangle3';
 
 export * as raycast3 from './raycast3';
