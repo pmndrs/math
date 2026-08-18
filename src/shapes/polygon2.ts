@@ -17,7 +17,7 @@ import type { Box2 } from './box2';
  * when they wind clockwise, so the sign can be used to determine winding order.
  *
  * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
- * @param n number of vertices to read from `verts`
+ * @param n number of vertices to read from `vertices`
  * @returns the signed area
  */
 export function signedArea(vertices: number[], n: number): number {
@@ -36,7 +36,7 @@ export function signedArea(vertices: number[], n: number): number {
  * Returns the (non-negative) area of the polygon.
  *
  * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
- * @param n number of vertices to read from `vertsices
+ * @param n number of vertices to read from `vertices`
  * @returns the absolute area
  */
 export function area(vertices: number[], n: number): number {
@@ -109,7 +109,7 @@ export function containsPoint(vertices: number[], n: number, point: Vec2): boole
  *
  * @param out the vector to store the centroid
  * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
- * @param n number of vertices to read from `verts`
+ * @param n number of vertices to read from `vertices`
  * @returns out
  */
 export function centroid(out: Vec2, vertices: number[], n: number): Vec2 {
@@ -219,19 +219,19 @@ export function isConvex(vertices: number[], n: number): boolean {
  * `[minX, minY, maxX, maxY]`.
  *
  * @param out the box to store the result
- * @param verts polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
- * @param n number of vertices to read from `verts`
+ * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `vertices`
  * @returns out
  */
-export function bounds(out: Box2, verts: number[], n: number): Box2 {
+export function bounds(out: Box2, vertices: number[], n: number): Box2 {
     let minX = Number.POSITIVE_INFINITY;
     let minY = Number.POSITIVE_INFINITY;
     let maxX = Number.NEGATIVE_INFINITY;
     let maxY = Number.NEGATIVE_INFINITY;
 
     for (let i = 0; i < n; i++) {
-        const x = verts[i * 2];
-        const y = verts[i * 2 + 1];
+        const x = vertices[i * 2];
+        const y = vertices[i * 2 + 1];
         if (x < minX) minX = x;
         if (x > maxX) maxX = x;
         if (y < minY) minY = y;
@@ -251,12 +251,12 @@ export function bounds(out: Box2, verts: number[], n: number): Box2 {
  * always on an edge.
  *
  * @param out the vector to store the closest point
- * @param verts polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
- * @param n number of vertices to read from `verts`
+ * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `vertices`
  * @param point the query point
  * @returns out
  */
-export function closestPoint(out: Vec2, verts: number[], n: number, point: Vec2): Vec2 {
+export function closestPoint(out: Vec2, vertices: number[], n: number, point: Vec2): Vec2 {
     const px = point[0];
     const py = point[1];
     let bestDistSq = Number.POSITIVE_INFINITY;
@@ -264,10 +264,10 @@ export function closestPoint(out: Vec2, verts: number[], n: number, point: Vec2)
     let bestY = py;
 
     for (let i = 0, j = n - 1; i < n; j = i++) {
-        const ax = verts[j * 2];
-        const ay = verts[j * 2 + 1];
-        const abx = verts[i * 2] - ax;
-        const aby = verts[i * 2 + 1] - ay;
+        const ax = vertices[j * 2];
+        const ay = vertices[j * 2 + 1];
+        const abx = vertices[i * 2] - ax;
+        const aby = vertices[i * 2 + 1] - ay;
 
         // Project the point onto edge (a -> b), clamped to the segment.
         const d = abx * abx + aby * aby;
@@ -297,21 +297,21 @@ export function closestPoint(out: Vec2, verts: number[], n: number, point: Vec2)
  * points inside the polygon get a negative distance and points outside get a
  * positive one.
  *
- * @param verts polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
- * @param n number of vertices to read from `verts`
+ * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `vertices`
  * @param point the query point
  * @returns the signed distance (negative inside, positive outside)
  */
-export function signedDistance(verts: number[], n: number, point: Vec2): number {
+export function signedDistance(vertices: number[], n: number, point: Vec2): number {
     const px = point[0];
     const py = point[1];
     let bestDistSq = Number.POSITIVE_INFINITY;
 
     for (let i = 0, j = n - 1; i < n; j = i++) {
-        const ax = verts[j * 2];
-        const ay = verts[j * 2 + 1];
-        const abx = verts[i * 2] - ax;
-        const aby = verts[i * 2 + 1] - ay;
+        const ax = vertices[j * 2];
+        const ay = vertices[j * 2 + 1];
+        const abx = vertices[i * 2] - ax;
+        const aby = vertices[i * 2 + 1] - ay;
 
         const d = abx * abx + aby * aby;
         let t = d > 0 ? ((px - ax) * abx + (py - ay) * aby) / d : 0;
@@ -325,18 +325,18 @@ export function signedDistance(verts: number[], n: number, point: Vec2): number 
     }
 
     const dist = Math.sqrt(bestDistSq);
-    return containsPoint(verts, n, point) ? -dist : dist;
+    return containsPoint(vertices, n, point) ? -dist : dist;
 }
 
 const _projA: [number, number] = [0, 0];
 const _projB: [number, number] = [0, 0];
 
 /** Projects a polygon onto the axis (nx, ny), storing [min, max] in `out`. */
-function projectOntoAxis(out: [number, number], nx: number, ny: number, verts: number[], n: number): void {
-    let min = nx * verts[0] + ny * verts[1];
+function projectOntoAxis(out: [number, number], nx: number, ny: number, vertices: number[], n: number): void {
+    let min = nx * vertices[0] + ny * vertices[1];
     let max = min;
     for (let i = 1; i < n; i++) {
-        const d = nx * verts[i * 2] + ny * verts[i * 2 + 1];
+        const d = nx * vertices[i * 2] + ny * vertices[i * 2 + 1];
         if (d < min) min = d;
         else if (d > max) max = d;
     }
@@ -345,14 +345,14 @@ function projectOntoAxis(out: [number, number], nx: number, ny: number, verts: n
 }
 
 /** Returns true if the two polygons are separated along any edge normal of A. */
-function separatedByEdgesOf(vertsA: number[], nA: number, vertsB: number[], nB: number): boolean {
-    for (let i = 0, j = nA - 1; i < nA; j = i++) {
+function separatedByEdgesOf(verticesA: number[], numA: number, verticesB: number[], numB: number): boolean {
+    for (let i = 0, j = numA - 1; i < numA; j = i++) {
         // Normal of edge (a -> b); orientation does not matter for separation.
-        const nx = vertsA[i * 2 + 1] - vertsA[j * 2 + 1];
-        const ny = -(vertsA[i * 2] - vertsA[j * 2]);
+        const nx = verticesA[i * 2 + 1] - verticesA[j * 2 + 1];
+        const ny = -(verticesA[i * 2] - verticesA[j * 2]);
 
-        projectOntoAxis(_projA, nx, ny, vertsA, nA);
-        projectOntoAxis(_projB, nx, ny, vertsB, nB);
+        projectOntoAxis(_projA, nx, ny, verticesA, numA);
+        projectOntoAxis(_projB, nx, ny, verticesB, numB);
 
         if (_projA[0] > _projB[1] || _projB[0] > _projA[1]) return true;
     }
@@ -364,15 +364,15 @@ function separatedByEdgesOf(vertsA: number[], nA: number, vertsB: number[], nB: 
  * Both polygons must be convex; results are undefined for concave input.
  * Polygons that touch along an edge or vertex are considered overlapping.
  *
- * @param vertsA vertices of the first polygon `[x0, y0, x1, y1, ...]`
- * @param nA number of vertices in the first polygon
- * @param vertsB vertices of the second polygon `[x0, y0, x1, y1, ...]`
- * @param nB number of vertices in the second polygon
+ * @param verticesA vertices of the first polygon `[x0, y0, x1, y1, ...]`
+ * @param numA number of vertices in the first polygon
+ * @param verticesB vertices of the second polygon `[x0, y0, x1, y1, ...]`
+ * @param numB number of vertices in the second polygon
  * @returns true if the polygons overlap
  */
-export function overlapConvex(vertsA: number[], nA: number, vertsB: number[], nB: number): boolean {
-    if (separatedByEdgesOf(vertsA, nA, vertsB, nB)) return false;
-    if (separatedByEdgesOf(vertsB, nB, vertsA, nA)) return false;
+export function overlapConvex(verticesA: number[], numA: number, verticesB: number[], numB: number): boolean {
+    if (separatedByEdgesOf(verticesA, numA, verticesB, numB)) return false;
+    if (separatedByEdgesOf(verticesB, numB, verticesA, numA)) return false;
     return true;
 }
 
@@ -381,14 +381,14 @@ export function overlapConvex(vertsA: number[], nA: number, vertsB: number[], nB
  * endpoint inside the polygon or crosses one of its edges. Works for convex and
  * concave polygons.
  *
- * @param verts polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
- * @param n number of vertices to read from `verts`
+ * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
+ * @param n number of vertices to read from `vertices`
  * @param a start of the segment
  * @param b end of the segment
  * @returns true if the segment intersects the polygon
  */
-export function intersectsSegment(verts: number[], n: number, a: Vec2, b: Vec2): boolean {
-    if (containsPoint(verts, n, a) || containsPoint(verts, n, b)) return true;
+export function intersectsSegment(vertices: number[], n: number, a: Vec2, b: Vec2): boolean {
+    if (containsPoint(vertices, n, a) || containsPoint(vertices, n, b)) return true;
 
     const ax = a[0];
     const ay = a[1];
@@ -396,10 +396,10 @@ export function intersectsSegment(verts: number[], n: number, a: Vec2, b: Vec2):
     const aby = b[1] - ay;
 
     for (let i = 0, j = n - 1; i < n; j = i++) {
-        const cx = verts[j * 2];
-        const cy = verts[j * 2 + 1];
-        const dx = verts[i * 2];
-        const dy = verts[i * 2 + 1];
+        const cx = vertices[j * 2];
+        const cy = vertices[j * 2 + 1];
+        const dx = vertices[i * 2];
+        const dy = vertices[i * 2 + 1];
 
         // Proper segment intersection via perp products (sign-of-area test).
         const a1 = abx * (dy - ay) - aby * (dx - ax); // (b-a) x (d-a)
