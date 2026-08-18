@@ -1,4 +1,4 @@
-import { signedArea } from '../shapes/polygon2';
+import { isReflexVertex, reverse, signedArea } from '../shapes/polygon2';
 
 /*
  * Convex decomposition
@@ -38,9 +38,9 @@ function atY(poly: number[], i: number): number {
     return poly[(i < 0 ? (i % s) + s : i % s) * 2 + 1];
 }
 
-/** True if vertex `i` is a reflex vertex (interior angle > 180°) of a CCW polygon. */
+/** True if vertex `i` is reflex; delegates to the shared polygon2 primitive. */
 function isReflex(poly: number[], i: number): boolean {
-    return triArea(atX(poly, i - 1), atY(poly, i - 1), atX(poly, i), atY(poly, i), atX(poly, i + 1), atY(poly, i + 1)) < 0;
+    return isReflexVertex(poly, poly.length / 2, i);
 }
 
 function sqDist(ax: number, ay: number, bx: number, by: number): number {
@@ -78,7 +78,11 @@ function lineIntersection(
     return out;
 }
 
-/** True if the segments (p1,p2) and (q1,q2) properly intersect. */
+/**
+ * True if the closed segments (p1,p2) and (q1,q2) intersect. Inlined,
+ * coordinate-form counterpart of `segment2.intersects`, kept local to avoid
+ * Vec2 allocations in the visibility loops.
+ */
 function segmentsIntersect(
     p1x: number,
     p1y: number,
@@ -89,18 +93,20 @@ function segmentsIntersect(
     q2x: number,
     q2y: number,
 ): boolean {
-    const dx = p2x - p1x;
-    const dy = p2y - p1y;
-    const da = q2x - q1x;
-    const db = q2y - q1y;
+    const rx = p2x - p1x;
+    const ry = p2y - p1y;
+    const ex = q2x - q1x;
+    const ey = q2y - q1y;
 
-    // Parallel segments never count as intersecting.
-    if (da * dy - db * dx === 0) return false;
+    const denom = rx * ey - ry * ex;
+    if (denom === 0) return false; // parallel or collinear
 
-    const s = (dx * (q1y - p1y) + dy * (p1x - q1x)) / (da * dy - db * dx);
-    const t = (da * (p1y - q1y) + db * (q1x - p1x)) / (db * dx - da * dy);
+    const wx = q1x - p1x;
+    const wy = q1y - p1y;
+    const u = (wx * ey - wy * ex) / denom;
+    const v = (wx * ry - wy * rx) / denom;
 
-    return s >= 0 && s <= 1 && t >= 0 && t <= 1;
+    return u >= 0 && u <= 1 && v >= 0 && v <= 1;
 }
 
 /** Appends vertices `from..to-1` of `src` onto `dst` (both flat arrays). */
@@ -123,24 +129,11 @@ function polygonCopy(poly: number[], i: number, j: number): number[] {
     return out;
 }
 
-/** Copies `vertices` into a fresh flat polygon, reversed if needed so it winds CCW. */
-function toCCW(vertices: number[], n: number): number[] {
-    const poly = new Array<number>(n * 2);
-    for (let i = 0; i < n; i++) {
-        poly[i * 2] = vertices[i * 2];
-        poly[i * 2 + 1] = vertices[i * 2 + 1];
-    }
-    if (signedArea(poly, n) < 0) {
-        for (let lo = 0, hi = n - 1; lo < hi; lo++, hi--) {
-            const x = poly[lo * 2];
-            const y = poly[lo * 2 + 1];
-            poly[lo * 2] = poly[hi * 2];
-            poly[lo * 2 + 1] = poly[hi * 2 + 1];
-            poly[hi * 2] = x;
-            poly[hi * 2 + 1] = y;
-        }
-    }
-    return poly;
+/** Writes a CCW copy of the first `n` vertices of `vertices` into `out`, reversing if needed. */
+function toCCW(out: number[], vertices: number[], n: number): number[] {
+    for (let k = 0; k < n * 2; k++) out[k] = vertices[k];
+    if (signedArea(out, n) < 0) reverse(out, out, n);
+    return out;
 }
 
 const QUICK_DECOMP_MAX_LEVEL = 100;
@@ -168,15 +161,12 @@ function canSeeSegment(poly: number[], a: number, b: number): boolean {
     return true;
 }
 
-/** Recursive Bayazit decomposition; appends convex pieces to `result`. */
-function quickDecompImpl(poly: number[], result: number[][], level: number): number[][] {
+/** Recursive Bayazit decomposition; returns the convex pieces of `poly` (assumed CCW). */
+function quickDecompImpl(poly: number[], level: number): number[][] {
     const s = poly.length / 2;
-    if (s < 3) return result;
-    if (level > QUICK_DECOMP_MAX_LEVEL) {
-        // Bail out rather than recurse forever on pathological input.
-        result.push(poly);
-        return result;
-    }
+    if (s < 3) return [];
+    // Bail out rather than recurse forever on pathological input.
+    if (level > QUICK_DECOMP_MAX_LEVEL) return [poly];
 
     for (let i = 0; i < s; i++) {
         if (!isReflex(poly, i)) continue;
@@ -265,7 +255,7 @@ function quickDecompImpl(poly: number[], result: number[][], level: number): num
             // Connect to the closest visible vertex within the cone.
             if (lowerIndex > upperIndex) upperIndex += s;
 
-            if (upperIndex < lowerIndex) return result;
+            if (upperIndex < lowerIndex) return [];
 
             let closestDist = Number.MAX_VALUE;
             let closestIndex = 0;
@@ -292,19 +282,12 @@ function quickDecompImpl(poly: number[], result: number[][], level: number): num
             }
         }
 
-        // Recurse into the smaller sub-polygon first.
-        if (lowerPoly.length < upperPoly.length) {
-            quickDecompImpl(lowerPoly, result, level + 1);
-            quickDecompImpl(upperPoly, result, level + 1);
-        } else {
-            quickDecompImpl(upperPoly, result, level + 1);
-            quickDecompImpl(lowerPoly, result, level + 1);
-        }
-        return result;
+        // Recurse into the smaller sub-polygon first, then concatenate the pieces.
+        const [first, second] = lowerPoly.length < upperPoly.length ? [lowerPoly, upperPoly] : [upperPoly, lowerPoly];
+        return [...quickDecompImpl(first, level + 1), ...quickDecompImpl(second, level + 1)];
     }
 
-    result.push(poly);
-    return result;
+    return [poly];
 }
 
 /**
@@ -319,7 +302,7 @@ function quickDecompImpl(poly: number[], result: number[][], level: number): num
  */
 export function decomposePolygon2Quick(vertices: number[], n: number): number[][] {
     if (n < 3) return [];
-    return quickDecompImpl(toCCW(vertices, n), [], 0);
+    return quickDecompImpl(toCCW([], vertices, n), 0);
 }
 
 /** True if vertices `a` and `b` can see each other (visibility test, used by the quality decomposition). */
@@ -429,7 +412,7 @@ function sliceByEdges(poly: number[], cutEdges: number[][]): number[][] {
  */
 export function decomposePolygon2Quality(vertices: number[], n: number): number[][] {
     if (n < 3) return [];
-    const poly = toCCW(vertices, n);
+    const poly = toCCW([], vertices, n);
     const edges = getCutEdges(poly);
     if (edges.length > 0) return sliceByEdges(poly, edges);
     return [poly];
