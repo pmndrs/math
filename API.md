@@ -741,6 +741,8 @@ import { polar } from 'math';
 - `type Plane3 = { normal: Vec3; constant: number; }` — A plane in 3D space
 - `type Sphere = { center: Vec3; radius: number; }` — A sphere in 3D space
 - `type Circle = { center: Vec2; radius: number; }` — A circle in 2D space
+- `type Frustum = [ Plane3, Plane3, Plane3, Plane3, Plane3, Plane3 ]` — A view frustum, represented as the six bounding planes of a camera's view volume.
+- `type FrustumCorners = [ Vec3, Vec3, Vec3, Vec3, Vec3, Vec3, Vec3, Vec3 ]` — The eight corners of a frustum, as returned by corners.
 
 <a id="api-math-shapes-box2"></a>
 
@@ -1014,6 +1016,38 @@ import { raycast3 } from 'math/shapes';
 
 - `raycast3.intersectsTriangle(out: IntersectsTriangleResult, origin: Vec3, direction: Vec3, length: number, a: Vec3, b: Vec3, c: Vec3, backfaceCulling: boolean): void` — Ray-triangle intersection test.
 - `raycast3.intersectsBox3(origin: Vec3, direction: Vec3, length: number, aabb: Box3): boolean` — Test if a ray intersects an axis-aligned bounding box.
+
+<a id="api-math-shapes-frustum"></a>
+
+### `frustum`
+
+```ts
+import { frustum } from 'math/shapes';
+```
+
+**Create**
+
+- `frustum.create(): Frustum` — Creates a new frustum of zeroed planes.
+- `frustum.clone(f: Frustum): Frustum` — Clones a frustum.
+- `frustum.copy(out: Frustum, f: Frustum): Frustum` — Copies one frustum to another.
+- `frustum.setFromViewProjectionMatrixNO(out: Frustum, proj: Mat4, view: Mat4): Frustum` — Extracts the six planes of a view frustum from a projection and view matrix, using the
+- `frustum.setFromViewProjectionMatrixZO(out: Frustum, proj: Mat4, view: Mat4): Frustum` — Extracts the six planes of a view frustum from a projection and view matrix, using the
+- `frustum.setFromViewProjectionMatrixSides(out: Frustum, proj: Mat4, view: Mat4): Frustum` — Extracts only the four lateral planes (left, right, bottom, top) of a view frustum from a
+
+**Operations**
+
+- `frustum.sidesIntersectsSphere(f: Frustum, s: Sphere): boolean` — Tests if a sphere intersects the lateral planes of a sides-only frustum, skipping near and far.
+- `frustum.sidesIntersectsBox3(f: Frustum, box: Box3): boolean` — Tests if an axis-aligned box intersects the lateral planes of a sides-only frustum, using the
+- `frustum.sidesContainsPoint(f: Frustum, p: Vec3): boolean` — Tests if a point is inside the lateral planes of a sides-only frustum, skipping near and far.
+- `frustum.sidesIntersectsRay(f: Frustum, origin: Vec3, direction: Vec3): boolean` — Tests if a ray intersects the lateral planes of a sides-only frustum, using a slab test over the
+- `frustum.corners(out: FrustumCorners, f: Frustum): FrustumCorners` — Computes the eight corners of the frustum by intersecting three planes each.
+
+**Query**
+
+- `frustum.intersectsSphere(f: Frustum, s: Sphere): boolean` — Tests if a sphere intersects the frustum.
+- `frustum.intersectsBox3(f: Frustum, box: Box3): boolean` — Tests if an axis-aligned box intersects the frustum, using the p-vertex test.
+- `frustum.containsPoint(f: Frustum, p: Vec3): boolean` — Tests if a point is inside the frustum.
+- `frustum.intersectsRay(f: Frustum, origin: Vec3, direction: Vec3): boolean` — Tests if a ray intersects the frustum, using a slab test over the planes.
 
 <a id="api-math-geometry"></a>
 

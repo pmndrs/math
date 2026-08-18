@@ -29,3 +29,6 @@ export * as triangle2 from './triangle2';
 export * as triangle3 from './triangle3';
 
 export * as raycast3 from './raycast3';
+
+export * as frustum from './frustum';
+export type { Frustum, FrustumCorners } from './frustum';
