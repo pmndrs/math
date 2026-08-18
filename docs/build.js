@@ -730,21 +730,6 @@ function buildApiMd() {
 Complete reference for every export in \`${packageName}\`, grouped by module. For an
 overview, installation, and examples, see the [README](./README.md).
 
-## Conventions
-
-- **Plain data** — every type is a plain array or object (e.g. \`Vec3 = [x, y, z]\`); no
-  classes, no typed arrays, all JSON-serializable.
-- **Output-argument first** — functions write their result into the first argument
-  (\`out\`) and return it, so nothing is allocated: \`vec3.add(out, a, b)\`. Aliasing
-  arguments is safe, e.g. \`vec3.normalize(out, out)\`.
-- **Tree-shakeable subpaths** — import each group from its own entrypoint:
-
-  \`\`\`ts
-  import { vec3, mat4, quat } from '${packageName}';
-  import { box3 } from '${packageName}/shapes';
-  import { simplex3d } from '${packageName}/noise';
-  \`\`\`
-
 ## Modules
 
 ${moduleList}
