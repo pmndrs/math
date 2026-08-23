@@ -66,6 +66,27 @@ export function lagrange(v0: number, v1: number, v2: number, t: number) {
 }
 
 /**
+ *
+ * Binomial coefficient, "n choose k": the number of ways to choose k items
+ * from a set of n without order or repetition.
+ *
+ * @param n total number of items
+ * @param k number of items to choose
+ * @returns the binomial coefficient, or 0 when k is out of range
+ */
+export function binomial(n: number, k: number): number {
+    if (k < 0 || k > n) return 0;
+    // C(n, k) === C(n, n - k), so iterate over the smaller of the two
+    const j = Math.min(k, n - k);
+    let coeff = 1;
+    // interleave multiply/divide to keep intermediates small and integer-exact
+    for (let i = 0; i < j; i++) {
+        coeff = (coeff * (n - i)) / (i + 1);
+    }
+    return Math.round(coeff);
+}
+
+/**
  * Clamp a value between min and max
  */
 export const clamp = (value: number, min: number, max: number): number => {
