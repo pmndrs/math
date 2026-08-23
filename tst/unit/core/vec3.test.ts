@@ -265,6 +265,31 @@ describe('vec3', () => {
         });
     });
 
+    describe('lagrange', () => {
+        const c: Vec3 = [7, 9, 11];
+
+        it('should return first vector at t=0', () => {
+            const result = vec3.lagrange(out, a, b, c, 0);
+            expect(result[0]).toBeCloseTo(a[0]);
+            expect(result[1]).toBeCloseTo(a[1]);
+            expect(result[2]).toBeCloseTo(a[2]);
+        });
+
+        it('should return middle vector at t=0.5', () => {
+            const result = vec3.lagrange(out, a, b, c, 0.5);
+            expect(result[0]).toBeCloseTo(b[0]);
+            expect(result[1]).toBeCloseTo(b[1]);
+            expect(result[2]).toBeCloseTo(b[2]);
+        });
+
+        it('should return last vector at t=1', () => {
+            const result = vec3.lagrange(out, a, b, c, 1);
+            expect(result[0]).toBeCloseTo(c[0]);
+            expect(result[1]).toBeCloseTo(c[1]);
+            expect(result[2]).toBeCloseTo(c[2]);
+        });
+    });
+
     describe('slerp', () => {
         it('should spherically interpolate between normalized vectors', () => {
             const v1 = vec3.normalize(vec3.create(), [1, 0, 0]);

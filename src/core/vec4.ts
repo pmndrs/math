@@ -448,6 +448,28 @@ export function lerp(out: Vec4, a: Vec4, b: Vec4, t: number): Vec4 {
 }
 
 /**
+ * Quadratic interpolation through three vectors using Lagrange interpolation.
+ * Passes through a at t=0, b at t=0.5, and c at t=1.
+ *
+ * @param out the receiving vector
+ * @param a vector at t=0
+ * @param b vector at t=0.5
+ * @param c vector at t=1
+ * @param t interpolation amount
+ * @returns out
+ */
+export function lagrange(out: Vec4, a: Vec4, b: Vec4, c: Vec4, t: number): Vec4 {
+    const c0 = 2 * (t - 1) * (t - 0.5);
+    const c1 = -4 * (t - 1) * t;
+    const c2 = 2 * (t - 0.5) * t;
+    out[0] = c0 * a[0] + c1 * b[0] + c2 * c[0];
+    out[1] = c0 * a[1] + c1 * b[1] + c2 * c[1];
+    out[2] = c0 * a[2] + c1 * b[2] + c2 * c[2];
+    out[3] = c0 * a[3] + c1 * b[3] + c2 * c[3];
+    return out;
+}
+
+/**
  * Transforms the vec4 with a mat4.
  *
  * @param out the receiving vector

@@ -259,6 +259,34 @@ describe('vec4', () => {
         });
     });
 
+    describe('lagrange', () => {
+        const c: Vec4 = [9, 11, 13, 15];
+
+        it('should return first vector at t=0', () => {
+            const result = vec4.lagrange(out, a, b, c, 0);
+            expect(result[0]).toBeCloseTo(a[0]);
+            expect(result[1]).toBeCloseTo(a[1]);
+            expect(result[2]).toBeCloseTo(a[2]);
+            expect(result[3]).toBeCloseTo(a[3]);
+        });
+
+        it('should return middle vector at t=0.5', () => {
+            const result = vec4.lagrange(out, a, b, c, 0.5);
+            expect(result[0]).toBeCloseTo(b[0]);
+            expect(result[1]).toBeCloseTo(b[1]);
+            expect(result[2]).toBeCloseTo(b[2]);
+            expect(result[3]).toBeCloseTo(b[3]);
+        });
+
+        it('should return last vector at t=1', () => {
+            const result = vec4.lagrange(out, a, b, c, 1);
+            expect(result[0]).toBeCloseTo(c[0]);
+            expect(result[1]).toBeCloseTo(c[1]);
+            expect(result[2]).toBeCloseTo(c[2]);
+            expect(result[3]).toBeCloseTo(c[3]);
+        });
+    });
+
     describe('transformMat4', () => {
         it('should transform vector by 4x4 matrix', () => {
             // Identity matrix should return original vector

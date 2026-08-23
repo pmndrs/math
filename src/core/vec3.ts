@@ -483,6 +483,27 @@ export function lerp(out: Vec3, a: Vec3, b: Vec3, t: number): Vec3 {
 }
 
 /**
+ * Quadratic interpolation through three vectors using Lagrange interpolation.
+ * Passes through a at t=0, b at t=0.5, and c at t=1.
+ *
+ * @param out the receiving vector
+ * @param a vector at t=0
+ * @param b vector at t=0.5
+ * @param c vector at t=1
+ * @param t interpolation amount
+ * @returns out
+ */
+export function lagrange(out: Vec3, a: Vec3, b: Vec3, c: Vec3, t: number): Vec3 {
+    const c0 = 2 * (t - 1) * (t - 0.5);
+    const c1 = -4 * (t - 1) * t;
+    const c2 = 2 * (t - 0.5) * t;
+    out[0] = c0 * a[0] + c1 * b[0] + c2 * c[0];
+    out[1] = c0 * a[1] + c1 * b[1] + c2 * c[1];
+    out[2] = c0 * a[2] + c1 * b[2] + c2 * c[2];
+    return out;
+}
+
+/**
  * Performs a spherical linear interpolation between two vec3's
  *
  * @param out the receiving vector

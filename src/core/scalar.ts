@@ -51,6 +51,21 @@ export function lerp(v0: number, v1: number, t: number) {
 }
 
 /**
+ *
+ * Quadratic interpolation through three values using Lagrange interpolation.
+ * Passes through v0 at t=0, v1 at t=0.5, and v2 at t=1.
+ *
+ * @param v0 value at t=0
+ * @param v1 value at t=0.5
+ * @param v2 value at t=1
+ * @param t
+ * @returns
+ */
+export function lagrange(v0: number, v1: number, v2: number, t: number) {
+    return 2 * (t - 1) * (t - 0.5) * v0 - 4 * (t - 1) * t * v1 + 2 * (t - 0.5) * t * v2;
+}
+
+/**
  * Clamp a value between min and max
  */
 export const clamp = (value: number, min: number, max: number): number => {

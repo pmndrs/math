@@ -269,6 +269,28 @@ describe('vec2', () => {
         });
     });
 
+    describe('lagrange', () => {
+        const c: Vec2 = [5, 8];
+
+        it('should return first vector at t=0', () => {
+            const result = vec2.lagrange(out, a, b, c, 0);
+            expect(result[0]).toBeCloseTo(a[0]);
+            expect(result[1]).toBeCloseTo(a[1]);
+        });
+
+        it('should return middle vector at t=0.5', () => {
+            const result = vec2.lagrange(out, a, b, c, 0.5);
+            expect(result[0]).toBeCloseTo(b[0]);
+            expect(result[1]).toBeCloseTo(b[1]);
+        });
+
+        it('should return last vector at t=1', () => {
+            const result = vec2.lagrange(out, a, b, c, 1);
+            expect(result[0]).toBeCloseTo(c[0]);
+            expect(result[1]).toBeCloseTo(c[1]);
+        });
+    });
+
     describe('transformMat2', () => {
         it('should transform vector by 2x2 matrix', () => {
             // Identity matrix should return original vector
