@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>math examples</title>
+    <style>
+        /* mobile-first base styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                sans-serif;
+            background: var(--color-background);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+
+            /* vars */
+            --color-background: #131518;
+            --color-card: #1c1f25;
+            --color-border: rgba(255, 255, 255, 0.1);
+            --color-viewer: #000;
+            --color-ink: #e8eaed;
+            --color-glass: rgba(22, 25, 31, 0.72);
+            --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas,
+                monospace;
+        }
+
+        /* sidebar - mobile first (hidden by default) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: 320px;
+            background: var(--color-background);
+            color: var(--color-ink);
+            overflow-y: auto;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+            /* hidden scrollbar */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        /* title + search scroll together as one sticky unit */
+        .sidebar-top {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--color-background);
+        }
+
+        .sidebar-header {
+            padding: 18px 14px 10px;
+        }
+
+        .sidebar-header h1 {
+            margin: 0;
+            font-family: var(--mono);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        .search-container {
+            margin: 0;
+            padding: 0 14px 12px;
+        }
+
+        .search-input {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 0;
+            padding: 9px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--color-ink);
+            font-size: 11px;
+            font-family: var(--mono);
+            text-transform: lowercase;
+            box-sizing: border-box;
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .search-input::placeholder {
+            color: #7d848c;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .examples-list {
+            padding: 10px 14px 16px;
+            margin: 0;
+            list-style: none;
+        }
+
+        .examples-list li {
+            margin-bottom: 12px;
+        }
+
+        .examples-list li:last-child {
+            margin-bottom: 16px;
+        }
+
+        .category-header {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: lowercase;
+            color: #8a95a1;
+            margin: 0 0 10px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            list-style: none;
+        }
+
+        .category-group {
+            margin-bottom: 22px;
+        }
+
+        .category-group.hidden {
+            display: none;
+        }
+
+        .example-item {
+            display: block;
+            color: #cfd8dc;
+            background-color: var(--color-card);
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 0;
+            overflow: hidden;
+            transition: border-color 0.16s ease;
+        }
+
+        .example-item:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .example-item.active {
+            border-color: #fff;
+        }
+
+        .example-preview {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            /* placeholder gradient shown until (or if) the screenshot loads */
+            background: radial-gradient(120% 120% at 30% 20%,
+                    #313c44 0%, #262d34 55%, #1a2025 100%);
+        }
+
+        .example-screenshot {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        .example-overlay {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            padding: 10px;
+            pointer-events: none;
+        }
+
+        /* animated wordmark rainbow (from makecat.io) */
+        .rainbow-text {
+            background-image: linear-gradient(90deg, #ff3ea5, #ffd23f, #3fa7ff, #8a2be2, #ff3ea5);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: wordmark-rainbow-slide 2s linear infinite;
+        }
+
+        @keyframes wordmark-rainbow-slide {
+            from {
+                background-position: 0% center;
+            }
+
+            to {
+                background-position: -200% center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .rainbow-text {
+                animation: none;
+            }
+        }
+
+        .example-title {
+            display: inline-block;
+            margin: 0;
+            padding: 4px 9px;
+            background: #fff;
+            color: #111;
+            font-family: var(--mono);
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 1.2;
+            letter-spacing: 0.01em;
+            text-transform: lowercase;
+        }
+
+        .content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-header {
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-border);
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hamburger {
+            display: block;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--color-ink);
+        }
+
+        .content-header h2 {
+            margin: 0;
+            font-size: 16px;
+            color: var(--color-ink);
+            flex: 1;
+        }
+
+        /* the demo lives inside its own rounded container floating on the page */
+        .viewer {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            background: var(--color-viewer);
+        }
+
+        .example-frame {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: var(--color-viewer);
+        }
+
+        /* title overlaid top-left of the demo (desktop) */
+        .viewer-title {
+            position: absolute;
+            top: 18px;
+            left: 20px;
+            z-index: 3;
+            pointer-events: none;
+            display: none;
+        }
+
+        .viewer-title h2 {
+            margin: 0;
+            font-family: var(--mono);
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-transform: lowercase;
+        }
+
+        .viewer-desc {
+            margin: 7px 0 0;
+            max-width: 360px;
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1.55;
+            letter-spacing: 0.01em;
+            text-transform: lowercase;
+            color: rgba(255, 255, 255, 0.68);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+        }
+
+        /* source / open / fullscreen buttons, bottom-right of the demo */
+        .viewer-toolbar {
+            position: absolute;
+            right: 14px;
+            bottom: 14px;
+            z-index: 3;
+            display: flex;
+            gap: 8px;
+        }
+
+        .viewer-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 11px;
+            background: var(--color-glass);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 0;
+            color: #e8eaed;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: lowercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .viewer-btn:hover {
+            background: rgba(35, 39, 47, 0.92);
+            border-color: rgba(255, 255, 255, 0.28);
+        }
+
+        .viewer-btn svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* tablet and up - enhance the mobile design */
+        @media (min-width: 769px) {
+            .sidebar {
+                position: static;
+                transform: none;
+                width: 300px;
+                min-width: 300px;
+                max-width: none;
+                box-shadow: none;
+            }
+
+            .content {
+                padding: 12px 12px 12px 0;
+            }
+
+            .viewer {
+                border-radius: 0;
+                box-shadow: 0 12px 34px rgba(0, 0, 0, 0.16);
+            }
+
+            .viewer-title {
+                display: block;
+            }
+
+            .content-header {
+                display: none;
+            }
+
+            .example-title {
+                font-size: 13px;
+            }
+
+            .hamburger {
+                display: none;
+            }
+
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-top">
+            <div class="sidebar-header">
+                <h1 class="rainbow-text">math</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="search examples..." />
+            </div>
+        </div>
+        <ul class="examples-list" id="examples-list"></ul>
+    </div>
+
+    <div class="content">
+        <div class="content-header">
+            <button class="hamburger" id="hamburger">☰</button>
+            <h2 id="example-title">Select an example</h2>
+        </div>
+        <div class="viewer" id="viewer">
+            <iframe class="example-frame" id="example-frame"></iframe>
+            <div class="viewer-title">
+                <h2 id="viewer-title-text" class="rainbow-text"></h2>
+                <p id="viewer-desc-text" class="viewer-desc"></p>
+            </div>
+            <div class="viewer-toolbar">
+                <a class="viewer-btn" id="btn-source" target="_blank" rel="noopener" title="View source on GitHub">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18v-6h6v6M9 6h6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    source
+                </a>
+                <a class="viewer-btn" id="btn-open" target="_blank" rel="noopener" title="Open in a new tab">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                    open
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import examples from "./src/examples.json" assert { type: "json" };
+
+        // display order for categories
+        const CATEGORY_ORDER = [
+            "geometry",
+            "shapes",
+            "basics",
+            "vectors",
+            "matrices",
+            "noise",
+            "color",
+            "random",
+            "time",
+        ];
+
+        function orderIndex(order, value) {
+            const i = order.indexOf(value);
+            return i === -1 ? order.length : i;
+        }
+
+        function prettyCategory(category) {
+            if (!category) return "Other";
+            return category.charAt(0).toUpperCase() + category.slice(1);
+        }
+
+        function cardHTML(key, example) {
+            return `
+                <li class="example-card" data-example="${key}">
+                    <div class="example-item" data-example="${key}">
+                        <div class="example-preview">
+                            <img src="./screenshots/${key}.png" alt="${example.title}" class="example-screenshot" draggable="false" onerror="this.style.display='none'">
+                            <div class="example-overlay">
+                                <h3 class="example-title">${example.title}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            `;
+        }
+
+        function addExamplesToSidebar() {
+            const examplesList = document.getElementById("examples-list");
+
+            // group entries by category
+            const byCategory = new Map();
+            for (const [key, example] of Object.entries(examples)) {
+                const category = example.category || "other";
+                if (!byCategory.has(category)) byCategory.set(category, []);
+                byCategory.get(category).push([key, example]);
+            }
+
+            const categories = [...byCategory.keys()].sort(
+                (a, b) => orderIndex(CATEGORY_ORDER, a) - orderIndex(CATEGORY_ORDER, b),
+            );
+
+            let html = "";
+            for (const category of categories) {
+                html += `<li class="category-group" data-category="${category}">`;
+                html += `<div class="category-header">${prettyCategory(category)}</div>`;
+                html += `<ul class="examples-list" style="padding:0;">`;
+                for (const [key, example] of byCategory.get(category)) {
+                    html += cardHTML(key, example);
+                }
+                html += `</ul></li>`;
+            }
+
+            examplesList.innerHTML = html;
+        }
+
+        // initialize examples list
+        addExamplesToSidebar();
+
+        const titleElement = document.getElementById("example-title");
+        const viewerTitleText = document.getElementById("viewer-title-text");
+        const viewerDescText = document.getElementById("viewer-desc-text");
+        const frameElement = document.getElementById("example-frame");
+        const btnSource = document.getElementById("btn-source");
+        const btnOpen = document.getElementById("btn-open");
+        const hamburger = document.getElementById("hamburger");
+        const sidebar = document.getElementById("sidebar");
+        const sidebarOverlay = document.getElementById("sidebar-overlay");
+        const searchInput = document.getElementById("search-input");
+
+        // search functionality
+        function filterExamples() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const cards = document.querySelectorAll(".example-card");
+
+            cards.forEach((card) => {
+                const exampleKey = card.getAttribute("data-example");
+                const example = examples[exampleKey];
+
+                // search in title, description, and tags
+                const searchableText = [
+                    example.title,
+                    example.description,
+                    ...(example.tags || []),
+                ]
+                    .join(" ")
+                    .toLowerCase();
+
+                card.style.display = searchableText.includes(searchTerm) ? "" : "none";
+            });
+
+            // hide category groups with no visible cards
+            document.querySelectorAll(".category-group").forEach((group) => {
+                const anyVisible = [...group.querySelectorAll(".example-card")].some(
+                    (c) => c.style.display !== "none",
+                );
+                group.classList.toggle("hidden", !anyVisible);
+            });
+        }
+
+        // attach search event listener
+        searchInput.addEventListener("input", filterExamples);
+
+        // handle sidebar clicks
+        function attachEventListeners() {
+            const exampleItems = document.querySelectorAll(".example-item");
+            exampleItems.forEach((item) => {
+                item.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    const exampleKey = item.getAttribute("data-example");
+                    loadExample(exampleKey);
+                });
+            });
+        }
+
+        // mobile navigation
+        hamburger.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            sidebarOverlay.classList.toggle("show");
+        });
+
+        sidebarOverlay.addEventListener("click", () => {
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("show");
+        });
+
+        function loadExample(exampleKey, scrollIntoView) {
+            const example = examples[exampleKey];
+            if (!example) return;
+
+            titleElement.textContent = example.title;
+            viewerTitleText.textContent = example.title;
+            viewerDescText.textContent = example.description;
+            frameElement.src = `./${exampleKey}.html`;
+            btnSource.href = `https://github.com/pmndrs/math/blob/main/examples/src/${exampleKey}.ts`;
+            btnOpen.href = `./${exampleKey}.html`;
+
+            // update active item
+            const exampleItems = document.querySelectorAll(".example-item");
+
+            let activeItem = null;
+            exampleItems.forEach((item) => {
+                item.classList.remove("active");
+                if (item.getAttribute("data-example") === exampleKey) {
+                    item.classList.add("active");
+                    activeItem = item;
+                }
+            });
+
+            // scroll active item into view
+            if (scrollIntoView && activeItem) {
+                activeItem.scrollIntoView({ block: "center", behavior: "auto" });
+            }
+
+            // update URL
+            window.location.hash = exampleKey;
+
+            // close mobile sidebar
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("show");
+        }
+
+        // handle hash changes
+        function handleHashChange(scrollIntoView = false) {
+            const hash = window.location.hash.substring(1);
+            if (hash && examples[hash]) {
+                loadExample(hash, scrollIntoView);
+            } else {
+                // load first example by default
+                const firstExample = Object.keys(examples)[0];
+                loadExample(firstExample, scrollIntoView);
+            }
+        }
+
+        // initialize
+        handleHashChange(true);
+        attachEventListeners();
+        window.addEventListener("hashchange", () => handleHashChange(true));
+    </script>
+</body>
+
+</html>

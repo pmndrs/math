@@ -1,0 +1,7 @@
+packages:
+  - 'benches'
+  - 'docs'
+  - 'examples'
+  - 'website'
+allowBuilds:
+  esbuild: true
