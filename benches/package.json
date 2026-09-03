@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "@pmndrs/labs": "^0.7.0"
+    "@pmndrs/labs": "^0.8.0"
   },
   "devDependencies": {
     "tsx": "^4.21.0",

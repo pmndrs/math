@@ -36,8 +36,8 @@ importers:
   benches:
     dependencies:
       '@pmndrs/labs':
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.8.0
+        version: 0.8.0
     devDependencies:
       tsx:
         specifier: ^4.21.0
@@ -107,24 +107,28 @@ packages:
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@biomejs/cli-linux-arm64@2.5.6':
     resolution: {integrity: sha512-6XsYwCFkp5sMxl85ffhgeGpGgs6A7dRYFnkceZ7WVxvycuTnGdD5xa534Z3xfrBQ0JCMK/mujT6ZNPJoghedwg==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@biomejs/cli-linux-x64-musl@2.5.6':
     resolution: {integrity: sha512-2Vp13QdKysH3HIWLaYLhUUwbK+jbZonJD1K+Lr0d0RO4wH7mkYd43vJixEDm8cUWrowoRz4UUHF1nm9Ae7ym8A==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@biomejs/cli-linux-x64@2.5.6':
     resolution: {integrity: sha512-Pop9VXCFUhFTMfFefZ39S+u2rOPyNp5iHlxbZRwXGACHLy2r0jjiRgJHmaEKJzL3SyxlVeGShXhvvElvWowonA==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@biomejs/cli-win32-arm64@2.5.6':
     resolution: {integrity: sha512-tDGshcm6BdkZOCGnTDX0Y8/U4IfBSlnUU7T56nNDuPEfed+aHg+u8G36NB43fJVl0Os6+QURXIE1yuD7AaEofA==}
@@ -313,14 +317,15 @@ packages:
     engines: {node: ^22.20 || ^24.12 || >=25}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@playwright/test@1.62.1':
     resolution: {integrity: sha512-DTcUc8qii+cpHvtOwggMtBRMjKZHXYWdw8syRYu2vtzuq4Wxphqq4NfCs5Zt44L6mA8rfDfj+PHnxFc/FeK6mQ==}
     engines: {node: '>=20'}
     hasBin: true
 
-  '@pmndrs/labs@0.7.0':
-    resolution: {integrity: sha512-9ujIIBSUMjp+eqh0Os2atCS2wHV7QsKBbFU8Brzt1vbBGtGNY5BOZXBVqtQo2MTpXg6tCBCQF0p1t3ChCnLKgA==}
+  '@pmndrs/labs@0.8.0':
+    resolution: {integrity: sha512-Ntb9zclfLhFgcGYdYCSm5hPG1ZlEJVBq/BmEex9+aIsitfOvALai5G3sF6KpXPRl+PnfkaazZCwVsM0UDgpTQQ==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
@@ -389,66 +394,79 @@ packages:
     resolution: {integrity: sha512-81wiiX3v7aqy+T+bT61TJ78yJjRquqFFTTbAPt08imfQQzkPIW8t6aJbkTagtCCrXMNc9D66+geqlK7ydLPNqA==}
     cpu: [arm]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm-musleabihf@4.62.4':
     resolution: {integrity: sha512-9kmDIvNZqdoHOBZgNtpTBeLWYO/LVipM3H/j62P8848/l/VPEQL6N3uxU9pvP1oZAsXyC2MEnFP3ovRjo7WYNQ==}
     cpu: [arm]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-arm64-gnu@4.62.4':
     resolution: {integrity: sha512-CcnXHWnXg69g+DX5VWL3FHts3qMRN2uVEHX+BZvGLdd07/gXkn3ePjYtO1LDJvxkGKVHMclKBRa1QUTH+6toYQ==}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-arm64-musl@4.62.4':
     resolution: {integrity: sha512-iFOibiHnTRuhrWLlRsOQFdZJJIa7S8OwkneJr4ocALP16u5yk6lWLINFwhHaEqBFMsKDUZofLkGos7+CPzGB3g==}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-loong64-gnu@4.62.4':
     resolution: {integrity: sha512-XnWYMI7euHlb5a871xPja+Gm7DRCFU+FGRrtS2sMq9N8FvqtpagUy6gD4YOemC5MRk9xbh8+jYMEJbigFQwsgA==}
     cpu: [loong64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-loong64-musl@4.62.4':
     resolution: {integrity: sha512-qGDAlO0U8xedCcsdRm9oaoQY8DAx/QT7uIxJWhCdx0ceIWX783UC9QSYkdpzAe29wNiVfp24+bZdQmn49o45SQ==}
     cpu: [loong64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-ppc64-gnu@4.62.4':
     resolution: {integrity: sha512-ru4H6ezD7ysA5EiEK6qkkaEb4modH8CTej6kUy/gQi20u3kB3G7Zn8snXXkeJSCOFKG/rbPPtM/+9Wgas1961w==}
     cpu: [ppc64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-ppc64-musl@4.62.4':
     resolution: {integrity: sha512-2W4MO5WQVJnbJaZdvDb9rhBDuFU1nKIepPFpJUBsTh2k1YY2g+ODViaWuyOAjQ5cOP7NvrvLzt3wvHOoiAvc7w==}
     cpu: [ppc64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-riscv64-gnu@4.62.4':
     resolution: {integrity: sha512-+fxjfuoAmVMCYV5QyjoIpu0cp5DOiOTeqYFk1AVaxGr+/ravWLX89XfQmptsoWcaVy/TGf2hexzbUOrCQIL1CQ==}
     cpu: [riscv64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-musl@4.62.4':
     resolution: {integrity: sha512-jTn8JfHGL4djjFxPuM06LmNUJDsst2jeVlsd9OmIH6zc5sC9K6rIuO4YajXatLUpBmBKl6b35ro1QZocLi+tcA==}
     cpu: [riscv64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-linux-s390x-gnu@4.62.4':
     resolution: {integrity: sha512-oCJCJL4pXsoDcP2QZ+JVlPTIRc6266zsIaeJJsWImmF7HO0W8nb6HuSgZlMWxJwaPf8ehbSw8yo0EUw925hKsA==}
     cpu: [s390x]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-gnu@4.62.4':
     resolution: {integrity: sha512-W69hukhZ3KKNRCaMIEzKvcFye42hh0FE1+YoYaf5+Ikacuftoco6yO/xouz0hc5d5W/s3yBro5jRiuEE/Q5vUw==}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.62.4':
     resolution: {integrity: sha512-qiXbGG2jkjXhzXpsFZSR2Xpb8DN/UaxYsbb/STbuR/6fpaDgRmmaq1B/LmtF2wQFOFOSsK2jdE0RZ3a0zHn4QA==}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@rollup/rollup-openbsd-x64@4.62.4':
     resolution: {integrity: sha512-nWeM//hxv8mIo6jD7Hu4o48DVmV9pbV6gsKaWU+4NFyqHoPKwrkRiZGLKUhOBk8qNmDmpwFtPKg80Bo/Tn4xiQ==}
@@ -573,7 +591,7 @@ packages:
     engines: {node: '>= 16'}
 
   dashcat@https://codeload.github.com/isaac-mason/dashcat/tar.gz/303478bc4dd20cec56b0e4f2f58cfdc1a79e172d:
-    resolution: {tarball: https://codeload.github.com/isaac-mason/dashcat/tar.gz/303478bc4dd20cec56b0e4f2f58cfdc1a79e172d}
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/isaac-mason/dashcat/tar.gz/303478bc4dd20cec56b0e4f2f58cfdc1a79e172d}
     version: 0.0.1-alpha.1
 
   debug@4.4.3:
@@ -651,7 +669,7 @@ packages:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
   gpucat@https://codeload.github.com/isaac-mason/gpucat/tar.gz/17fdd24630322bfb3a3f01719de0d3bea47909c4:
-    resolution: {tarball: https://codeload.github.com/isaac-mason/gpucat/tar.gz/17fdd24630322bfb3a3f01719de0d3bea47909c4}
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/isaac-mason/gpucat/tar.gz/17fdd24630322bfb3a3f01719de0d3bea47909c4}
     version: 0.0.0-alpha.1
 
   hasown@2.0.4:
@@ -684,8 +702,8 @@ packages:
     resolution: {integrity: sha512-RCEsPjR+sr0x+AuYp601tKTkgFG4YEPLCzHST3cQ/fhlJkqAkz1L2/Qbp1j9qw5SBwQHFBoW8+hoN5xssOF0Tw==}
     hasBin: true
 
-  math@1.0.0-canary-7cec7231-20260817:
-    resolution: {integrity: sha512-pB/W+KXnWr9Pd1XD+1JDo5jIVAZd685RSoUmAmU7m+LIBPOCamAGnN4Z83cJuGaVthIzXclQLKGONlk4UfjH9w==}
+  math@1.0.0-canary-dbc0c0c5-20260823:
+    resolution: {integrity: sha512-4jnPsuc9Y8+NXviArjI8QZPZbzhQvCn2a/B5JeZsFhoe1pwzMcWBHHeeWcNzD2Wbp7YTRXsMkktp4UCqYBE2mg==}
 
   mdurl@2.1.0:
     resolution: {integrity: sha512-1+HBaOx0zi/dQWht8rNv9MYf9qqpqL/kxI0hXImU6Y547zM6Sni8BQibt7ifgMcYtQg41ao3Ivd6cnSM86inpg==}
@@ -1047,7 +1065,7 @@ snapshots:
     dependencies:
       playwright: 1.62.1
 
-  '@pmndrs/labs@0.7.0':
+  '@pmndrs/labs@0.8.0':
     dependencies:
       '@clack/prompts': 1.7.0
       tsx: 4.23.12
@@ -1334,7 +1352,7 @@ snapshots:
 
   gpucat@https://codeload.github.com/isaac-mason/gpucat/tar.gz/17fdd24630322bfb3a3f01719de0d3bea47909c4:
     dependencies:
-      math: 1.0.0-canary-7cec7231-20260817
+      math: 1.0.0-canary-dbc0c0c5-20260823
 
   hasown@2.0.4:
     dependencies:
@@ -1369,7 +1387,7 @@ snapshots:
       punycode.js: 2.3.1
       uc.micro: 2.1.0
 
-  math@1.0.0-canary-7cec7231-20260817: {}
+  math@1.0.0-canary-dbc0c0c5-20260823: {}
 
   mdurl@2.1.0: {}
 
