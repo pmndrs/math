@@ -30,14 +30,17 @@ export function sample({ perm }: Worley2DGenerator, x: number, y: number): numbe
     let f1 = Infinity; // squared nearest distance
 
     // check the point's cell and its 8 neighbours; the nearest feature point can
-    // only be in one of these
-    for (let gx = -1; gx <= 1; gx++) {
-        for (let gy = -1; gy <= 1; gy++) {
+    // only be in one of these. The row (y) hashes are shared by the three cells
+    // in a row, so hash them once per row.
+    for (let gy = -1; gy <= 1; gy++) {
+        const cy = iy + gy;
+        const py = perm[cy & 255];
+        const qy = perm[(cy + 37) & 255];
+        for (let gx = -1; gx <= 1; gx++) {
             const cx = ix + gx;
-            const cy = iy + gy;
             // a hashed feature-point offset in [0, 1) per axis, decorrelated
-            const rx = perm[(cx & 255) + perm[cy & 255]] / 256;
-            const ry = perm[((cx + 71) & 255) + perm[(cy + 37) & 255]] / 256;
+            const rx = perm[(cx & 255) + py] / 256;
+            const ry = perm[((cx + 71) & 255) + qy] / 256;
             const dx = cx + rx - x;
             const dy = cy + ry - y;
             const d2 = dx * dx + dy * dy;

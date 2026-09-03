@@ -42,6 +42,8 @@ overview, installation, and examples, see the [README](./README.md).
 - <a id="round"></a>`round(a: number): number` — Symmetric round
 - <a id="fade"></a>`fade(t: number)` — Ease-in-out, goes to -Infinite before 0 and Infinite after 1
 - <a id="lerp"></a>`lerp(v0: number, v1: number, t: number)`
+- <a id="lagrange"></a>`lagrange(v0: number, v1: number, v2: number, t: number)`
+- <a id="binomial"></a>`binomial(n: number, k: number): number`
 - <a id="clamp"></a>`clamp(value: number, min: number, max: number): number` — Clamp a value between min and max
 - <a id="repeat"></a>`repeat(t: number, length: number): number` — Loops `t` so that it is never larger than `length` and never smaller than 0.
 - <a id="remap"></a>`remap(number: number, inLow: number, inHigh: number, outLow: number, outHigh: number): number` — Remaps a number from one range to another.
@@ -102,6 +104,7 @@ import { vec2 } from 'math';
 - `vec2.dot(a: Vec2, b: Vec2): number` — Calculates the dot product of two vec2's
 - `vec2.cross(out: Vec3, a: Vec2, b: Vec2): Vec3` — Computes the cross product of two vec2's
 - `vec2.lerp(out: Vec2, a: Vec2, b: Vec2, t: number): Vec2` — Performs a linear interpolation between two vec2's
+- `vec2.lagrange(out: Vec2, a: Vec2, b: Vec2, c: Vec2, t: number): Vec2` — Quadratic interpolation through three vectors using Lagrange interpolation.
 
 **Transform**
 
@@ -175,6 +178,7 @@ import { vec3 } from 'math';
 - `vec3.cross(out: Vec3, a: Vec3, b: Vec3): Vec3` — Computes the cross product of two vec3's
 - `vec3.perpendicular(out: Vec3, a: Vec3): Vec3` — Calculates a normalized perpendicular vector to the given vector.
 - `vec3.lerp(out: Vec3, a: Vec3, b: Vec3, t: number): Vec3` — Performs a linear interpolation between two vec3's
+- `vec3.lagrange(out: Vec3, a: Vec3, b: Vec3, c: Vec3, t: number): Vec3` — Quadratic interpolation through three vectors using Lagrange interpolation.
 - `vec3.slerp(out: Vec3, a: Vec3, b: Vec3, t: number): Vec3` — Performs a spherical linear interpolation between two vec3's
 - `vec3.hermite(out: Vec3, a: Vec3, b: Vec3, c: Vec3, d: Vec3, t: number): Vec3` — Performs a hermite interpolation with two control points
 - `vec3.bezier(out: Vec3, a: Vec3, b: Vec3, c: Vec3, d: Vec3, t: number): Vec3` — Performs a bezier interpolation with two control points
@@ -249,6 +253,7 @@ import { vec4 } from 'math';
 - `vec4.dot(a: Vec4, b: Vec4): number` — Calculates the dot product of two vec4's
 - `vec4.cross(out: Vec4, u: Vec4, v: Vec4, w: Vec4): Vec4` — Returns the cross-product of three vectors in a 4-dimensional space
 - `vec4.lerp(out: Vec4, a: Vec4, b: Vec4, t: number): Vec4` — Performs a linear interpolation between two vec4's
+- `vec4.lagrange(out: Vec4, a: Vec4, b: Vec4, c: Vec4, t: number): Vec4` — Quadratic interpolation through three vectors using Lagrange interpolation.
 
 **Transform**
 
@@ -1256,7 +1261,7 @@ import { random } from 'math/random';
 
 **Types**
 
-- `type Permutation = { perm: number[]; gradP: Vec3[]; gradP4: Vec4[]; }` — Seeded permutation and gradient tables that back a noise generator.
+- `type Permutation = { perm: Uint8Array; grad3: Float64Array; grad4: Float64Array; }` — Seeded permutation and gradient tables that back a noise generator.
 
 **Operations**
 
@@ -1286,7 +1291,7 @@ import { perlin2d } from 'math/noise';
 
 **Operations**
 
-- `perlin2d.sample({ perm, gradP }: Perlin2DGenerator, x: number, y: number): number` — Samples 2D Perlin noise.
+- `perlin2d.sample({ perm, grad3 }: Perlin2DGenerator, x: number, y: number): number` — Samples 2D Perlin noise.
 
 <a id="api-math-noise-perlin3d"></a>
 
@@ -1306,7 +1311,7 @@ import { perlin3d } from 'math/noise';
 
 **Operations**
 
-- `perlin3d.sample({ perm, gradP }: Perlin3DGenerator, x: number, y: number, z: number): number` — Samples 3D Perlin noise.
+- `perlin3d.sample({ perm, grad3 }: Perlin3DGenerator, x: number, y: number, z: number): number` — Samples 3D Perlin noise.
 
 <a id="api-math-noise-simplex2d"></a>
 
@@ -1326,7 +1331,7 @@ import { simplex2d } from 'math/noise';
 
 **Operations**
 
-- `simplex2d.sample({ perm, gradP }: Simplex2DGenerator, x: number, y: number): number` — Samples 2D simplex noise, returning a value in the interval [-1, 1].
+- `simplex2d.sample({ perm, grad3 }: Simplex2DGenerator, x: number, y: number): number` — Samples 2D simplex noise, returning a value in the interval [-1, 1].
 
 <a id="api-math-noise-simplex3d"></a>
 
@@ -1346,7 +1351,7 @@ import { simplex3d } from 'math/noise';
 
 **Operations**
 
-- `simplex3d.sample({ perm, gradP }: Simplex3DGenerator, x: number, y: number, z: number): number` — Samples 3D simplex noise, returning a value in the interval [-1, 1].
+- `simplex3d.sample({ perm, grad3 }: Simplex3DGenerator, x: number, y: number, z: number): number` — Samples 3D simplex noise, returning a value in the interval [-1, 1].
 
 <a id="api-math-noise-simplex4d"></a>
 
@@ -1366,7 +1371,7 @@ import { simplex4d } from 'math/noise';
 
 **Operations**
 
-- `simplex4d.sample({ perm, gradP4 }: Simplex4DGenerator, x: number, y: number, z: number, w: number): number` — Samples 4D simplex noise, returning a value in the interval [-1, 1].
+- `simplex4d.sample({ perm, grad4 }: Simplex4DGenerator, x: number, y: number, z: number, w: number): number` — Samples 4D simplex noise, returning a value in the interval [-1, 1].
 
 <a id="api-math-noise-worley2d"></a>
 

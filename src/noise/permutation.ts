@@ -1,6 +1,3 @@
-import type { Vec3 } from '../core/vec3';
-import type { Vec4 } from '../core/vec4';
-
 // Adapated from https://github.com/josephg/noisejs
 //
 // ```
@@ -22,17 +19,16 @@ import type { Vec4 } from '../core/vec4';
  * Seeded permutation and gradient tables that back a noise generator.
  *
  * All noise variants (simplex/perlin, 2D/3D/4D) share this same table shape, so
- * each generator type is a structural alias of this. `gradP` holds the 3D
- * gradients (used by 2D and 3D noise); `gradP4` holds the 4D gradients.
+ * each generator type is a structural alias of this. `perm` is the doubled
+ * (512 entry) permutation table. `grad3` holds the 3D gradient for each
+ * permutation index as flat xyz triples (used by 2D and 3D noise), and `grad4`
+ * holds the 4D gradient for each index as flat xyzw quads. Flat typed arrays
+ * keep sampling free of nested array loads and allocation.
  */
-export type Permutation = { perm: number[]; gradP: Vec3[]; gradP4: Vec4[] };
+export type Permutation = { perm: Uint8Array; grad3: Float64Array; grad4: Float64Array };
 
-export const dot2 = (grad: Vec3, x: number, y: number) => grad[0] * x + grad[1] * y;
-export const dot3 = (grad: Vec3, x: number, y: number, z: number) => grad[0] * x + grad[1] * y + grad[2] * z;
-export const dot4 = (grad: Vec4, x: number, y: number, z: number, w: number) =>
-    grad[0] * x + grad[1] * y + grad[2] * z + grad[3] * w;
-
-const grad3: Vec3[] = [
+// the 12 3D gradient directions (edges of a cube), indexed by perm value % 12
+const GRAD3: number[][] = [
     [1, 1, 0],
     [-1, 1, 0],
     [1, -1, 0],
@@ -48,7 +44,7 @@ const grad3: Vec3[] = [
 ];
 
 // the 32 4D gradient directions (edges of a hypercube), indexed by perm value % 32
-const grad4: Vec4[] = [
+const GRAD4: number[][] = [
     [0, 1, 1, 1],
     [0, 1, 1, -1],
     [0, 1, -1, 1],
@@ -114,9 +110,9 @@ export function createPermutation(seed: number): Permutation {
     }
 
     // To remove the need for index wrapping, double the permutation table length
-    const perm: number[] = new Array(512);
-    const gradP: Vec3[] = new Array(512);
-    const gradP4: Vec4[] = new Array(512);
+    const perm = new Uint8Array(512);
+    const grad3 = new Float64Array(512 * 3);
+    const grad4 = new Float64Array(512 * 4);
 
     for (let i = 0; i < 256; i++) {
         let v: number;
@@ -127,9 +123,16 @@ export function createPermutation(seed: number): Permutation {
         }
 
         perm[i] = perm[i + 256] = v;
-        gradP[i] = gradP[i + 256] = grad3[v % 12];
-        gradP4[i] = gradP4[i + 256] = grad4[v % 32];
+
+        const g3 = GRAD3[v % 12];
+        const g4 = GRAD4[v % 32];
+        for (let k = 0; k < 3; k++) {
+            grad3[i * 3 + k] = grad3[(i + 256) * 3 + k] = g3[k];
+        }
+        for (let k = 0; k < 4; k++) {
+            grad4[i * 4 + k] = grad4[(i + 256) * 4 + k] = g4[k];
+        }
     }
 
-    return { perm, gradP, gradP4 };
+    return { perm, grad3, grad4 };
 }

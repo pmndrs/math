@@ -1,5 +1,5 @@
 import { fade, lerp } from '../core/scalar';
-import { createPermutation, dot3, type Permutation } from './permutation';
+import { createPermutation, type Permutation } from './permutation';
 
 /** A seeded 3D Perlin noise generator. Create one with {@link create}. */
 export type Perlin3DGenerator = Permutation;
@@ -23,7 +23,7 @@ export function create(seed: number): Perlin3DGenerator {
  * @param z Z coordinate
  * @returns The noise value at (x, y, z)
  */
-export function sample({ perm, gradP }: Perlin3DGenerator, x: number, y: number, z: number): number {
+export function sample({ perm, grad3 }: Perlin3DGenerator, x: number, y: number, z: number): number {
     // Find unit grid cell containing point
     let X = Math.floor(x);
     let Y = Math.floor(y);
@@ -37,15 +37,37 @@ export function sample({ perm, gradP }: Perlin3DGenerator, x: number, y: number,
     Y = Y & 255;
     Z = Z & 255;
 
+    const x1 = x - 1;
+    const y1 = y - 1;
+    const z1 = z - 1;
+
+    // Hash the Z and Y rows once; each corner then only needs one more lookup
+    const pz0 = perm[Z];
+    const pz1 = perm[Z + 1];
+    const py00 = perm[Y + pz0];
+    const py01 = perm[Y + pz1];
+    const py10 = perm[Y + 1 + pz0];
+    const py11 = perm[Y + 1 + pz1];
+
+    // Hashed gradient indices of the eight corners (flat xyz triples in grad3)
+    const g000 = (X + py00) * 3;
+    const g001 = (X + py01) * 3;
+    const g010 = (X + py10) * 3;
+    const g011 = (X + py11) * 3;
+    const g100 = (X + 1 + py00) * 3;
+    const g101 = (X + 1 + py01) * 3;
+    const g110 = (X + 1 + py10) * 3;
+    const g111 = (X + 1 + py11) * 3;
+
     // Calculate noise contributions from each of the eight corners
-    const n000 = dot3(gradP[X + perm[Y + perm[Z]]], x, y, z);
-    const n001 = dot3(gradP[X + perm[Y + perm[Z + 1]]], x, y, z - 1);
-    const n010 = dot3(gradP[X + perm[Y + 1 + perm[Z]]], x, y - 1, z);
-    const n011 = dot3(gradP[X + perm[Y + 1 + perm[Z + 1]]], x, y - 1, z - 1);
-    const n100 = dot3(gradP[X + 1 + perm[Y + perm[Z]]], x - 1, y, z);
-    const n101 = dot3(gradP[X + 1 + perm[Y + perm[Z + 1]]], x - 1, y, z - 1);
-    const n110 = dot3(gradP[X + 1 + perm[Y + 1 + perm[Z]]], x - 1, y - 1, z);
-    const n111 = dot3(gradP[X + 1 + perm[Y + 1 + perm[Z + 1]]], x - 1, y - 1, z - 1);
+    const n000 = grad3[g000] * x + grad3[g000 + 1] * y + grad3[g000 + 2] * z;
+    const n001 = grad3[g001] * x + grad3[g001 + 1] * y + grad3[g001 + 2] * z1;
+    const n010 = grad3[g010] * x + grad3[g010 + 1] * y1 + grad3[g010 + 2] * z;
+    const n011 = grad3[g011] * x + grad3[g011 + 1] * y1 + grad3[g011 + 2] * z1;
+    const n100 = grad3[g100] * x1 + grad3[g100 + 1] * y + grad3[g100 + 2] * z;
+    const n101 = grad3[g101] * x1 + grad3[g101 + 1] * y + grad3[g101 + 2] * z1;
+    const n110 = grad3[g110] * x1 + grad3[g110 + 1] * y1 + grad3[g110 + 2] * z;
+    const n111 = grad3[g111] * x1 + grad3[g111 + 1] * y1 + grad3[g111 + 2] * z1;
 
     // Compute the fade curve value for x, y, z
     const u = fade(x);

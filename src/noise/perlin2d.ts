@@ -1,5 +1,5 @@
 import { fade, lerp } from '../core/scalar';
-import { createPermutation, dot2, type Permutation } from './permutation';
+import { createPermutation, type Permutation } from './permutation';
 
 /** A seeded 2D Perlin noise generator. Create one with {@link create}. */
 export type Perlin2DGenerator = Permutation;
@@ -22,7 +22,7 @@ export function create(seed: number): Perlin2DGenerator {
  * @param y Y coordinate
  * @returns The noise value at (x, y)
  */
-export function sample({ perm, gradP }: Perlin2DGenerator, x: number, y: number): number {
+export function sample({ perm, grad3 }: Perlin2DGenerator, x: number, y: number): number {
     // Find unit grid cell containing point
     let X = Math.floor(x);
     let Y = Math.floor(y);
@@ -33,11 +33,20 @@ export function sample({ perm, gradP }: Perlin2DGenerator, x: number, y: number)
     X = X & 255;
     Y = Y & 255;
 
+    const x1 = x - 1;
+    const y1 = y - 1;
+
+    // Hashed gradient indices of the four corners (flat xyz triples in grad3)
+    const g00 = (X + perm[Y]) * 3;
+    const g01 = (X + perm[Y + 1]) * 3;
+    const g10 = (X + 1 + perm[Y]) * 3;
+    const g11 = (X + 1 + perm[Y + 1]) * 3;
+
     // Calculate noise contributions from each of the four corners
-    const n00 = dot2(gradP[X + perm[Y]], x, y);
-    const n01 = dot2(gradP[X + perm[Y + 1]], x, y - 1);
-    const n10 = dot2(gradP[X + 1 + perm[Y]], x - 1, y);
-    const n11 = dot2(gradP[X + 1 + perm[Y + 1]], x - 1, y - 1);
+    const n00 = grad3[g00] * x + grad3[g00 + 1] * y;
+    const n01 = grad3[g01] * x + grad3[g01 + 1] * y1;
+    const n10 = grad3[g10] * x1 + grad3[g10 + 1] * y;
+    const n11 = grad3[g11] * x1 + grad3[g11 + 1] * y1;
 
     // Compute the fade curve value for x
     const u = fade(x);

@@ -1,4 +1,4 @@
-import { createPermutation, dot4, type Permutation } from './permutation';
+import { createPermutation, type Permutation } from './permutation';
 
 /** A seeded 4D simplex noise generator. Create one with {@link create}. */
 export type Simplex4DGenerator = Permutation;
@@ -30,13 +30,7 @@ export function create(seed: number): Simplex4DGenerator {
  * @param w W coordinate
  * @returns The noise value at (x, y, z, w)
  */
-export function sample({ perm, gradP4 }: Simplex4DGenerator, x: number, y: number, z: number, w: number): number {
-    let n0: number;
-    let n1: number;
-    let n2: number;
-    let n3: number;
-    let n4: number; // Noise contributions from the five corners
-
+export function sample({ perm, grad4 }: Simplex4DGenerator, x: number, y: number, z: number, w: number): number {
     // Skew the input space to determine which simplex cell we're in
     const s = (x + y + z + w) * F4; // Factor for 4D skewing
     const i = Math.floor(x + s);
@@ -108,51 +102,47 @@ export function sample({ perm, gradP4 }: Simplex4DGenerator, x: number, y: numbe
     const w4 = w0 - 1 + 4 * G4;
 
     // Work out the hashed gradient indices of the five simplex corners
+    // (flat xyzw quads in grad4)
     const ii = i & 255;
     const jj = j & 255;
     const kk = k & 255;
     const ll = l & 255;
-    const g0 = gradP4[ii + perm[jj + perm[kk + perm[ll]]]];
-    const g1 = gradP4[ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]];
-    const g2 = gradP4[ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]];
-    const g3 = gradP4[ii + i3 + perm[jj + j3 + perm[kk + k3 + perm[ll + l3]]]];
-    const g4 = gradP4[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]];
+    const g0 = (ii + perm[jj + perm[kk + perm[ll]]]) * 4;
+    const g1 = (ii + i1 + perm[jj + j1 + perm[kk + k1 + perm[ll + l1]]]) * 4;
+    const g2 = (ii + i2 + perm[jj + j2 + perm[kk + k2 + perm[ll + l2]]]) * 4;
+    const g3 = (ii + i3 + perm[jj + j3 + perm[kk + k3 + perm[ll + l3]]]) * 4;
+    const g4 = (ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]) * 4;
 
     // Calculate the contribution from the five corners
+    let n0 = 0;
+    let n1 = 0;
+    let n2 = 0;
+    let n3 = 0;
+    let n4 = 0;
     let t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
-    if (t0 < 0) {
-        n0 = 0;
-    } else {
+    if (t0 >= 0) {
         t0 *= t0;
-        n0 = t0 * t0 * dot4(g0, x0, y0, z0, w0);
+        n0 = t0 * t0 * (grad4[g0] * x0 + grad4[g0 + 1] * y0 + grad4[g0 + 2] * z0 + grad4[g0 + 3] * w0);
     }
     let t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
-    if (t1 < 0) {
-        n1 = 0;
-    } else {
+    if (t1 >= 0) {
         t1 *= t1;
-        n1 = t1 * t1 * dot4(g1, x1, y1, z1, w1);
+        n1 = t1 * t1 * (grad4[g1] * x1 + grad4[g1 + 1] * y1 + grad4[g1 + 2] * z1 + grad4[g1 + 3] * w1);
     }
     let t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
-    if (t2 < 0) {
-        n2 = 0;
-    } else {
+    if (t2 >= 0) {
         t2 *= t2;
-        n2 = t2 * t2 * dot4(g2, x2, y2, z2, w2);
+        n2 = t2 * t2 * (grad4[g2] * x2 + grad4[g2 + 1] * y2 + grad4[g2 + 2] * z2 + grad4[g2 + 3] * w2);
     }
     let t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
-    if (t3 < 0) {
-        n3 = 0;
-    } else {
+    if (t3 >= 0) {
         t3 *= t3;
-        n3 = t3 * t3 * dot4(g3, x3, y3, z3, w3);
+        n3 = t3 * t3 * (grad4[g3] * x3 + grad4[g3 + 1] * y3 + grad4[g3 + 2] * z3 + grad4[g3 + 3] * w3);
     }
     let t4 = 0.6 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
-    if (t4 < 0) {
-        n4 = 0;
-    } else {
+    if (t4 >= 0) {
         t4 *= t4;
-        n4 = t4 * t4 * dot4(g4, x4, y4, z4, w4);
+        n4 = t4 * t4 * (grad4[g4] * x4 + grad4[g4 + 1] * y4 + grad4[g4 + 2] * z4 + grad4[g4 + 3] * w4);
     }
 
     // Add contributions from each corner to get the final noise value.

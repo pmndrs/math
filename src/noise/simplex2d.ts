@@ -1,4 +1,4 @@
-import { createPermutation, dot2, type Permutation } from './permutation';
+import { createPermutation, type Permutation } from './permutation';
 
 /** A seeded 2D simplex noise generator. Create one with {@link create}. */
 export type Simplex2DGenerator = Permutation;
@@ -25,10 +25,7 @@ export function create(seed: number): Simplex2DGenerator {
  * @param y Y coordinate
  * @returns The noise value at (x, y)
  */
-export function sample({ perm, gradP }: Simplex2DGenerator, x: number, y: number): number {
-    let n0: number;
-    let n1: number;
-    let n2: number; // Noise contributions from the three corners
+export function sample({ perm, grad3 }: Simplex2DGenerator, x: number, y: number): number {
     // Skew the input space to determine which simplex cell we're in
     const s = (x + y) * F2; // Hairy factor for 2D
     let i = Math.floor(x + s);
@@ -57,32 +54,30 @@ export function sample({ perm, gradP }: Simplex2DGenerator, x: number, y: number
     const x2 = x0 - 1 + 2 * G2; // Offsets for last corner in (x,y) unskewed coords
     const y2 = y0 - 1 + 2 * G2;
     // Work out the hashed gradient indices of the three simplex corners
+    // (flat xyz triples in grad3; only x and y are used for 2D)
     i &= 255;
     j &= 255;
-    const gi0 = gradP[i + perm[j]];
-    const gi1 = gradP[i + i1 + perm[j + j1]];
-    const gi2 = gradP[i + 1 + perm[j + 1]];
+    const gi0 = (i + perm[j]) * 3;
+    const gi1 = (i + i1 + perm[j + j1]) * 3;
+    const gi2 = (i + 1 + perm[j + 1]) * 3;
     // Calculate the contribution from the three corners
+    let n0 = 0;
+    let n1 = 0;
+    let n2 = 0;
     let t0 = 0.5 - x0 * x0 - y0 * y0;
-    if (t0 < 0) {
-        n0 = 0;
-    } else {
+    if (t0 >= 0) {
         t0 *= t0;
-        n0 = t0 * t0 * dot2(gi0, x0, y0); // (x,y) of grad3 used for 2D gradient
+        n0 = t0 * t0 * (grad3[gi0] * x0 + grad3[gi0 + 1] * y0);
     }
     let t1 = 0.5 - x1 * x1 - y1 * y1;
-    if (t1 < 0) {
-        n1 = 0;
-    } else {
+    if (t1 >= 0) {
         t1 *= t1;
-        n1 = t1 * t1 * dot2(gi1, x1, y1);
+        n1 = t1 * t1 * (grad3[gi1] * x1 + grad3[gi1 + 1] * y1);
     }
     let t2 = 0.5 - x2 * x2 - y2 * y2;
-    if (t2 < 0) {
-        n2 = 0;
-    } else {
+    if (t2 >= 0) {
         t2 *= t2;
-        n2 = t2 * t2 * dot2(gi2, x2, y2);
+        n2 = t2 * t2 * (grad3[gi2] * x2 + grad3[gi2 + 1] * y2);
     }
     // Add contributions from each corner to get the final noise value.
     // The result is scaled to return values in the interval [-1,1].
