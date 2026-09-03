@@ -10,29 +10,32 @@ const N = 10_000;
 group('random sample 10k @random', () => {
     bench('mulberry32', function* () {
         const state = mulberry32.create(1);
-        yield () => {
+        const sink = yield () => {
             let sink = 0;
             for (let i = 0; i < N; i++) sink += mulberry32.sample(state);
             return sink;
         };
+        return sink;
     });
 
     bench('isaac32', function* () {
         const state = isaac32.create(1);
-        yield () => {
+        const sink = yield () => {
             let sink = 0;
             for (let i = 0; i < N; i++) sink += isaac32.sample(state);
             return sink;
         };
+        return sink;
     });
 
     bench('isaac64', function* () {
         const state = isaac64.create(1n);
-        yield () => {
+        const sink = yield () => {
             let sink = 0;
             for (let i = 0; i < N; i++) sink += isaac64.sample(state);
             return sink;
         };
+        return sink;
     });
 });
 
@@ -41,29 +44,32 @@ group('random sample 10k @random', () => {
 group('random next 10k @random', () => {
     bench('mulberry32', function* () {
         const state = mulberry32.create(1);
-        yield () => {
+        const sink = yield () => {
             let sink = 0;
             for (let i = 0; i < N; i++) sink += mulberry32.next(state);
             return sink;
         };
+        return sink;
     });
 
     bench('isaac32', function* () {
         const state = isaac32.create(1);
-        yield () => {
+        const sink = yield () => {
             let sink = 0;
             for (let i = 0; i < N; i++) sink += isaac32.next(state);
             return sink;
         };
+        return sink;
     });
 
     bench('isaac64', function* () {
         const state = isaac64.create(1n);
-        yield () => {
+        const sink = yield () => {
             let sink = 0n;
             for (let i = 0; i < N; i++) sink += isaac64.next(state);
             return sink;
         };
+        return sink;
     });
 });
 
@@ -74,26 +80,29 @@ const CREATE_N = 1_000;
 
 group('random create 1k @random', () => {
     bench('mulberry32', function* () {
-        yield () => {
+        const sink = yield () => {
             let sink = 0;
             for (let i = 0; i < CREATE_N; i++) sink += mulberry32.create(i).a;
             return sink;
         };
+        return sink;
     });
 
     bench('isaac32', function* () {
-        yield () => {
+        const sink = yield () => {
             let sink = 0;
             for (let i = 0; i < CREATE_N; i++) sink += isaac32.create(i).m[0];
             return sink;
         };
+        return sink;
     });
 
     bench('isaac64', function* () {
-        yield () => {
+        const sink = yield () => {
             let sink = 0;
             for (let i = 0; i < CREATE_N; i++) sink += isaac64.create(BigInt(i)).mLo[0];
             return sink;
         };
+        return sink;
     });
 });

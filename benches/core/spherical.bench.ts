@@ -33,25 +33,43 @@ group('spherical ops 10k @core @spherical', () => {
     bench('setFromVec3', function* () {
         const v = makeVec3s(1);
         const out = spherical.create();
-        yield () => {
-            for (let i = 0; i < N; i++) spherical.setFromVec3(out, v[i]);
+        const acc = yield () => {
+            let acc = 0;
+            for (let i = 0; i < N; i++) {
+                spherical.setFromVec3(out, v[i]);
+                acc += out[0];
+            }
+            return acc;
         };
+        return [acc, ...out];
     });
 
     bench('toVec3', function* () {
         const s = makeSphericals(1);
         const out: Vec3 = [0, 0, 0];
-        yield () => {
-            for (let i = 0; i < N; i++) spherical.toVec3(out, s[i]);
+        const acc = yield () => {
+            let acc = 0;
+            for (let i = 0; i < N; i++) {
+                spherical.toVec3(out, s[i]);
+                acc += out[0];
+            }
+            return acc;
         };
+        return [acc, ...out];
     });
 
     bench('toVec2', function* () {
         const s = makeSphericals(1);
         const out: Vec2 = [0, 0];
-        yield () => {
-            for (let i = 0; i < N; i++) spherical.toVec2(out, s[i]);
+        const acc = yield () => {
+            let acc = 0;
+            for (let i = 0; i < N; i++) {
+                spherical.toVec2(out, s[i]);
+                acc += out[0];
+            }
+            return acc;
         };
+        return [acc, ...out];
     });
 
     bench('fromVec2', function* () {
@@ -59,27 +77,40 @@ group('spherical ops 10k @core @spherical', () => {
         const v: Vec2[] = [];
         for (let i = 0; i < N; i++) v.push([mulberry32.sample(rand) * 20 - 10, mulberry32.sample(rand) * 20 - 10]);
         const out = spherical.create();
-        yield () => {
-            for (let i = 0; i < N; i++) spherical.fromVec2(out, v[i]);
+        const acc = yield () => {
+            let acc = 0;
+            for (let i = 0; i < N; i++) {
+                spherical.fromVec2(out, v[i]);
+                acc += out[0];
+            }
+            return acc;
         };
+        return [acc, ...out];
     });
 
     bench('lerp', function* () {
         const a = makeSphericals(1);
         const b = makeSphericals(2);
         const out = spherical.create();
-        yield () => {
-            for (let i = 0; i < N; i++) spherical.lerp(out, a[i], b[i], 0.5);
+        const acc = yield () => {
+            let acc = 0;
+            for (let i = 0; i < N; i++) {
+                spherical.lerp(out, a[i], b[i], 0.5);
+                acc += out[0];
+            }
+            return acc;
         };
+        return [acc, ...out];
     });
 
     bench('angleTo', function* () {
         const a = makeSphericals(1);
         const b = makeSphericals(2);
-        yield () => {
+        const sum = yield () => {
             let sum = 0;
             for (let i = 0; i < N; i++) sum += spherical.angleTo(a[i], b[i]);
             return sum;
         };
+        return sum;
     });
 });

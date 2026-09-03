@@ -76,7 +76,7 @@ group("raycast closest-hit 64x1024 @algo @raycast", () => {
     const result = raycast3.createIntersectsTriangleResult();
     const hitPoint = vec3.create();
 
-    yield () => {
+    const score = yield () => {
       let fractionSum = 0;
       let hits = 0;
       for (let r = 0; r < RAYS; r++) {
@@ -114,5 +114,6 @@ group("raycast closest-hit 64x1024 @algo @raycast", () => {
 
       return fractionSum + hits;
     };
+    return score;
   });
 });

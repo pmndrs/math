@@ -111,37 +111,43 @@ group("box3 ops 10k @shapes @box3", () => {
     const mats = makeMats(2);
     const out = box3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         box3.transformMat4(out, boxes[i], mats[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("intersectsBox3", function* () {
     const a = makeBoxes(1);
     const b = makeBoxes(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (box3.intersectsBox3(a[i], b[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("containsPoint", function* () {
     const boxes = makeBoxes(1);
     const points = makePoints(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (box3.containsPoint(boxes[i], points[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("union", function* () {
@@ -149,11 +155,15 @@ group("box3 ops 10k @shapes @box3", () => {
     const b = makeBoxes(2);
     const out = box3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         box3.union(out, a[i], b[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("expandByPoint", function* () {
@@ -161,11 +171,15 @@ group("box3 ops 10k @shapes @box3", () => {
     const points = makePoints(2);
     const out = box3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         box3.expandByPoint(out, boxes[i], points[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("setFromCenterAndSize", function* () {
@@ -173,50 +187,57 @@ group("box3 ops 10k @shapes @box3", () => {
     const sizes = makePoints(2);
     const out = box3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         box3.setFromCenterAndSize(out, centers[i], sizes[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("intersectsSphere", function* () {
     const boxes = makeBoxes(1);
     const spheres = makeSpheres(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (box3.intersectsSphere(boxes[i], spheres[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("intersectsPlane3", function* () {
     const boxes = makeBoxes(1);
     const planes = makePlanes(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (box3.intersectsPlane3(boxes[i], planes[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("intersectsTriangle3", function* () {
     const boxes = makeBoxes(1);
     const tris = makeTriangles(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         const t = tris[i];
         if (box3.intersectsTriangle3(boxes[i], t[0], t[1], t[2])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 });

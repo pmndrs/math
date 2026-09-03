@@ -1,6 +1,6 @@
 # math benches
 
-Performance benchmarks powered by [`@pmndrs/labs`](https://github.com/pmndrs/labs) — statistically rigorous benchmarking (Mann-Whitney U, Cliff's delta, adaptive sampling) with baseline comparison.
+Performance benchmarks powered by [`@pmndrs/labs`](https://github.com/pmndrs/labs) — statistically rigorous benchmarking (fresh-process blocks, Mann-Whitney U on block medians, Hodges-Lehmann effect size) with baseline comparison and output snapshots.
 
 Benches import directly from `../src`, so no build step is needed.
 
@@ -14,7 +14,7 @@ pnpm bench "vec3"         # filter by file/bench name
 pnpm bench "@core"        # filter by tag (@core, @noise, @algo, ...)
 pnpm bench -n "v1.0.0" -b # save with a name and set as baseline
 pnpm bench compare        # compare latest run against the baseline
-pnpm bench run            # run without saving
+pnpm bench --no-save      # run without saving
 ```
 
 ## Layout
@@ -33,18 +33,23 @@ Results are saved to `.labs/` (gitignored). Comparisons only report a change whe
 
 ## Writing a bench
 
-Benches use a generator: code before `yield` is setup, the yielded function is measured, code after is teardown. Chain `.gc('inner')` to force GC between samples.
+Benches use a generator: code before `yield` is setup, the yielded function is measured, code after is teardown. Each sample starts with a forced GC by default; chain `.gc(false)` to opt out.
+
+`yield` hands back the result of the first untimed call, so teardown can check it. Return it from the generator and labs snapshots it against the baseline: a compare then reports `output changed` (and exits 1) if a refactor altered the result, alongside the speed verdict. Use `assert` from labs for hard invariants.
 
 ```ts
-import { bench, group } from '@pmndrs/labs';
+import { assert, bench, group } from '@pmndrs/labs';
 
 group('my group @mytag', () => {
   bench('my bench', function* () {
     // setup
-    yield () => {
-      // measured
+    const result = yield () => {
+      // measured; return something that depends on the work
+      return 42;
     };
-    // teardown
-  }).gc('inner');
+    // teardown: check invariants, then return the result to snapshot it
+    assert(Number.isFinite(result), 'result must be finite');
+    return result;
+  });
 });
 ```

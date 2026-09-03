@@ -36,15 +36,16 @@ group('frustum culling 4096 @algo @culling', () => {
                 radius: 0.5 + mulberry32.sample(rand) * 1.5,
             });
         }
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
             buildFrustum();
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.intersectsSphere(f, spheres[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('aabbs', function* () {
@@ -59,14 +60,15 @@ group('frustum culling 4096 @algo @culling', () => {
             ]);
             boxes.push(b);
         }
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
             buildFrustum();
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.intersectsBox3(f, boxes[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 });

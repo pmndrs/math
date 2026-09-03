@@ -1,4 +1,4 @@
-import { bench, group } from '@pmndrs/labs';
+import { assert, bench, group } from '@pmndrs/labs';
 import { decomposePolygon2Quality, decomposePolygon2Quick } from '../../src/geometry';
 
 // A star/gear polygon with `spikes` points: alternating outer/inner radii make
@@ -24,13 +24,17 @@ group('polygon2 quick decomposition @geometry @polygon2', () => {
 
     for (const g of gears) {
         bench(`decomposePolygon2Quick (${g.label})`, function* () {
-            let acc = 0;
-            yield () => {
+            const acc = yield () => {
+                let acc = 0;
                 for (let i = 0; i < N; i++) {
                     acc += decomposePolygon2Quick(g.verts, g.n).length;
                 }
+                return acc;
             };
-            if (acc < 0) throw new Error('unreachable');
+            const pieces = decomposePolygon2Quick(g.verts, g.n);
+            assert(pieces.length > 1, 'a gear must decompose into several convex pieces');
+            assert(acc === N * pieces.length, 'piece count must be identical on every call');
+            return [acc, ...pieces];
         });
     }
 });
@@ -46,13 +50,17 @@ group('polygon2 quality decomposition @geometry @polygon2', () => {
 
     for (const g of gears) {
         bench(`decomposePolygon2Quality (${g.label})`, function* () {
-            let acc = 0;
-            yield () => {
+            const acc = yield () => {
+                let acc = 0;
                 for (let i = 0; i < N; i++) {
                     acc += decomposePolygon2Quality(g.verts, g.n).length;
                 }
+                return acc;
             };
-            if (acc < 0) throw new Error('unreachable');
+            const pieces = decomposePolygon2Quality(g.verts, g.n);
+            assert(pieces.length > 1, 'a gear must decompose into several convex pieces');
+            assert(acc === N * pieces.length, 'piece count must be identical on every call');
+            return [acc, ...pieces];
         });
     }
 });

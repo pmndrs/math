@@ -1,4 +1,4 @@
-import { bench, group } from "@pmndrs/labs";
+import { assert, bench, group } from "@pmndrs/labs";
 import * as mat3 from "../../src/core/mat3";
 import type { Mat4 } from "../../src/core/mat4";
 import * as mat4 from "../../src/core/mat4";
@@ -89,40 +89,43 @@ group("obb3 ops 10k @shapes @obb3", () => {
   bench("intersectsOBB3", function* () {
     const a = makeOBBs(1);
     const b = makeOBBs(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (obb3.intersectsOBB3(a[i], b[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("intersectsBox3", function* () {
     const obbs = makeOBBs(1);
     const boxes = makeBoxes(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (obb3.intersectsBox3(obbs[i], boxes[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("containsPoint", function* () {
     const obbs = makeOBBs(1);
     const points = makePoints(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (obb3.containsPoint(obbs[i], points[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("clampPoint", function* () {
@@ -130,11 +133,16 @@ group("obb3 ops 10k @shapes @obb3", () => {
     const points = makePoints(2);
     const out: Vec3 = [0, 0, 0];
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         obb3.clampPoint(out, obbs[i], points[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    assert(obb3.containsPoint(obbs[N - 1], out), "clamped point must lie inside the box");
+    return [acc, ...out];
   });
 
   bench("applyMatrix4", function* () {
@@ -142,10 +150,14 @@ group("obb3 ops 10k @shapes @obb3", () => {
     const mats = makeMats(2);
     const out = obb3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         obb3.applyMatrix4(out, obbs[i], mats[i]);
+        acc += out.center[0];
       }
+      return acc;
     };
+    return [acc, ...out.center, ...out.halfExtents, ...out.rotation];
   });
 });

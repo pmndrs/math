@@ -1,4 +1,4 @@
-import { bench, group } from '@pmndrs/labs';
+import { assert, bench, group } from '@pmndrs/labs';
 import type { Mat4 } from '../../src/core/mat4';
 import * as mat4 from '../../src/core/mat4';
 import type { Vec3 } from '../../src/core/vec3';
@@ -117,147 +117,177 @@ group('frustum ops 10k @shapes @frustum', () => {
         const cameras = makeCameras(1);
         const f = frustum.create();
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 frustum.setFromViewProjectionMatrixZO(f, cameras[i].proj, cameras[i].view);
+                acc += f[0].constant;
             }
+            return acc;
         };
+        // plane normals are normalized on extraction
+        assert(Math.abs(vec3.length(f[0].normal) - 1) < 1e-6, 'plane normal must be unit length');
+        return [acc, ...f.flatMap((p) => [p.normal[0], p.normal[1], p.normal[2], p.constant])];
     });
 
     bench('setFromViewProjectionMatrixNO', function* () {
         const cameras = makeCameras(1);
         const f = frustum.create();
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 frustum.setFromViewProjectionMatrixNO(f, cameras[i].proj, cameras[i].view);
+                acc += f[0].constant;
             }
+            return acc;
         };
+        // plane normals are normalized on extraction
+        assert(Math.abs(vec3.length(f[0].normal) - 1) < 1e-6, 'plane normal must be unit length');
+        return [acc, ...f.flatMap((p) => [p.normal[0], p.normal[1], p.normal[2], p.constant])];
     });
 
     bench('setFromViewProjectionMatrixSides', function* () {
         const cameras = makeCameras(1);
         const f = frustum.create();
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 frustum.setFromViewProjectionMatrixSides(f, cameras[i].proj, cameras[i].view);
+                acc += f[0].constant;
             }
+            return acc;
         };
+        // plane normals are normalized on extraction
+        assert(Math.abs(vec3.length(f[0].normal) - 1) < 1e-6, 'plane normal must be unit length');
+        return [acc, ...f.flatMap((p) => [p.normal[0], p.normal[1], p.normal[2], p.constant])];
     });
 
     bench('intersectsSphere', function* () {
         const frustums = makeFrustums(1);
         const spheres = makeSpheres(2);
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.intersectsSphere(frustums[i], spheres[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('intersectsBox3', function* () {
         const frustums = makeFrustums(1);
         const boxes = makeBoxes(2);
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.intersectsBox3(frustums[i], boxes[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('containsPoint', function* () {
         const frustums = makeFrustums(1);
         const points = makePoints(2);
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.containsPoint(frustums[i], points[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('sidesIntersectsSphere', function* () {
         const frustums = makeFrustums(1);
         const spheres = makeSpheres(2);
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.sidesIntersectsSphere(frustums[i], spheres[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('sidesIntersectsBox3', function* () {
         const frustums = makeFrustums(1);
         const boxes = makeBoxes(2);
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.sidesIntersectsBox3(frustums[i], boxes[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('sidesContainsPoint', function* () {
         const frustums = makeFrustums(1);
         const points = makePoints(2);
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.sidesContainsPoint(frustums[i], points[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('sidesIntersectsRay', function* () {
         const frustums = makeFrustums(1);
         const rays = makeRays(2);
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.sidesIntersectsRay(frustums[i], rays[i].origin, rays[i].dir)) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('intersectsRay', function* () {
         const frustums = makeFrustums(1);
         const rays = makeRays(2);
-        let acc = 0;
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (frustum.intersectsRay(frustums[i], rays[i].origin, rays[i].dir)) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('corners', function* () {
         const frustums = makeFrustums(1);
         const out = makeCornersOut();
 
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 frustum.corners(out, frustums[i]);
+                acc += out[0][0];
             }
+            return acc;
         };
+        return [acc, ...out.flat()];
     });
 });

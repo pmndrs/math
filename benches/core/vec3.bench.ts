@@ -1,4 +1,4 @@
-import { bench, group } from "@pmndrs/labs";
+import { assert, bench, group } from "@pmndrs/labs";
 import * as mat4 from "../../src/core/mat4";
 import type { Mat4 } from "../../src/core/mat4";
 import * as vec3 from "../../src/core/vec3";
@@ -28,11 +28,15 @@ group("vec3 ops 10k @core @vec3", () => {
     const b = makeVecs(2);
     const out = vec3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         vec3.add(out, a[i], b[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("cross", function* () {
@@ -40,36 +44,45 @@ group("vec3 ops 10k @core @vec3", () => {
     const b = makeVecs(2);
     const out = vec3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         vec3.cross(out, a[i], b[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("dot", function* () {
     const a = makeVecs(1);
     const b = makeVecs(2);
 
-    yield () => {
+    const sum = yield () => {
       let sum = 0;
       for (let i = 0; i < N; i++) {
         sum += vec3.dot(a[i], b[i]);
       }
-
       return sum;
     };
+    return sum;
   });
 
   bench("normalize", function* () {
     const a = makeVecs(1);
     const out = vec3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         vec3.normalize(out, a[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    assert(Math.abs(vec3.length(out) - 1) < 1e-6, "normalized vector must be unit length");
+    return [acc, ...out];
   });
 
   bench("lerp", function* () {
@@ -77,11 +90,15 @@ group("vec3 ops 10k @core @vec3", () => {
     const b = makeVecs(2);
     const out = vec3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         vec3.lerp(out, a[i], b[i], 0.5);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("transformMat4", function* () {
@@ -91,10 +108,14 @@ group("vec3 ops 10k @core @vec3", () => {
     mat4.translate(m, m, [1, 2, 3]);
     const out = vec3.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         vec3.transformMat4(out, a[i], m);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 });

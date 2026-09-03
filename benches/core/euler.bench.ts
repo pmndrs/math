@@ -1,4 +1,4 @@
-import { bench, group } from "@pmndrs/labs";
+import { assert, bench, group } from "@pmndrs/labs";
 import * as euler from "../../src/core/euler";
 import type { Euler, EulerOrder } from "../../src/core/euler";
 import * as mat4 from "../../src/core/mat4";
@@ -62,66 +62,90 @@ group("euler ops 10k @core @euler", () => {
     const mats = makeMats(1);
     const out = euler.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         euler.fromRotationMat4(out, mats[i], "xyz");
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, out[0], out[1], out[2]];
   });
 
   bench("fromRotationMat4 (zyx)", function* () {
     const mats = makeMats(1);
     const out = euler.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         euler.fromRotationMat4(out, mats[i], "zyx");
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, out[0], out[1], out[2]];
   });
 
   bench("fromQuat (xyz)", function* () {
     const quats = makeQuats(1);
     const out = euler.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         euler.fromQuat(out, quats[i], "xyz");
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, out[0], out[1], out[2]];
   });
 
   bench("reorder (xyz -> zyx)", function* () {
     const eulers = makeEulers(1);
     const out = euler.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         euler.reorder(out, eulers[i], "zyx");
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, out[0], out[1], out[2]];
   });
 
   bench("fromDegrees", function* () {
+    // no fixtures: inputs are derived from the loop index
     const out = euler.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         euler.fromDegrees(out, i * 0.01, i * 0.02, i * 0.03, "xyz");
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, out[0], out[1], out[2]];
   });
 
   bench("equals", function* () {
     const a = makeEulers(1);
     const b = makeEulers(1);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (euler.equals(a[i], b[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    // both sets come from the same seed, so every pair must compare equal
+    assert(acc === N, "identical eulers must all compare equal");
+    return acc;
   });
 });

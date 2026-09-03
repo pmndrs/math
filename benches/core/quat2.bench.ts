@@ -54,22 +54,30 @@ group("quat2 ops 10k @core @quat2", () => {
     const b = makeDualQuats(2);
     const out = quat2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat2.multiply(out, a[i], b[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("rotateX", function* () {
     const a = makeDualQuats(1);
     const out = quat2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat2.rotateX(out, a[i], i * 0.001);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("rotateAroundAxis", function* () {
@@ -77,33 +85,45 @@ group("quat2 ops 10k @core @quat2", () => {
     const axis: [number, number, number] = [0.267261, 0.534522, 0.801784];
     const out = quat2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat2.rotateAroundAxis(out, a[i], axis, i * 0.001);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("normalize", function* () {
     const a = makeDualQuats(1);
     const out = quat2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat2.normalize(out, a[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("invert", function* () {
     const a = makeDualQuats(1);
     const out = quat2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat2.invert(out, a[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("lerp", function* () {
@@ -111,11 +131,15 @@ group("quat2 ops 10k @core @quat2", () => {
     const b = makeDualQuats(2);
     const out = quat2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat2.lerp(out, a[i], b[i], 0.5);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("fromRotationTranslation", function* () {
@@ -130,21 +154,29 @@ group("quat2 ops 10k @core @quat2", () => {
     const t: [number, number, number] = [1, 2, 3];
     const out = quat2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat2.fromRotationTranslation(out, quats[i], t);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("fromMat4", function* () {
     const mats = makeMats(1);
     const out = quat2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat2.fromMat4(out, mats[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 });

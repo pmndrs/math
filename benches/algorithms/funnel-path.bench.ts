@@ -131,7 +131,7 @@ group("funnel string pull 16x256 @algo @nav", () => {
         throw new Error("funnel produced a degenerate path");
     }
 
-    yield () => {
+    const totalLength = yield () => {
       let totalLength = 0;
       for (let c = 0; c < corridors.length; c++) {
         const corridor = corridors[c];
@@ -147,5 +147,6 @@ group("funnel string pull 16x256 @algo @nav", () => {
       }
       return totalLength;
     };
+    return totalLength;
   });
 });

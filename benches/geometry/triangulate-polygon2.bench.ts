@@ -1,4 +1,4 @@
-import { bench, group } from '@pmndrs/labs';
+import { assert, bench, group } from '@pmndrs/labs';
 import { triangulatePolygon2 } from '../../src/geometry';
 
 group('polygon2 triangulation @geometry @polygon2', () => {
@@ -18,23 +18,28 @@ group('polygon2 triangulation @geometry @polygon2', () => {
 
     bench('triangulatePolygon2 (14-gon, concave)', function* () {
         const out: number[] = [];
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 acc += triangulatePolygon2(out, comb, combN);
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        // a simple polygon with n vertices always yields n - 2 triangles
+        assert(acc === N * (combN - 2), 'triangle count must be n - 2 on every call');
+        return [acc, ...out];
     });
 
     bench('triangulatePolygon2 (32-gon, convex)', function* () {
         const out: number[] = [];
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 acc += triangulatePolygon2(out, convex, CONVEX_N);
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        assert(acc === N * (CONVEX_N - 2), 'triangle count must be n - 2 on every call');
+        return [acc, ...out];
     });
 });

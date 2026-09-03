@@ -1,4 +1,4 @@
-import { bench, group } from "@pmndrs/labs";
+import { assert, bench, group } from "@pmndrs/labs";
 import * as mat4 from "../../src/core/mat4";
 import type { Mat4 } from "../../src/core/mat4";
 import * as mulberry32 from "../../src/random/mulberry32";
@@ -31,11 +31,15 @@ group("mat4 ops 10k @core @mat4", () => {
     const b = makeMats(2);
     const out = mat4.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         mat4.multiply(out, a[i], b[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("multiply3x3", function* () {
@@ -43,34 +47,45 @@ group("mat4 ops 10k @core @mat4", () => {
     const b = makeMats(2);
     const out = mat4.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         mat4.multiply3x3(out, a[i], b[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("invert", function* () {
     const a = makeMats(1);
     const out = mat4.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         mat4.invert(out, a[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("determinant", function* () {
     const a = makeMats(1);
 
-    yield () => {
+    const sum = yield () => {
       let sum = 0;
       for (let i = 0; i < N; i++) {
         sum += mat4.determinant(a[i]);
       }
       return sum;
     };
+    // rotation + translation matrices all have determinant 1
+    assert(Math.abs(sum - N) < 1e-6, "determinants of rigid transforms must be 1");
+    return sum;
   });
 
   bench("fromRotationTranslationScale", function* () {
@@ -79,10 +94,14 @@ group("mat4 ops 10k @core @mat4", () => {
     const s: [number, number, number] = [1, 1, 1];
     const out = mat4.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         mat4.fromRotationTranslationScale(out, q, t, s);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 });

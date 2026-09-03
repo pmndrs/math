@@ -42,7 +42,7 @@ group("transform hierarchy 4096 @algo @scene", () => {
     const nodeBox = box3.create();
     const sceneBounds = box3.create();
 
-    yield () => {
+    const area = yield () => {
       // parent indices precede child indices, so one pass propagates fully
       for (let i = 0; i < N; i++) {
         mat4.fromRotationTranslationScale(
@@ -67,5 +67,6 @@ group("transform hierarchy 4096 @algo @scene", () => {
 
       return box3.surfaceArea(sceneBounds);
     };
+    return area;
   });
 });

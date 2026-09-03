@@ -36,8 +36,8 @@ importers:
   benches:
     dependencies:
       '@pmndrs/labs':
-        specifier: ^0.8.0
-        version: 0.8.0
+        specifier: ^0.9.0
+        version: 0.9.0
     devDependencies:
       tsx:
         specifier: ^4.21.0
@@ -324,8 +324,8 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
-  '@pmndrs/labs@0.8.0':
-    resolution: {integrity: sha512-Ntb9zclfLhFgcGYdYCSm5hPG1ZlEJVBq/BmEex9+aIsitfOvALai5G3sF6KpXPRl+PnfkaazZCwVsM0UDgpTQQ==}
+  '@pmndrs/labs@0.9.0':
+    resolution: {integrity: sha512-drIrOj8A4NOLEvPRsUD5pifbZxjnDSarfJQTMuRr9x6V0yWzver6t/1KmlMB3hHqKsBP5wgX57ElU+ZwqvFcQw==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
@@ -1065,7 +1065,7 @@ snapshots:
     dependencies:
       playwright: 1.62.1
 
-  '@pmndrs/labs@0.8.0':
+  '@pmndrs/labs@0.9.0':
     dependencies:
       '@clack/prompts': 1.7.0
       tsx: 4.23.12

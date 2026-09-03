@@ -5,3 +5,5 @@ packages:
   - 'website'
 allowBuilds:
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@pmndrs/labs@0.9.0'

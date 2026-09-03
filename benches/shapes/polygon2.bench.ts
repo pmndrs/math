@@ -1,4 +1,4 @@
-import { bench, group } from '@pmndrs/labs';
+import { assert, bench, group } from '@pmndrs/labs';
 import type { Vec2 } from '../../src/core/vec2';
 import * as mulberry32 from '../../src/random/mulberry32';
 import * as polygon2 from '../../src/shapes/polygon2';
@@ -29,115 +29,135 @@ group('polygon2 ops 10k @shapes @polygon2', () => {
     const poly = makePolygon(SIDES);
 
     bench('area', function* () {
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 acc += polygon2.area(poly, SIDES);
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        // the polygon is a regular 12-gon of circumradius 5
+        const expected = 0.5 * SIDES * 25 * Math.sin((2 * Math.PI) / SIDES);
+        assert(Math.abs(acc / N - expected) < 1e-9, 'area of a regular polygon');
+        return acc;
     });
 
     bench('containsPoint', function* () {
         const points = makePoints(1);
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (polygon2.containsPoint(poly, SIDES, points[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 
     bench('centroid', function* () {
         const out: Vec2 = [0, 0];
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 polygon2.centroid(out, poly, SIDES);
                 acc += out[0];
             }
+            return acc;
         };
-        if (acc === Number.POSITIVE_INFINITY) throw new Error('unreachable');
+        // a regular polygon about the origin has its centroid at the origin
+        assert(Math.abs(out[0]) < 1e-9 && Math.abs(out[1]) < 1e-9, 'centroid must be at the origin');
+        return [acc, ...out];
     });
 
     bench('perimeter', function* () {
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 acc += polygon2.perimeter(poly, SIDES);
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        const expected = SIDES * 2 * 5 * Math.sin(Math.PI / SIDES);
+        assert(Math.abs(acc / N - expected) < 1e-9, 'perimeter of a regular polygon');
+        return acc;
     });
 
     bench('isConvex', function* () {
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (polygon2.isConvex(poly, SIDES)) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        assert(acc === N, 'a regular polygon is convex');
+        return acc;
     });
 
     bench('bounds', function* () {
         const out: [number, number, number, number] = [0, 0, 0, 0];
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 polygon2.bounds(out, poly, SIDES);
                 acc += out[0];
             }
+            return acc;
         };
-        if (acc === Number.POSITIVE_INFINITY) throw new Error('unreachable');
+        assert(Math.abs(out[0] + 5) < 1e-9 && Math.abs(out[2] - 5) < 1e-9, 'bounds must span the circumradius');
+        return [acc, ...out];
     });
 
     bench('closestPoint', function* () {
         const points = makePoints(1);
         const out: Vec2 = [0, 0];
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 polygon2.closestPoint(out, poly, SIDES, points[i]);
                 acc += out[0];
             }
+            return acc;
         };
-        if (acc === Number.POSITIVE_INFINITY) throw new Error('unreachable');
+        return [acc, ...out];
     });
 
     bench('signedDistance', function* () {
         const points = makePoints(1);
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 acc += polygon2.signedDistance(poly, SIDES, points[i]);
             }
+            return acc;
         };
-        if (acc === Number.POSITIVE_INFINITY) throw new Error('unreachable');
+        return acc;
     });
 
     bench('overlapConvex', function* () {
         // A second polygon translated so it partially overlaps the first.
         const other = poly.map((v, i) => (i % 2 === 0 ? v + 4 : v));
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (polygon2.overlapConvex(poly, SIDES, other, SIDES)) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        assert(acc === N, 'the translated polygon overlaps on every query');
+        return acc;
     });
 
     bench('intersectsSegment', function* () {
         const points = makePoints(1);
         const points2 = makePoints(2);
-        let acc = 0;
-        yield () => {
+        const acc = yield () => {
+            let acc = 0;
             for (let i = 0; i < N; i++) {
                 if (polygon2.intersectsSegment(poly, SIDES, points[i], points2[i])) acc++;
             }
+            return acc;
         };
-        if (acc < 0) throw new Error('unreachable');
+        return acc;
     });
 });

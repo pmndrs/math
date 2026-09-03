@@ -16,38 +16,42 @@ function makeAngles(seed: number): number[] {
 group('angle ops 10k @core @angle', () => {
     bench('wrapAngle', function* () {
         const angles = makeAngles(1);
-        yield () => {
+        const sum = yield () => {
             let sum = 0;
             for (let i = 0; i < N; i++) sum += wrapAngle(angles[i]);
             return sum;
         };
+        return sum;
     });
 
     bench('deltaAngle', function* () {
         const a = makeAngles(1);
         const b = makeAngles(2);
-        yield () => {
+        const sum = yield () => {
             let sum = 0;
             for (let i = 0; i < N; i++) sum += deltaAngle(a[i], b[i]);
             return sum;
         };
+        return sum;
     });
 
     bench('degreesToRadians', function* () {
         const degrees = makeAngles(1);
-        yield () => {
+        const sum = yield () => {
             let sum = 0;
             for (let i = 0; i < N; i++) sum += degreesToRadians(degrees[i]);
             return sum;
         };
+        return sum;
     });
 
     bench('radiansToDegrees', function* () {
         const radians = makeAngles(1);
-        yield () => {
+        const sum = yield () => {
             let sum = 0;
             for (let i = 0; i < N; i++) sum += radiansToDegrees(radians[i]);
             return sum;
         };
+        return sum;
     });
 });

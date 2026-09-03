@@ -51,40 +51,43 @@ group("box2 ops 10k @shapes @box2", () => {
   bench("intersectsBox2", function* () {
     const a = makeBoxes(1);
     const b = makeBoxes(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (box2.intersectsBox2(a[i], b[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("containsPoint", function* () {
     const boxes = makeBoxes(1);
     const points = makePoints(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (box2.containsPoint(boxes[i], points[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("containsBox2", function* () {
     const a = makeBoxes(1);
     const b = makeBoxes(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (box2.containsBox2(a[i], b[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 
   bench("union", function* () {
@@ -92,11 +95,15 @@ group("box2 ops 10k @shapes @box2", () => {
     const b = makeBoxes(2);
     const out = box2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         box2.union(out, a[i], b[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("expandByPoint", function* () {
@@ -104,11 +111,15 @@ group("box2 ops 10k @shapes @box2", () => {
     const points = makePoints(2);
     const out = box2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         box2.expandByPoint(out, boxes[i], points[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("setFromCenterAndSize", function* () {
@@ -116,23 +127,28 @@ group("box2 ops 10k @shapes @box2", () => {
     const sizes = makePoints(2);
     const out = box2.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         box2.setFromCenterAndSize(out, centers[i], sizes[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("intersectsCircle", function* () {
     const boxes = makeBoxes(1);
     const circles = makeCircles(2);
-    let acc = 0;
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         if (box2.intersectsCircle(boxes[i], circles[i])) acc++;
       }
+      return acc;
     };
-    if (acc < 0) throw new Error("unreachable");
+    return acc;
   });
 });

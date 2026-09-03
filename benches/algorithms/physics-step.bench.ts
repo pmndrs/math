@@ -57,7 +57,7 @@ group("sphere physics step 512 @algo @physics", () => {
     const contactNormal = vec3.create();
     const relativeVelocity = vec3.create();
 
-    yield {
+    const energy = yield {
       bench: () => {
         // integrate
         for (let i = 0; i < N; i++) {
@@ -151,5 +151,6 @@ group("sphere physics step 512 @algo @physics", () => {
         }
       },
     };
+    return energy;
   });
 });

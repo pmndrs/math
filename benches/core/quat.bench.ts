@@ -1,4 +1,4 @@
-import { bench, group } from "@pmndrs/labs";
+import { assert, bench, group } from "@pmndrs/labs";
 import * as quat from "../../src/core/quat";
 import type { Quat } from "../../src/core/quat";
 import * as mulberry32 from "../../src/random/mulberry32";
@@ -26,11 +26,15 @@ group("quat ops 10k @core @quat", () => {
     const b = makeQuats(2);
     const out = quat.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat.multiply(out, a[i], b[i]);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 
   bench("slerp", function* () {
@@ -38,21 +42,30 @@ group("quat ops 10k @core @quat", () => {
     const b = makeQuats(2);
     const out = quat.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat.slerp(out, a[i], b[i], 0.5);
+        acc += out[0];
       }
+      return acc;
     };
+    assert(Math.abs(quat.length(out) - 1) < 1e-6, "slerp of unit quaternions must stay unit length");
+    return [acc, ...out];
   });
 
   bench("setAxisAngle", function* () {
     const axis: [number, number, number] = [0.267261, 0.534522, 0.801784];
     const out = quat.create();
 
-    yield () => {
+    const acc = yield () => {
+      let acc = 0;
       for (let i = 0; i < N; i++) {
         quat.setAxisAngle(out, axis, i * 0.001);
+        acc += out[0];
       }
+      return acc;
     };
+    return [acc, ...out];
   });
 });
