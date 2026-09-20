@@ -33,7 +33,7 @@ export const pushIn = 0.08;
 /** Seconds the pressure front takes to close the type after the drop. */
 export const sweepTime = 0.42;
 /** Beats the finished type holds before the pmndrs mark cuts in. */
-export const titleBeats = 5;
+export const titleBeats = 8;
 /** Seconds the mark holds before the film ends. */
 export const markHold = 1.7;
 
