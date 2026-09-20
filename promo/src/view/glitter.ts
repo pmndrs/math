@@ -69,19 +69,21 @@ function field(height: number) {
   return result;
 }
 
-/** `intensity` scales every glint, so the sky can fade in behind the title. */
-export function renderGlitter(ctx: CanvasRenderingContext2D, height: number, time: number, intensity = 1) {
-  if (intensity <= 0) return;
+/** Seconds the ignition wave takes to cross the sky, and the extra scatter in each glint's moment. */
+const igniteSpread = 0.9;
+const igniteScatter = 0.45;
+/** Seconds a glint takes to switch on, and the brief overshoot as it does. */
+const igniteSnap = 0.06;
+const igniteFlash = 1.8;
+
+/**
+ * `intensity` scales every glint. With `ignition`, the seconds since the sky was lit, glints
+ * switch on one after another in a wave spreading out from the centre, each with a brief flash.
+ */
+export function renderGlitter(ctx: CanvasRenderingContext2D, height: number, time: number, intensity = 1, ignition = Infinity) {
+  if (intensity <= 0 || ignition < 0) return;
   const glints = field(height);
   const lightX = Math.sin(time * 0.32) * 0.55, lightY = Math.cos(time * 0.23) * 0.3;
-
-  // A faint warm halo follows the light, standing in for the shader's drifting nebula.
-  const halo = ctx.createRadialGradient(500 + lightX * height, height / 2 + lightY * height, 0,
-    500 + lightX * height, height / 2 + lightY * height, height * 0.7);
-  halo.addColorStop(0, `rgba(234,229,218,${(0.05 * intensity).toFixed(3)})`);
-  halo.addColorStop(1, 'rgba(234,229,218,0)');
-  ctx.fillStyle = halo;
-  ctx.fillRect(0, 0, 1000, height);
 
   const buckets = new Map<string, Path2D>();
   for (let i = 0; i < glints.count; i++) {
@@ -106,7 +108,16 @@ export function renderGlitter(ctx: CanvasRenderingContext2D, height: number, tim
     const facing = (tiltX * hx + tiltY * hy + 0.72 * hz) * normalScale * halfScale;
     if (facing < 0.95) continue;
     const specular = facing ** 80 * (rz * 0.9 + 0.6);
-    const alpha = clamp(specular * visibility * 2.4 * intensity, 0, 1);
+    let lit = 1;
+    if (Number.isFinite(ignition)) {
+      // This glint's moment: its distance from the centre sets the wave, its seed the scatter.
+      const moment = Math.hypot(px, py) / 0.7 * igniteSpread + rz * igniteScatter;
+      const since = ignition - moment;
+      if (since < 0) continue;
+      const on = Math.min(1, since / igniteSnap);
+      lit = on * (1 + (igniteFlash - 1) * Math.max(0, 1 - since / 0.12));
+    }
+    const alpha = clamp(specular * visibility * 2.4 * intensity * lit, 0, 1);
     if (alpha < 0.04) continue;
 
     const radial = radius > 1e-4 ? (tiltX * dx + tiltY * dy) / radius : 0;

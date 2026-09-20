@@ -4,7 +4,8 @@ import { Geometry, Study } from '../forms/traits';
 import { Sequence } from '../sequence/traits';
 import { Time } from '../time/traits';
 import { pushIn, ramp } from '../sequence/cuts';
-import { renderReveal, renderResidue, revealExposure } from '../reveal/systems';
+import { renderDistortion, renderReveal, revealExposure } from '../reveal/systems';
+import { sceneContext } from './scene';
 import { projectGeometry, drawGeometry } from './geometry';
 import { text } from './drawing';
 import { View } from './traits';
@@ -34,39 +35,47 @@ export function renderFilm(world: World) {
 
   if (sequence.reveal) renderReveal(world);
   else {
-    // The whole frame pushes in across the shutter section and releases when the type lands.
-    const push = 1 + pushIn * ramp(revealExposure(world));
-    ctx.save();
-    ctx.translate(500, h / 2);
-    ctx.scale(push, push);
-    ctx.translate(-500, -h / 2);
-    // Between pulses only the retained ink stays on screen.
+    const progress = revealExposure(world);
+    // Through the shutter section the scene renders offscreen, so the field can distort it.
+    const distorting = progress > 0;
+    const target = distorting ? sceneContext(view) : ctx;
+    if (distorting) {
+      target.fillStyle = palette.base;
+      target.fillRect(0, 0, 1000, h);
+    }
+    // Between pulses nothing but the field is on screen.
     if (sequence.open) world.query(Study, Geometry).readEach(([study, mesh]) => {
       if (study.index !== sequence.index) return;
       const index = study.index;
       projectGeometry(view, mesh, study, elapsed, h);
-      const progress = revealExposure(world);
       // Solve from the pulse's initial state so seeking and playback share the same response, and
       // every recalled screen arrives with the same pop.
       view.arrival.value = 0;
       view.arrival.velocity = 0;
       spring.update(view.arrival, 1, Math.min(0.085, sequence.duration * 0.18), 0.48, sequence.pulseLocal);
       const arrival = view.arrival.value;
-      ctx.save();
-      ctx.translate(500, (h - 165) / 2 + (1 - arrival) * 10);
-      ctx.scale(0.95 + arrival * 0.05, 0.95 + arrival * 0.05);
-      ctx.translate(-500, -(h - 165) / 2);
+      target.save();
+      target.translate(500, (h - 165) / 2 + (1 - arrival) * 10);
+      target.scale(0.95 + arrival * 0.05, 0.95 + arrival * 0.05);
+      target.translate(-500, -(h - 165) / 2);
       // Each flash stays at full brightness through the shutter section; only the captions recede.
-      drawGeometry(ctx, view, mesh, index, accent(sequence.cut + sequence.pulse));
-      ctx.restore();
+      drawGeometry(target, view, mesh, index, accent(sequence.cut + sequence.pulse));
+      target.restore();
       // Captions recede a little through the shutter section but stay legible on any paused frame.
-      ctx.globalAlpha = 1 - progress * 0.3;
-
-      text(ctx, study.title, 500, h - 168, 32, palette.light, 'center', 'sans');
-      text(ctx, study.equation, 500, h - 115, index === 0 ? 16 : 20, palette.muted, 'center');
+      target.globalAlpha = 1 - progress * 0.3;
+      text(target, study.title, 500, h - 168, 32, palette.light, 'center', 'sans');
+      text(target, study.equation, 500, h - 115, index === 0 ? 16 : 20, palette.muted, 'center');
+      target.globalAlpha = 1;
     });
-    ctx.globalAlpha = 1;
-    renderResidue(world);
-    ctx.restore();
+    if (distorting) {
+      // The whole frame pushes in across the shutter section and releases when the type lands.
+      const push = 1 + pushIn * ramp(progress);
+      ctx.save();
+      ctx.translate(500, h / 2);
+      ctx.scale(push, push);
+      ctx.translate(-500, -h / 2);
+      renderDistortion(world, view.scene!);
+      ctx.restore();
+    }
   }
 }
