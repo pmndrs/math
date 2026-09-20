@@ -3,6 +3,7 @@ packages:
   - 'docs'
   - 'examples'
   - 'website'
+  - 'promo'
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:

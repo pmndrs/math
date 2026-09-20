@@ -69,6 +69,8 @@
     "build:dts": "tsc -p tsconfig.build.json && node scripts/add-js-extensions-dts.mjs",
     "build:examples": "pnpm --filter math-examples build",
     "dev:examples": "pnpm --filter math-examples dev",
+    "dev:promo": "pnpm --filter math-promo dev",
+    "build:promo": "pnpm --filter math-promo build",
     "build:website": "pnpm --filter website build",
     "format": "biome format --write src/. tst/.",
     "lint": "biome lint --write src/. tst/.",
