@@ -6,8 +6,7 @@ import { sequenceFilm } from '../src/sequence/systems';
 import { advanceTime } from '../src/time/systems';
 import { updateForms } from '../src/forms/systems';
 import { Geometry, Study } from '../src/forms/traits';
-import { bandStride } from '../src/reveal/actions';
-import { beat, drop, dropBeats, exposureFrames, filmDuration, finalExposureFrames, markAt, markHold, shutterCuts, sweepTime, titleBeats } from '../src/sequence/cuts';
+import { beat, drop, dropBeats, easeCuts, exposureFrames, filmDuration, finalExposureFrames, markAt, markHold, openingBeats, openingCuts, shutterCuts, sweepTime, titleBeats } from '../src/sequence/cuts';
 
 describe('motion studies', () => {
   it('builds to a sustained fast cadence, accelerates again, and shows every study once', () => {
@@ -21,15 +20,22 @@ describe('motion studies', () => {
     const duration = world.get(Time)!.duration;
     expect(duration).toBeCloseTo(filmDuration(cuts));
     expect(duration).toBeCloseTo(cuts[cuts.length - 1].at + dropBeats * beat + sweepTime + titleBeats * beat + markHold);
-    // One constant beat throughout.
-    for (let i = 0; i < cuts.length - 1; i++) expect(cuts[i + 1].at - cuts[i].at).toBeCloseTo(beat);
+    // The opening cuts breathe, ease into the beat with growing steps, then hold one constant beat.
+    for (let i = 0; i < openingCuts; i++) expect(cuts[i + 1].at - cuts[i].at).toBeCloseTo(openingBeats * beat);
+    let previousStep = 0;
+    for (let i = openingCuts; i < openingCuts + easeCuts; i++) {
+      const step = (cuts[i].at - cuts[i - 1].at) - (cuts[i + 1].at - cuts[i].at);
+      expect(step).toBeGreaterThanOrEqual(previousStep - 1e-9);
+      previousStep = step;
+    }
+    for (let i = openingCuts + easeCuts - 1; i < cuts.length - 1; i++) expect(cuts[i + 1].at - cuts[i].at).toBeCloseTo(beat);
     // The type lands, holds, then the mark takes its place and holds for at least a second.
     expect(markAt).toBeCloseTo(drop + sweepTime + titleBeats * beat);
     expect(duration - cuts[cuts.length - 1].at).toBeGreaterThanOrEqual(markAt + 1);
     // Full exposures until the shutter cuts, which flash briefly and hold dark for the rest of the
     // beat, tightening from the first shutter cut to the last.
     const shutterStart = cuts.length - 1 - shutterCuts;
-    for (let i = 0; i < shutterStart; i++) expect(cuts[i].exposure).toBeCloseTo(beat);
+    for (let i = 0; i < shutterStart; i++) expect(cuts[i].exposure).toBeCloseTo(cuts[i + 1].at - cuts[i].at);
     expect(cuts[shutterStart].exposure * 60).toBeCloseTo(exposureFrames);
     expect(cuts[cuts.length - 2].exposure * 60).toBeCloseTo(finalExposureFrames);
     for (let i = shutterStart + 1; i < cuts.length - 1; i++) expect(cuts[i].exposure).toBeLessThanOrEqual(cuts[i - 1].exposure + 1e-9);
@@ -100,6 +106,7 @@ describe('motion studies', () => {
         const shown = world.get(Sequence)!.index;
         const mesh = world.query(Study, Geometry).find(entity => entity.get(Study)!.index === shown)!.get(Geometry)!;
         let emphasis = 0;
+        // Only the cut's accent counts; spectrum inks (3 and up) are deliberate per-part colours.
         for (let v = 0; v < mesh.count; v++) if (mesh.ink[v] === 2) emphasis++;
         expect(emphasis / mesh.count, `study ${shown}`).toBeLessThanOrEqual(0.3);
       }
@@ -122,15 +129,6 @@ describe('motion studies', () => {
       expect(sequence.pulse, `t=${t}`).toBeGreaterThanOrEqual(0);
     }
     world.destroy();
-  });
-
-  it('scatters one band per pulse over every row of the type', () => {
-    for (const total of [21, 25, 38, 40, 55, 64]) {
-      const stride = bandStride(total);
-      const rows = new Set<number>();
-      for (let k = 0; k < total; k++) rows.add((k * stride + 6) % total);
-      expect(rows.size).toBe(total);
-    }
   });
 
   it('lights the pillars inside the camera frustum and dims the rest', () => {
