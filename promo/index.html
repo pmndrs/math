@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#191712" />
+    <title>math — motion studies</title>
+    <meta name="description" content="Twenty-seven studies in motion. Made with math and Koota." />
+  </head>
+  <body>
+    <main>
+      <div class="stage"><canvas aria-label="Animated mathematical studies" role="img"></canvas></div>
+      <div class="controls">
+        <div class="transport">
+          <button id="play" aria-label="Pause animation">Ⅱ</button>
+          <button id="restart" aria-label="Restart animation">↺</button>
+          <span id="time">00.0 / 00.0</span>
+          <input id="seek" type="range" min="0" max="1" value="0" step="0.01" aria-label="Playback position" />
+        </div>
+        <div class="settings">
+          <select id="format" aria-label="Aspect ratio"><option value="1:1">1:1</option><option value="4:5">4:5</option><option value="9:16">9:16</option></select>
+          <button id="clean" title="Hide controls. Tap the film or press H to restore.">Clean view</button>
+          <button id="export">Export film ↗</button>
+        </div>
+      </div>
+      <p class="hint" id="status" role="status">SPACE pause &nbsp; R restart &nbsp; H hide controls</p>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
