@@ -37,7 +37,10 @@ export function voxels(mesh: Mesh, time: number, work: Workspace) {
   for (let z = 8; z >= 0; z--) {
     for (let x = 8; x >= 0; x--) {
       const px = (x - 4.5) * 0.42, pz = (z - 4.5) * 0.42;
-      const height = (Math.floor((simplex3d.sample(work.noise!, x * 0.16, z * 0.16, time * 0.07) + 1) * 4) + 1) * 0.22;
+      const level = Math.floor((simplex3d.sample(work.noise!, x * 0.16, z * 0.16, time * 0.07) + 1) * 4) + 1;
+      const height = level * 0.22;
+      // The tallest columns' tops catch the accent; the rest of the terrain stays greyscale.
+      const top = level >= 8 ? 2.9 : 0.9;
       const base = mesh.count;
       isoVertex(mesh, px, height - 1, pz, true);
       isoVertex(mesh, px + 0.4, height - 1, pz, false);
@@ -55,8 +58,8 @@ export function voxels(mesh: Mesh, time: number, work: Workspace) {
       face(mesh, base, base + 6, base + 1, 0.28);
       face(mesh, base, base + 3, base + 10, 0.48);
       face(mesh, base, base + 10, base + 5, 0.48);
-      face(mesh, base, base + 1, base + 2, 0.9);
-      face(mesh, base, base + 2, base + 3, 0.9);
+      face(mesh, base, base + 1, base + 2, top);
+      face(mesh, base, base + 2, base + 3, top);
     }
   }
 }

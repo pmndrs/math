@@ -21,7 +21,8 @@ export const FormWorkspace = trait(() => ({
   a: vec2.create(), b: vec2.create(), c: vec2.create(), target: vec2.create(),
   circle: null as ReturnType<typeof circle.create> | null,
   chain: null as ReturnType<typeof fabrik2.createChain2> | null,
-  structure: null as ReturnType<typeof fabrik3.createStructure3> | null,
+  /** The robot arm: a constrained 3D FABRIK chain. */
+  arm: null as ReturnType<typeof fabrik3.createChain3> | null,
   aim: vec3.create(),
   cloud3: new Array<number>(144).fill(0), moving3: new Array<number>(144).fill(0),
   polygon: new Array<number>(24).fill(0), indices: new Array<number>(30).fill(0),

@@ -18,23 +18,15 @@ export function initializeForms(world: World) {
   vec2.set(work.a, 1, 0);
   for (let i = 0; i < 9; i++) fabrik2.addConsecutiveBone(work.chain, work.a, 0.42);
 
-  // A spine held in a cone at its base, with two arms hanging off it. The arms' base bones turn
-  // freely about Y, their other joints are ball joints, and each arm reaches for its own target.
-  const structure = fabrik3.createStructure3();
-  const spine = fabrik3.createChain3();
-  fabrik3.addBone(spine, [0, -2.3, 0], [0, -1.75, 0]);
-  for (let i = 1; i < 6; i++) fabrik3.addConsecutiveBone(spine, [0.03, 1, 0], 0.55, fabrik3.setBallJoint(fabrik3.createJoint3(), Math.PI / 4));
-  fabrik3.setBaseboneRotorConstraint(spine, fabrik3.BaseboneConstraintType.GLOBAL_ROTOR, [0, 1, 0], Math.PI / 5);
-  fabrik3.addChain(structure, spine);
-  for (const side of [-1, 1]) {
-    const arm = fabrik3.createChain3();
-    fabrik3.addBone(arm, [0, 0, 0], [side * 0.5, 0, 0]);
-    for (let i = 1; i < 4; i++) fabrik3.addConsecutiveBone(arm, [side, 0, 0], 0.5, fabrik3.setBallJoint(fabrik3.createJoint3(), Math.PI / 3));
-    fabrik3.setBaseboneHingeConstraint(arm, fabrik3.BaseboneConstraintType.GLOBAL_HINGE, [0, 1, 0], Math.PI, Math.PI, [side, 0, 0]);
-    arm.useEmbeddedTarget = true;
-    fabrik3.connectChain(structure, arm, 0, side < 0 ? 3 : 4, fabrik3.BoneConnectionPoint.END);
+  // A robot arm: four bones on a base that can only yaw within a cone, with ball-jointed elbows
+  // that bend up to a third of a turn. It solves for a wandering target every frame.
+  const arm = fabrik3.createChain3();
+  fabrik3.addBone(arm, [0, -1.45, 0], [0, -0.5, 0]);
+  for (const length of [0.85, 0.7, 0.5]) {
+    fabrik3.addConsecutiveBone(arm, [0.2, 0.98, 0], length, fabrik3.setBallJoint(fabrik3.createJoint3(), Math.PI / 3));
   }
-  work.structure = structure;
+  fabrik3.setBaseboneRotorConstraint(arm, fabrik3.BaseboneConstraintType.GLOBAL_ROTOR, [0, 1, 0], Math.PI / 2.6);
+  work.arm = arm;
 
   const random = mulberry32.create(76);
   for (let i = 0; i < 60; i++) {

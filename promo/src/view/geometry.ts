@@ -1,7 +1,7 @@
 import { clamp, quat, vec3 } from 'math';
 import type { Mesh } from '../forms/geometry';
 import type { View } from './traits';
-import { lightRgb, palette } from './theme';
+import { lightRgb, palette, spectrumRgb } from './theme';
 
 type Projection = ReturnType<typeof View.schema>;
 
@@ -9,10 +9,12 @@ export function projectGeometry(view: Projection, mesh: Mesh, study: { index: nu
   const index = study.index;
   const cy = (height - 165) / 2;
   const scale = Math.min(138, (height - 400) / 5.6);
+  // The robot arm keeps a fixed three-quarter view; only the arm moves. Everything else turns.
+  const still = index === 54;
   vec3.set(view.axis, 0, 1, 0);
-  quat.setAxisAngle(view.rotation, view.axis, elapsed * 0.6 + (index === 2 ? 0.15 : -0.5));
+  quat.setAxisAngle(view.rotation, view.axis, still ? -0.38 : elapsed * 0.6 + (index === 2 ? 0.15 : -0.5));
   vec3.set(view.axis, 1, 0, 0);
-  quat.setAxisAngle(view.tilt, view.axis, (index === 2 || index === 3 ? -0.12 : 0.53) + Math.sin(elapsed * 0.8) * 0.16);
+  quat.setAxisAngle(view.tilt, view.axis, still ? 0.3 : (index === 2 || index === 3 ? -0.12 : 0.53) + Math.sin(elapsed * 0.8) * 0.16);
   quat.multiply(view.rotation, view.tilt, view.rotation);
   if (study.planar) quat.identity(view.rotation);
   
@@ -29,8 +31,9 @@ export function projectGeometry(view: Projection, mesh: Mesh, study: { index: nu
     minY = Math.min(minY, view.projected[i * 3 + 1]);
     maxY = Math.max(maxY, view.projected[i * 3 + 1]);
   }
-  // Flow trails keep their world framing and may extend beyond the canvas.
-  if (index === 9) return;
+  // Flow trails keep their world framing and may extend beyond the canvas. The frustum field keeps
+  // its framing too, so the sweeping cone doesn't slide the whole study to fit.
+  if (index === 9 || index === 26) return;
   const fit = Math.min(1, 840 / (maxX - minX), (height - 440) / (maxY - minY));
   for (let i = 0; i < mesh.count; i++) {
     view.projected[i * 3] = 500 + (view.projected[i * 3] - (minX + maxX) / 2) * fit;
@@ -41,8 +44,14 @@ export function projectGeometry(view: Projection, mesh: Mesh, study: { index: nu
 export function drawGeometry(ctx: CanvasRenderingContext2D, view: Projection, mesh: Mesh, index: number, accent: readonly [number, number, number] = lightRgb) {
   for (let i = 0; i < mesh.faceCount; i++) {
     const a = mesh.faces[i * 3] * 3, b = mesh.faces[i * 3 + 1] * 3, c = mesh.faces[i * 3 + 2] * 3;
-    const shade = Math.round(8 + mesh.shades[i] * 224);
-    ctx.fillStyle = `rgb(${shade},${Math.round(shade * 0.98)},${Math.round(shade * 0.93)})`;
+    // Shades in [0, 1] are greyscale; 2 and up are the accent at (shade − 2) brightness.
+    if (mesh.shades[i] >= 2) {
+      const k = clamp(mesh.shades[i] - 2, 0, 1);
+      ctx.fillStyle = `rgb(${Math.round(accent[0] * k)},${Math.round(accent[1] * k)},${Math.round(accent[2] * k)})`;
+    } else {
+      const shade = Math.round(8 + mesh.shades[i] * 224);
+      ctx.fillStyle = `rgb(${shade},${Math.round(shade * 0.98)},${Math.round(shade * 0.93)})`;
+    }
     ctx.beginPath();
     ctx.moveTo(view.projected[a], view.projected[a + 1]);
     ctx.lineTo(view.projected[b], view.projected[b + 1]);
@@ -50,13 +59,14 @@ export function drawGeometry(ctx: CanvasRenderingContext2D, view: Projection, me
     ctx.closePath(); ctx.fill();
   }
   
-  // Batch depth and line weight so diagrams can mix guides and construction lines.
+  // Batch depth and line weight so diagrams can mix guides and construction lines. Ink 0 is a
+  // faint guide, 1 the construction, 2 the cut's accent, and 3 and up pick a spectrum colour.
   for (let band = 0; band < 6; band++) {
-    for (let ink = 0; ink < 3; ink++) {
-      const [r, g, b] = ink === 2 ? accent : lightRgb;
-      ctx.strokeStyle = `rgba(${r},${g},${b},${(0.24 + (5 - band) * 0.13) * (ink === 0 ? 0.3 : ink === 2 ? 1.45 : 1)})`;
+    for (let ink = 0; ink < 3 + spectrumRgb.length; ink++) {
+      const [r, g, b] = ink === 2 ? accent : ink > 2 ? spectrumRgb[ink - 3] : lightRgb;
+      ctx.strokeStyle = `rgba(${r},${g},${b},${(0.24 + (5 - band) * 0.13) * (ink === 0 ? 0.3 : ink >= 2 ? 1.45 : 1)})`;
       ctx.fillStyle = ctx.strokeStyle;
-      ctx.lineWidth = ink === 2 ? 1.9 : index === 11 ? 1.65 : index === 2 ? 1.05 : 1.15;
+      ctx.lineWidth = ink >= 2 ? 1.9 : index === 11 ? 1.65 : index === 2 ? 1.05 : 1.15;
       ctx.beginPath();
       for (let i = 0; i < mesh.count; i++) {
         const p = i * 3;
@@ -76,7 +86,9 @@ export function drawGeometry(ctx: CanvasRenderingContext2D, view: Projection, me
   }
   for (let i = 0; i < mesh.count; i++) {
     if (mesh.radii[i] === 0) continue;
-    ctx.fillStyle = mesh.ink[i] === 0 ? palette.dim : mesh.ink[i] === 2 ? `rgb(${accent[0]},${accent[1]},${accent[2]})` : palette.light;
+    const ink = mesh.ink[i];
+    const [r, g, b] = ink === 2 ? accent : ink > 2 ? spectrumRgb[ink - 3] : lightRgb;
+    ctx.fillStyle = ink === 0 ? palette.dim : ink === 1 ? palette.light : `rgb(${r},${g},${b})`;
     ctx.beginPath(); ctx.arc(view.projected[i * 3], view.projected[i * 3 + 1], mesh.radii[i], 0, Math.PI * 2); ctx.fill();
   }
 }

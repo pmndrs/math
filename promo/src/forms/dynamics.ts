@@ -146,43 +146,88 @@ function segment3(mesh: Mesh, ax: number, ay: number, az: number, bx: number, by
   vertex(mesh, bx, by, bz, false, ink);
 }
 
-export function kinematics3(mesh: Mesh, time: number, work: Workspace) {
-  const structure = work.structure!;
-  const [spine, left, right] = structure.chains;
-  // The spine chases a slow orbit while each arm reaches for its own target.
-  vec3.set(work.aim, Math.cos(time * 0.7) * 1.3, 1.1 + Math.sin(time * 0.9) * 0.9, Math.sin(time * 0.7) * 1.3);
-  vec3.set(left.embeddedTarget, -1.9 + Math.sin(time * 1.3) * 0.5, Math.sin(time * 1.1) * 1.1, Math.cos(time * 0.8) * 1.3);
-  vec3.set(right.embeddedTarget, 1.9 + Math.cos(time * 1.2) * 0.5, Math.cos(time * 0.9) * 1.1, Math.sin(time * 0.85) * 1.3);
-  // Solve from the same rest pose every frame, so seeking has no history: the arms hang off the
-  // straightened spine's joints before the structure moves them onto the solved ones.
-  fabrik3.straighten(spine, [0.05, 0.9987, 0]);
-  fabrik3.setBaseLocation(left, spine.bones[3].end);
-  fabrik3.setBaseLocation(right, spine.bones[4].end);
-  fabrik3.straighten(left, [-0.9987, 0.05, 0]);
-  fabrik3.straighten(right, [0.9987, 0.05, 0]);
-  fabrik3.solveStructure(structure, work.aim);
+/** The target the arm reaches for at `time`, written to `out`: a slow wander within its reach. */
+function armTarget(time: number, out: Vec3) {
+  // In front of the base, offset toward the camera's side, so the arm reaches out at an angle.
+  out[0] = 0.55 + Math.cos(time * 0.7) * 1.05;
+  out[1] = 0.3 + Math.sin(time * 1.1) * 0.95;
+  out[2] = -0.9 + Math.sin(time * 0.9) * 0.55;
+  return out;
+}
 
-  for (const chain of structure.chains) {
-    for (let i = 0; i < chain.bones.length; i++) {
-      const bone = chain.bones[i];
-      segment3(mesh, bone.start[0], bone.start[1], bone.start[2], bone.end[0], bone.end[1], bone.end[2], 1);
-      vertex(mesh, bone.start[0], bone.start[1], bone.start[2], true, 1, 2.4);
-      // Each ball joint's cone, drawn as a ring about the previous bone's direction.
-      if (i > 0 && bone.joint.type === fabrik3.JointType.BALL) {
-        const previous = chain.bones[i - 1];
-        cone(mesh, previous.start, previous.end, bone.joint.rotor, 0.28);
-      }
-    }
+const armTrace: Vec3 = [0, 0, 0];
+
+export function kinematics3(mesh: Mesh, time: number, work: Workspace) {
+  const arm = work.arm!;
+  // Solve from the same slightly bent rest pose every frame, so seeking has no history.
+  fabrik3.straighten(arm, [0.3, 0.954, 0]);
+  fabrik3.solve(arm, armTarget(time, work.aim));
+
+  // A ground grid and the base plate.
+  for (let line = -2; line <= 2; line++) {
+    segment3(mesh, line * 0.6, -1.45, -1.2, line * 0.6, -1.45, 1.2, 0);
+    segment3(mesh, -1.2, -1.45, line * 0.6, 1.2, -1.45, line * 0.6, 0);
   }
-  // The spine's own cone at its base.
-  cone(mesh, [0, -2.85, 0], spine.base, spine.baseboneRotor, 0.32);
-  target3(mesh, work.aim);
-  target3(mesh, left.embeddedTarget);
-  target3(mesh, right.embeddedTarget);
+  cone(mesh, [0, -2.45, 0], [0, -1.45, 0], Math.PI / 2, 0.5);
+
+  // Each bone as a pair of crossed diamonds, its joint a dot in the cut's accent with its cone
+  // as a light ring.
+  for (let i = 0; i < arm.bones.length; i++) {
+    const bone = arm.bones[i];
+    diamond(mesh, bone.start, bone.end, 0.21 - i * 0.03);
+    vertex(mesh, bone.start[0], bone.start[1], bone.start[2], true, 2, 3.2);
+    if (i > 0) cone(mesh, arm.bones[i - 1].start, arm.bones[i - 1].end, bone.joint.rotor, 0.22, 1);
+    else cone(mesh, [0, -2.45, 0], bone.start, arm.baseboneRotor, 0.34, 1);
+  }
+  const tip = arm.bones[arm.bones.length - 1];
+  gripper(mesh, tip.start, tip.end, 2);
+
+  // The target: a light ring, an accent dot, and the path it has traced.
+  cone(mesh, [work.aim[0], work.aim[1] - 1, work.aim[2]], work.aim, Math.PI / 2, 0.2, 1);
+  vertex(mesh, work.aim[0], work.aim[1], work.aim[2], true, 2, 4);
+  for (let k = 0; k <= 32; k++) {
+    armTarget(time - k * 0.035, armTrace);
+    vertex(mesh, armTrace[0], armTrace[1], armTrace[2], k === 0, 0);
+  }
+}
+
+/** A bone drawn as two crossed diamonds, `width` wide at its middle, in the 2D study's style. */
+function diamond(mesh: Mesh, from: Vec3, to: Vec3, width: number) {
+  let dx = to[0] - from[0], dy = to[1] - from[1], dz = to[2] - from[2];
+  const length = Math.hypot(dx, dy, dz) || 1;
+  dx /= length; dy /= length; dz /= length;
+  const ax = Math.abs(dx) < 0.9 ? 1 : 0, ay = ax ? 0 : 1;
+  let ux = ay * dz, uy = -ax * dz, uz = ax * dy - ay * dx;
+  const u = Math.hypot(ux, uy, uz) || 1;
+  ux /= u; uy /= u; uz /= u;
+  const vx = dy * uz - dz * uy, vy = dz * ux - dx * uz, vz = dx * uy - dy * ux;
+  const mx = (from[0] + to[0]) / 2, my = (from[1] + to[1]) / 2, mz = (from[2] + to[2]) / 2;
+  for (const [px, py, pz] of [[ux, uy, uz], [vx, vy, vz]]) {
+    vertex(mesh, from[0], from[1], from[2], true, 1);
+    vertex(mesh, mx + px * width, my + py * width, mz + pz * width, false, 1);
+    vertex(mesh, to[0], to[1], to[2], false, 1);
+    vertex(mesh, mx - px * width, my - py * width, mz - pz * width, false, 1);
+    vertex(mesh, from[0], from[1], from[2], false, 1);
+  }
+}
+
+/** Two short fingers splayed from the tip, continuing the last bone's direction. */
+function gripper(mesh: Mesh, from: Vec3, to: Vec3, ink: number) {
+  let dx = to[0] - from[0], dy = to[1] - from[1], dz = to[2] - from[2];
+  const length = Math.hypot(dx, dy, dz) || 1;
+  dx /= length; dy /= length; dz /= length;
+  const ax = Math.abs(dx) < 0.9 ? 1 : 0, ay = ax ? 0 : 1;
+  let ux = ay * dz, uy = -ax * dz, uz = ax * dy - ay * dx;
+  const u = Math.hypot(ux, uy, uz) || 1;
+  ux /= u; uy /= u; uz /= u;
+  for (const side of [-1, 1]) {
+    segment3(mesh, to[0] + ux * side * 0.07, to[1] + uy * side * 0.07, to[2] + uz * side * 0.07,
+      to[0] + dx * 0.16 + ux * side * 0.11, to[1] + dy * 0.16 + uy * side * 0.11, to[2] + dz * 0.16 + uz * side * 0.11, ink);
+  }
 }
 
 /** A ring of half-angle `rotor` about the direction from `from` to `to`, `reach` along it. */
-function cone(mesh: Mesh, from: Vec3, to: Vec3, rotor: number, reach: number) {
+function cone(mesh: Mesh, from: Vec3, to: Vec3, rotor: number, reach: number, ink = 0) {
   let dx = to[0] - from[0], dy = to[1] - from[1], dz = to[2] - from[2];
   const length = Math.hypot(dx, dy, dz) || 1;
   dx /= length; dy /= length; dz /= length;
@@ -198,16 +243,7 @@ function cone(mesh: Mesh, from: Vec3, to: Vec3, rotor: number, reach: number) {
     const rx = ux * Math.cos(angle) + vx * Math.sin(angle);
     const ry = uy * Math.cos(angle) + vy * Math.sin(angle);
     const rz = uz * Math.cos(angle) + vz * Math.sin(angle);
-    vertex(mesh, to[0] + dx * along + rx * across, to[1] + dy * along + ry * across, to[2] + dz * along + rz * across, step === 0, 0);
-  }
-}
-
-/** A target: a dot with three short axis ticks. */
-function target3(mesh: Mesh, p: Vec3) {
-  vertex(mesh, p[0], p[1], p[2], true, 2, 4);
-  for (let axis = 0; axis < 3; axis++) {
-    const o = [0, 0, 0]; o[axis] = 0.16;
-    segment3(mesh, p[0] - o[0], p[1] - o[1], p[2] - o[2], p[0] + o[0], p[1] + o[1], p[2] + o[2], 2);
+    vertex(mesh, to[0] + dx * along + rx * across, to[1] + dy * along + ry * across, to[2] + dz * along + rz * across, step === 0, ink);
   }
 }
 

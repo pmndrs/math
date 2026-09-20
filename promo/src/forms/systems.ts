@@ -119,13 +119,17 @@ function harmonics(mesh: Mesh, time: number) {
 function orbits(mesh: Mesh, time: number) {
   for (let line = 0; line < 24; line++) {
     const tilt = line / 24 * Math.PI;
+    const radius = 2.2 + 0.12 * Math.sin(time + line * 0.5);
     for (let step = 0; step <= 220; step++) {
       const angle = step / 220 * Math.PI * 2;
-      const radius = 2.2 + 0.12 * Math.sin(time + line * 0.5);
       const x = Math.cos(angle) * radius;
       const y = Math.sin(angle) * radius;
       vertex(mesh, x * Math.cos(tilt), y, x * Math.sin(tilt), step === 0);
     }
+    // A satellite on each orbit, each at its own period, carrying the accent.
+    const angle = time * (0.9 + (line % 5) * 0.22) + line * 1.7;
+    const x = Math.cos(angle) * radius, y = Math.sin(angle) * radius;
+    vertex(mesh, x * Math.cos(tilt), y, x * Math.sin(tilt), true, 2, 3);
   }
 }
 
