@@ -94,10 +94,15 @@ export const clamp = (value: number, min: number, max: number): number => {
 };
 
 /**
- * Loops `t` so that it is never larger than `length` and never smaller than 0.
+ * Loops `t` so that it wraps into the range `[0, length)`.
+ *
+ * Unlike the `%` operator (a remainder), this is a true floored modulo, so
+ * negative `t` wraps to a positive value: `repeat(-1, 3) === 2`.
+ *
+ * Based on https://github.com/angus-c/just/blob/master/packages/number-modulo/index.mjs
  */
 export function repeat(t: number, length: number): number {
-    return clamp(t - Math.floor(t / length) * length, 0, length);
+    return ((t % length) + length) % length;
 }
 
 /**
