@@ -121,7 +121,7 @@ const pullRamp = 6;
 const batchSkew = 0.45;
 /** Seconds of motion each particle's streak shows, as motion blur. */
 const blurTime = 0.045;
-/** The share of particles that catch the light, how often each glints per second, and how long a glint lasts. */
+/** The share of particles that catch the light once they fly, how often each glints per second, and how long a glint lasts. */
 const glintShare = 0.14;
 const glintRate = 1.3;
 const glintLength = 0.12;
@@ -267,7 +267,7 @@ export function drawParticles(ctx: CanvasRenderingContext2D, field: Field, x: nu
   for (let i = 0; i < levels * sizes; i++) buckets.push(new Path2D());
   const heads: Path2D[] = [];
   for (let i = 0; i < levels; i++) heads.push(new Path2D());
-  // Particles catching the light: a bright flare with a small four-point star.
+  // Blasted particles catching the light: a bright flare with a small four-point star.
   const flares = new Path2D();
   const stars = new Path2D();
   // Flying particles get tapered tails: three segments back along the path, thinning and dimming.
@@ -327,7 +327,8 @@ export function drawParticles(ctx: CanvasRenderingContext2D, field: Field, x: nu
     const alpha = glow * arrived * (0.22 + 0.78 * ease) * blastFade;
     const size = field.particles[p + 6] * (0.7 + 0.3 * ease) * (flying ? 1.3 : 1);
     const level = Math.min(levels - 1, Math.floor(alpha * levels));
-    const glint = glintAt(i, time) * arrived * blastFade;
+    // Only the blasted particles catch the light: while they gather, the letters are not there yet.
+    const glint = flying ? glintAt(i, time) * arrived * blastFade : 0;
     if (glint > 0.05) {
       const reach = size * (2 + glint * 6);
       flares.moveTo(x + point[0] + size * 1.6, y + point[1]);
