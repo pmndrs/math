@@ -116,3 +116,24 @@ export function remapClamp(value: number, inLow: number, inHigh: number, outLow:
     const remapped = outLow + scale * (outHigh - outLow);
     return Math.max(outLow, Math.min(outHigh, remapped));
 }
+
+/**
+ * Smooth Hermite step from 0 to 1 as `x` goes from `edge0` to `edge1`, matching GLSL `smoothstep`.
+ * Clamped outside the edges, with zero slope at both of them.
+ *
+ * https://en.wikipedia.org/wiki/Smoothstep
+ */
+export function smoothstep(edge0: number, edge1: number, x: number): number {
+    const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+    return t * t * (3 - 2 * t);
+}
+
+/**
+ * Ken Perlin's smootherstep, like smoothstep but with zero slope and curvature at both edges.
+ * Same curve as `fade`, clamped outside the edges.
+ *
+ * https://en.wikipedia.org/wiki/Smoothstep#Variations
+ */
+export function smootherstep(edge0: number, edge1: number, x: number): number {
+    return fade(clamp((x - edge0) / (edge1 - edge0), 0, 1));
+}
