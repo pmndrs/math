@@ -12,12 +12,40 @@ export type EulerOrder = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx';
 /** A Euler in 3D space, with an optional order (default is 'xyz') */
 export type Euler = [x: number, y: number, z: number, order?: EulerOrder];
 
-
 /**
  * Creates a new Euler with default values (0, 0, 0, 'xyz').
  */
 export function create(): Euler {
     return [0, 0, 0, 'xyz'];
+}
+
+/**
+ * Creates a new Euler initialized with values from an existing one.
+ * @param a The source Euler.
+ * @returns A new Euler.
+ */
+export function clone(a: Const<Euler>): Euler {
+    return a.length === 3 ? [a[0], a[1], a[2]] : [a[0], a[1], a[2], a[3]];
+}
+
+/**
+ * Copies values from one Euler to another.
+ * @param out The receiving Euler.
+ * @param a The source Euler.
+ * @returns The output Euler.
+ */
+export function copy(out: Euler, a: Const<Euler>): Euler {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+
+    if (a.length === 3) {
+        out.length = 3;
+    } else {
+        out[3] = a[3];
+    }
+
+    return out;
 }
 
 /**

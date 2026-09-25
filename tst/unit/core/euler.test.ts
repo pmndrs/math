@@ -34,6 +34,41 @@ describe('euler', () => {
         });
     });
 
+    describe('clone', () => {
+        it('should create a separate Euler with the same values', () => {
+            const source: Euler = [1, 2, 3, 'yxz'];
+            const result = euler.clone(source);
+
+            expect(result).toEqual(source);
+            expect(result).not.toBe(source);
+        });
+
+        it('should preserve an omitted order', () => {
+            const result = euler.clone([1, 2, 3]);
+
+            expect(result).toEqual([1, 2, 3]);
+            expect(result).toHaveLength(3);
+        });
+    });
+
+    describe('copy', () => {
+        it('should copy values into and return the output Euler', () => {
+            const out: Euler = [0, 0, 0];
+            const result = euler.copy(out, [1, 2, 3, 'zyx']);
+
+            expect(result).toBe(out);
+            expect(out).toEqual([1, 2, 3, 'zyx']);
+        });
+
+        it('should remove the output order when it is omitted from the source', () => {
+            const out = euler.create();
+            euler.copy(out, [1, 2, 3]);
+
+            expect(out).toEqual([1, 2, 3]);
+            expect(out).toHaveLength(3);
+        });
+    });
+
     describe('fromValues', () => {
         it('should create Euler from values', () => {
             const result = euler.fromValues(Math.PI / 4, Math.PI / 3, Math.PI / 6, 'yxz');
