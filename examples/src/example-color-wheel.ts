@@ -2,6 +2,7 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { color, hsl } from 'math/color';
 import { createRenderer } from './common/renderer';
+import { clearColor } from './common/theme';
 
 // An HSL colour wheel: hue around the circle, saturation from the grey centre to
 // the vivid rim (lightness fixed at 0.5). Every vertex colour is computed with
@@ -107,15 +108,15 @@ scene.add(new g.Mesh(wheelGeometry, wheelMaterial));
 
 const marker = document.createElement('div');
 marker.style.cssText =
-    'position:absolute;width:18px;height:18px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px rgba(0,0,0,0.55);transform:translate(-50%,-50%);pointer-events:none;z-index:10';
+    'position:absolute;width:18px;height:18px;border-radius:50%;border:2px solid var(--mc-ink);box-shadow:0 0 0 1.5px rgba(20,18,14,0.6);transform:translate(-50%,-50%);pointer-events:none;z-index:10';
 document.body.appendChild(marker);
 
 const panel = document.createElement('div');
 // no container — just monospace text + a swatch
 panel.style.cssText =
-    'position:absolute;left:16px;bottom:16px;display:flex;align-items:center;gap:11px;font-family:var(--mc-mono);font-size:13px;line-height:1.6;color:var(--mc-ink);text-shadow:0 1px 2px rgba(0,0,0,0.6);white-space:nowrap;pointer-events:none;z-index:10';
+    'position:absolute;left:16px;bottom:16px;display:flex;align-items:center;gap:11px;font-family:var(--mc-mono);font-size:13px;line-height:1.6;color:var(--mc-ink);text-shadow:0 1px 2px var(--mc-base);white-space:nowrap;pointer-events:none;z-index:10';
 const swatch = document.createElement('div');
-swatch.style.cssText = 'width:34px;height:34px;border-radius:6px;border:1px solid rgba(255,255,255,0.22);flex:none';
+swatch.style.cssText = 'width:34px;height:34px;border:1px solid rgba(234,229,218,0.22);flex:none';
 const readout = document.createElement('div');
 panel.append(swatch, readout);
 document.body.appendChild(panel);
@@ -166,7 +167,7 @@ window.addEventListener('resize', () => {
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 

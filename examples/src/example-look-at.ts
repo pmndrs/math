@@ -2,8 +2,9 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { quat, type Vec3, vec3 as v3 } from 'math';
 import { createPanel } from './common/dash';
-import { rainbowRGB, time } from './common/rainbow';
+import { ink, light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, spectrum } from './common/theme';
 
 // A grid of arrows that all turn to point at a glowing orb as it wanders above
 // them - like sunflowers tracking the sun. Each arrow aims with a single call:
@@ -16,6 +17,7 @@ const TAU = Math.PI * 2;
 const GRID = 7;
 const SPACING = 1.05;
 const UP: Vec3 = [0, 1, 0];
+const ACCENT = spectrum[2];
 
 /* hand-built arrow geometry, pointing along +Y, centred on the origin */
 
@@ -119,7 +121,7 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* one shared arrow geometry + rainbow-lit material, reused by every instance */
+/* one shared arrow geometry + flat warm-white material, reused by every instance */
 
 const arrow = buildArrowGeometry();
 const geometry = new g.Geometry();
@@ -128,16 +130,9 @@ geometry.setBuffer('normal', g.createVertexBuffer(d.vec3f, arrow.normals));
 geometry.setIndex(g.createIndexBuffer(arrow.indices));
 
 const pos = g.attribute('position', d.vec3f);
-const nrm = g.attribute('normal', d.vec3f);
 const world = g.mul(g.modelWorldMatrix, g.vec4(pos, g.f32(1)));
 const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
-const vNormal = g.varying(g.normalize(g.mul(g.modelNormalMatrix, nrm)), 'v_n');
-const vWorld = g.varying(world.xyz, 'v_w');
-const lightDirection = g.vec3(0.5, 1.0, 0.7).normalize();
-const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
-const shade = g.Var('shade', g.f32(0.4).add(diffuse.mul(g.f32(0.7))));
-const base = g.Var('base', rainbowRGB(vWorld));
-const material = new g.Material({ vertex: clip, fragment: g.vec4(base.mul(shade), g.f32(1)), cullMode: 'none' });
+const material = new g.Material({ vertex: clip, fragment: g.vec4(light, g.f32(1)), cullMode: 'none' });
 
 // arrows, laid out on the ground grid
 type Arrow = { mesh: g.Mesh; pos: Vec3 };
@@ -154,27 +149,40 @@ for (let ix = 0; ix < GRID; ix++) {
     }
 }
 
-/* the glowing orb the arrows track - a bright unlit sphere */
+// a faint ground grid between the arrows, like the guides under the film's studies
+const HALF = (GRID * SPACING) / 2;
+const gridPoints: number[] = [];
+for (let i = 0; i <= GRID; i++) {
+    const at = -HALF + i * SPACING;
+    gridPoints.push(at, -0.42, -HALF, at, -0.42, HALF, -HALF, -0.42, at, HALF, -0.42, at);
+}
+const grid = new g.LineSegments(
+    new g.LineSegmentsGeometry(new Float32Array(gridPoints), gridPoints.length / 3),
+    new g.LineMaterial({ color: g.vec4(light, g.f32(0.2)), lineWidth: pixels(1.25), transparent: true }),
+);
+scene.add(grid);
+
+/* the orb the arrows track - an unlit sphere in the accent */
 
 const orbGeometry = g.createSphereGeometry(0.22, 24, 16);
 const orbPos = g.attribute('position', d.vec3f);
 const orbWorld = g.mul(g.modelWorldMatrix, g.vec4(orbPos, g.f32(1)));
 const orbClip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, orbWorld));
-const orbMaterial = new g.Material({ vertex: orbClip, fragment: g.vec4f(1, 1, 1, 1) });
+const orbMaterial = new g.Material({ vertex: orbClip, fragment: g.vec4(ink(ACCENT), g.f32(1)) });
 const orb = new g.Mesh(orbGeometry, orbMaterial);
 scene.add(orb);
 
 /* ui */
 
 const settings = { speed: 1, height: 2.4, reach: 3 };
-const panel = createPanel('look at');
+const panel = createPanel('look at', ACCENT);
 panel.add(settings, 'speed', { min: 0, max: 3, step: 0.01, label: 'Speed' });
 panel.add(settings, 'height', { min: 0.5, max: 5, step: 0.01, label: 'Orb height' });
 panel.add(settings, 'reach', { min: 0.5, max: 5, step: 0.01, label: 'Orbit radius' });
 
 /* render loop */
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -188,7 +196,6 @@ function frame() {
     const dt = Math.min(0.05, (now - lastT) / 1000);
     lastT = now;
     clock += dt * settings.speed;
-    time.value = now / 1000;
 
     // orb drifts on a Lissajous path above the grid
     target[0] = Math.cos(clock * 0.6) * settings.reach;

@@ -1,0 +1,29 @@
+/* The pmndrs brand theme shared by the gallery and every example. Mirrors common/theme.ts */
+
+@font-face {
+    font-family: Geist;
+    src: url("./assets/fonts/Geist-Variable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Geist Mono";
+    src: url("./assets/fonts/GeistMono-Variable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-display: block;
+}
+
+:root {
+    --mc-base: #14120e;
+    --mc-page: #191712;
+    --mc-ink: #eae5da;
+    --mc-dim: #8c877a;
+    --mc-faint: #5a554a;
+    --mc-line: #36342f;
+    --mc-accent: #caf543;
+    --mc-sans: Geist, system-ui, sans-serif;
+    --mc-mono: "Geist Mono", ui-monospace, monospace;
+    font-synthesis: none;
+    color-scheme: dark;
+}

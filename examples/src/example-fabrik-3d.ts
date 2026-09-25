@@ -3,15 +3,17 @@ import { d } from 'gpucat';
 import { type Vec3, vec3 } from 'math';
 import { fabrik3 } from 'math/ik';
 import { createPanel } from './common/dash';
-import { time } from './common/rainbow';
+import { createInfo } from './common/info';
+import { grey, ink, light } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, palette, spectrum } from './common/theme';
 
 // A gallery of 3D IK setups solved with math's FABRIK solver, following the scenarios in Caliko's
 // own demo app - Caliko being the reference implementation that accompanies Aristidou & Lasenby's
 // FABRIK paper, and the thing math/ik's constraint model is modelled on.
 //
 // Pick a scenario in the panel. Every one solves the same way, with fabrik3.solveStructure against
-// the orbiting white target. The only thing that changes is how the joints are constrained.
+// the orbiting target. The only thing that changes is how the joints are constrained.
 //
 //   Unconstrained            free ball joints - the chain reaches, but any which way
 //   Ball joint rotors        each bone held within a cone of the one before it
@@ -193,7 +195,7 @@ const SCENARIOS: Scenario[] = [
     },
     {
         name: 'Embedded targets',
-        hint: 'the connected chain reaches for its OWN orbiting target (yellow) while the host chases the white one',
+        hint: 'the connected chain reaches for its OWN orbiting target (white) while the host chases the red one',
         build: () => {
             const structure = fabrik3.createStructure3();
 
@@ -262,27 +264,26 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* materials - one solid colour per chain, plus a dark one for the joints */
+/* materials - flat bones, outlined joints, and an accent target */
 
 const position = g.attribute('position', d.vec3f);
 const normal = g.attribute('normal', d.vec3f);
 
 const world = g.mul(g.modelWorldMatrix, g.vec4(position, g.f32(1)));
 const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
-const worldNormal = g.varying(g.normalize(g.mul(g.modelNormalMatrix, normal)), 'v_n');
+const viewNormal = g.varying(
+    g.mul(g.cameraViewMatrix, g.vec4(g.normalize(g.mul(g.modelNormalMatrix, normal)), g.f32(0))).xyz,
+    'v_n',
+);
 
-const lightDirection = g.vec3(0.5, 1.0, 0.7).normalize();
-const diffuse = g.Var('diffuse', worldNormal.dot(lightDirection).max(g.f32(0)));
-const shade = g.Var('shade', g.f32(0.42).add(diffuse.mul(g.f32(0.7))));
-
-function solidMaterial(r: number, gr: number, b: number): g.Material {
-    return new g.Material({ vertex: clip, fragment: g.vec4(g.vec3(r, gr, b).mul(shade), g.f32(1)) });
+function solidMaterial(color: g.Node<typeof d.vec3f>): g.Material {
+    return new g.Material({ vertex: clip, fragment: g.vec4(color, g.f32(1)) });
 }
 
-// pink / yellow / blue, matching the palette the other examples flow through
-const CHAIN_MATERIALS = [solidMaterial(1.0, 0.243, 0.647), solidMaterial(1.0, 0.824, 0.247), solidMaterial(0.247, 0.655, 1.0)];
-const BRANCH_MATERIAL = solidMaterial(0.541, 0.169, 0.886);
-const JOINT_MATERIAL = solidMaterial(0.13, 0.14, 0.18);
+const ACCENT = spectrum[1];
+const BONE_MATERIAL = solidMaterial(light);
+const BRANCH_MATERIAL = solidMaterial(grey(g.f32(0.65)));
+const JOINT_MATERIAL = solidMaterial(g.mix(light, ink(palette.base), g.smoothstep(g.f32(0.45), g.f32(0.6), viewNormal.z)));
 
 const boneGeometry = g.createCylinderGeometry(1, 1, 1, 16);
 const jointGeometry = g.createSphereGeometry(1, 16, 12);
@@ -307,8 +308,8 @@ function buildMeshes(): void {
 
     for (let c = 0; c < structure.chains.length; c++) {
         const chain = structure.chains[c];
-        // a connected chain gets its own colour so the structure reads as two pieces
-        const material = structure.connections[c].hostChain >= 0 ? BRANCH_MATERIAL : CHAIN_MATERIALS[c % CHAIN_MATERIALS.length];
+        // a connected chain gets a darker grey so the structure reads as two pieces
+        const material = structure.connections[c].hostChain >= 0 ? BRANCH_MATERIAL : BONE_MATERIAL;
 
         const bones: g.Mesh[] = [];
         const joints: g.Mesh[] = [];
@@ -358,10 +359,10 @@ function updateMeshes(): void {
 /* targets */
 
 const targetGeometry = g.createSphereGeometry(0.13, 20, 14);
-const targetMesh = new g.Mesh(targetGeometry, new g.Material({ vertex: clip, fragment: g.vec4f(1, 1, 1, 1) }));
+const targetMesh = new g.Mesh(targetGeometry, new g.Material({ vertex: clip, fragment: g.vec4(ink(ACCENT), g.f32(1)) }));
 scene.add(targetMesh);
 
-const embeddedMesh = new g.Mesh(targetGeometry, new g.Material({ vertex: clip, fragment: g.vec4f(1, 0.85, 0.2, 1) }));
+const embeddedMesh = new g.Mesh(targetGeometry, new g.Material({ vertex: clip, fragment: g.vec4(light, g.f32(1)) }));
 scene.add(embeddedMesh);
 
 /* ui */
@@ -371,12 +372,7 @@ for (let i = 0; i < SCENARIOS.length; i++) names[SCENARIOS[i].name] = i;
 
 const settings = { scenario: 0, speed: 1, reach: 1.5, height: 1 };
 
-const hint = document.createElement('div');
-hint.className = 'mc-info';
-hint.style.left = '16px';
-hint.style.bottom = '16px';
-hint.style.maxWidth = 'min(720px, calc(100vw - 32px))';
-document.body.appendChild(hint);
+const hint = createInfo();
 
 function selectScenario(index: number): void {
     scenario = SCENARIOS[index];
@@ -385,7 +381,7 @@ function selectScenario(index: number): void {
     hint.textContent = `${scenario.name} — ${scenario.hint}`;
 }
 
-const panel = createPanel('fabrik 3d');
+const panel = createPanel('fabrik 3d', ACCENT);
 panel.add(settings, 'scenario', { options: names, label: 'Scenario' }).onChange((value) => selectScenario(value));
 panel.add(settings, 'speed', { min: 0, max: 3, step: 0.01, label: 'Speed' });
 panel.add(settings, 'reach', { min: 0.5, max: 4, step: 0.01, label: 'Orbit radius' });
@@ -396,7 +392,7 @@ selectScenario(settings.scenario);
 
 /* render */
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -410,7 +406,6 @@ function frame() {
     const dt = Math.min(0.05, (now - lastT) / 1000);
     lastT = now;
     clock += dt * settings.speed;
-    time.value = now / 1000;
 
     target[0] = Math.cos(clock * 0.6) * settings.reach;
     target[1] = settings.height + Math.sin(clock * 1.3) * 0.8;

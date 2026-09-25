@@ -3,18 +3,18 @@ import { d } from 'gpucat';
 import { polar, vec2 } from 'math';
 import { polygon2 } from 'math/shapes';
 import { createPanel } from './common/dash';
-import { palette } from './common/rainbow';
+import { createInfo } from './common/info';
+import { ink, light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, spectrum } from './common/theme';
 
 // The shape is never drawn as a shape. A lattice of probes each asks math's
 // polygon2 two questions every frame - how far am I from this outline, and
 // where is the nearest point on it - and the answers alone draw the picture.
 //
-// polygon2.signedDistance gives each probe its hue and its brightness. Hue
-// carries only the sign - warm inside the outline, cool outside - and
-// brightness sweeps within each band of distance and snaps back at the
-// boundary, so the bright rings that appear are contours of the shape and the
-// innermost one is the outline itself.
+// polygon2.signedDistance gives each probe its colour and size. Cyan marks
+// inside and white marks outside. Larger dots at regular distance intervals
+// trace contours, including the zero contour along the outline.
 //
 // polygon2.closestPoint aims a needle from every probe at the nearest point on
 // the outline, turning the gradient of that field into a flow. It is off by
@@ -35,9 +35,8 @@ const SPAN = 2.9; // half-width
 const PAD = 1.74;
 const MAX_COLUMNS = 96;
 const NEEDLE = 0.085; // the longest a needle is drawn, whatever the distance
-const DOT = 0.016; // every probe is the same size, so only colour carries meaning
-const INSIDE_HUE = 0.06; // pink end of the palette
-const OUTSIDE_HUE = 0.55; // blue end
+const DOT = 0.02; // contour probes are larger than the background samples
+const ACCENT = spectrum[6];
 // the dots are spheres, so they occupy depth either side of z = 0. Needles and
 // the outline sit above that, or they draw inside the very probes they belong to
 const Z_NEEDLE = 0.03;
@@ -123,19 +122,22 @@ window.addEventListener('resize', () => {
 
 const MAX_PROBES = MAX_COLUMNS * Math.ceil((MAX_COLUMNS * VIEW) / SPAN);
 
-// instanced spheres, per-probe vec4 = (x, y, palette hue, brightness)
+// instanced spheres, per-probe vec4 = (x, y, inside, contour)
 const dotData = new Float32Array(MAX_PROBES * 4);
 const dotBuffer = new g.GpuBuffer(d.array(d.vec4f), { data: dotData, usage: 'storage' });
 const instance = g.index(g.storage(dotBuffer), g.instanceIndex);
 
 const position = g.attribute('position', d.vec3f);
-const dotWorld = g.add(g.mul(position, g.f32(DOT)), g.vec3(instance.xy, g.f32(0)));
+const dotWorld = g.add(
+    g.mul(position, g.f32(DOT).mul(instance.w.mul(g.f32(0.7)).add(g.f32(0.3)))),
+    g.vec3(instance.xy, g.f32(0)),
+);
 const dotClip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(dotWorld, g.f32(1))));
 const dots = new g.Mesh(
     g.createSphereGeometry(1, 8, 6),
     new g.Material({
         vertex: dotClip,
-        fragment: g.vec4(palette(g.varying(instance.z, 'v_hue')).mul(g.varying(instance.w, 'v_level')), g.f32(1)),
+        fragment: g.vec4(g.mix(light, ink(ACCENT), g.varying(instance.z, 'v_inside')), g.f32(1)),
     }),
 );
 scene.add(dots);
@@ -146,14 +148,14 @@ const needlePoints = new Float32Array(MAX_PROBES * 2 * 3);
 const needleGeometry = new g.LineSegmentsGeometry(needlePoints, MAX_PROBES * 2);
 const needles = new g.LineSegments(
     needleGeometry,
-    new g.LineMaterial({ color: g.vec4f(1, 1, 1, 0.85), lineWidth: 2, transparent: true }),
+    new g.LineMaterial({ color: g.vec4(light, g.f32(0.85)), lineWidth: pixels(1.25), transparent: true }),
 );
 needles.visible = settings.needles;
 scene.add(needles);
 
 const outlinePoints = new Float32Array(VERTS * 3);
 const outlineGeometry = new g.LineGeometry(outlinePoints, true, VERTS);
-const outlineLine = new g.Line(outlineGeometry, new g.LineMaterial({ color: g.vec4f(1, 1, 1, 0.9), lineWidth: 3 }));
+const outlineLine = new g.Line(outlineGeometry, new g.LineMaterial({ color: g.vec4(light, g.f32(0.9)), lineWidth: pixels(1.5) }));
 // off by default: the zero contour already is the outline, and drawing it over
 // the top gives the answer away
 outlineLine.visible = settings.outline;
@@ -183,7 +185,7 @@ canvas.addEventListener('pointerleave', () => {
 
 let queryMs = 0;
 
-const panel = createPanel('polygon2 signed distance');
+const panel = createPanel('polygon2 signed distance', ACCENT);
 panel.add(settings, 'columns', { min: 24, max: MAX_COLUMNS, step: 1, label: 'Probes' }).onChange(layout);
 panel.add(settings, 'band', { min: 0.05, max: 0.8, step: 0.01, label: 'Contour band' });
 panel.add(settings, 'needles', { label: 'Needles' }).onChange(() => {
@@ -195,12 +197,15 @@ panel.add(settings, 'outline', { label: 'Show outline' }).onChange(() => {
 panel.monitor(() => probeCount, { label: 'probes' });
 panel.monitor(() => queryMs, { label: 'queries', unit: 'duration' });
 
+const readout = createInfo();
+readout.innerHTML = `<span style="color:${ACCENT}">●</span> Inside · ● Outside<br>Large dots mark distance contours`;
+
 /* render */
 
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -227,11 +232,10 @@ function frame(tms: number) {
 
         dotData[i * 4] = _frame_probe[0];
         dotData[i * 4 + 1] = _frame_probe[1];
-        // hue says which side of the outline the probe is on, and nothing else
-        dotData[i * 4 + 2] = inside ? INSIDE_HUE : OUTSIDE_HUE;
-        // brightest right after each band boundary and fading across the band,
-        // so what the eye picks out is a ring at every multiple of the band
-        dotData[i * 4 + 3] = 0.22 + 0.78 * (1 - ((magnitude / settings.band) % 1));
+        // the accent says which side of the outline the probe is on, and nothing else
+        dotData[i * 4 + 2] = inside ? 1 : 0;
+        // Larger probes mark each distance band without changing ink brightness.
+        dotData[i * 4 + 3] = (magnitude / settings.band) % 1 < 0.22 ? 1 : 0;
 
         if (!settings.needles) continue;
         polygon2.closestPoint(_frame_closest, polygon, VERTS, _frame_probe);

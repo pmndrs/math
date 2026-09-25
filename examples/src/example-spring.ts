@@ -2,13 +2,16 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import type { Vec2 } from 'math';
 import { type Spring, spring2 } from 'math/time';
-import { rainbowRGB, time } from './common/rainbow';
+import { createInfo } from './common/info';
+import { ink, light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, palette, spectrum } from './common/theme';
 
 // A springy tail that chases the pointer. The head springs toward the cursor and
 // each following bead springs toward the one ahead (math's spring2, under-
 // damped so it overshoots and settles). Move the pointer (or drag on touch) to
-// whip it around. Beads are instanced spheres, tapering and rainbow-coloured.
+// whip it around. Beads are instanced spheres, tapering along a fine line, with
+// the head in the accent.
 
 const N = 18;
 const SMOOTH_HEAD = 0.08; // approx seconds to catch up
@@ -16,6 +19,7 @@ const SMOOTH_LINK = 0.05;
 const DAMPING = 0.45; // < 1 => bouncy
 const R_HEAD = 0.14;
 const R_TAIL = 0.025;
+const ACCENT = spectrum[4];
 
 const chain: Spring<Vec2>[] = [];
 for (let i = 0; i < N; i++) chain.push(spring2.create([0, 0]));
@@ -91,30 +95,35 @@ const nrm = g.attribute('normal', d.vec3f);
 const world = g.add(g.mul(pos, inst.w), inst.xyz); // scale by radius, translate to bead
 const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(world, g.f32(1))));
 const vNormal = g.varying(g.normalize(nrm), 'v_n');
-const vWorld = g.varying(world, 'v_w');
-const lightDirection = g.vec3(0.4, 0.8, 0.6).normalize();
-const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
-const litFactor = g.Var('lit', g.f32(0.45).add(diffuse.mul(g.f32(0.6))));
-const material = new g.Material({ vertex: clip, fragment: g.vec4(rainbowRGB(vWorld, 2.5).mul(litFactor), g.f32(1)) });
+// only the head is as large as R_HEAD, so its radius picks it out for the accent
+const vHead = g.varying(g.step(g.f32(R_HEAD - 1e-4), inst.w), 'v_head');
+const material = new g.Material({
+    vertex: clip,
+    fragment: g.vec4(
+        g.mix(ink(palette.base), g.mix(light, ink(ACCENT), vHead), g.smoothstep(g.f32(0.35), g.f32(0.5), vNormal.z)),
+        g.f32(1),
+    ),
+});
 const beads = new g.Mesh(sphere, material);
 beads.count = N;
 scene.add(beads);
 
+// the chain itself, a fine line through every bead
+const chainPoints = new Float32Array(N * 3);
+const chainGeometry = new g.LineGeometry(chainPoints, false, N);
+scene.add(new g.Line(chainGeometry, new g.LineMaterial({ color: g.vec4(light, g.f32(1)), lineWidth: pixels(1) })));
+
 /* hint */
 
-const hint = document.createElement('div');
-hint.className = 'mc-info';
-hint.style.left = '16px';
-hint.style.bottom = '16px';
+const hint = createInfo();
 hint.textContent = 'move the pointer to lead the tail';
-document.body.appendChild(hint);
 
 /* render */
 
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -122,7 +131,6 @@ let last = -1;
 
 function frame(tms: number) {
     const t = tms / 1000;
-    time.value = t;
     if (last < 0) last = t;
     const dt = Math.min(t - last, 0.05);
     last = t;
@@ -143,8 +151,11 @@ function frame(tms: number) {
         beadData[i * 4 + 1] = chain[i].value[1];
         beadData[i * 4 + 2] = 0;
         beadData[i * 4 + 3] = radius(i);
+        chainPoints[i * 3] = chain[i].value[0];
+        chainPoints[i * 3 + 1] = chain[i].value[1];
     }
     beadBuffer.needsUpdate = true;
+    chainGeometry.update(chainPoints, false);
 
     scene.updateWorldMatrix();
     camera.updateViewMatrix();

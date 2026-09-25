@@ -4,15 +4,14 @@ import { mat4, quat, vec3 as v3 } from 'math';
 import { quickhull3 } from 'math/geometry';
 import { mulberry32 } from 'math/random';
 import { createPanel } from './common/dash';
-import { rainbowRGB, time } from './common/rainbow';
+import { grey, ink } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, spectrum } from './common/theme';
 
 // A point cloud and its convex hull (math's quickhull3), rendered with gpucat:
-// a translucent hull shell + instanced spheres, coloured by a flowing "brand
-// rainbow" (see common/rainbow) — a palette sampled by world position and
-// animated over time, so the bands anchor to the geometry as the camera orbits.
-// On-hull points glow rainbow; interior points stay grey. Pick a point set from
-// the dropdown (the Stanford bunny, primitives, or random).
+// a translucent shell and its vertices share a spatial cyan-to-purple gradient.
+// Interior points stay neutral so the source shape reads through the hull.
+// Pick a point set from the dropdown (the Stanford bunny, primitives, or random).
 
 /* point sets */
 
@@ -154,12 +153,17 @@ window.addEventListener('resize', () => {
 const sphereGeometry = g.createSphereGeometry(1, 12, 8);
 const HULL_MARKER_RADIUS = 0.03;
 const INNER_MARKER_RADIUS = 0.009;
-const HULL_OPACITY = 0.16;
+const ACCENT = spectrum[0];
 
 /* (re)build */
 
 let pointsMesh: g.Mesh | null = null;
 let hullMesh: g.Mesh | null = null;
+/** Spatial color gives the shell and its vertices the same depth cues. */
+function hullColor(position: g.Node<typeof d.vec3f>): g.Node<typeof d.vec3f> {
+    const phase = g.clamp(position.dot(g.vec3(0.35, 0.12, -0.2)).add(g.f32(0.5)), g.f32(0), g.f32(1));
+    return g.mix(ink(spectrum[6]), ink(ACCENT), phase);
+}
 
 function buildPoints(points: number[], hullSet: Set<number>): g.Mesh {
     const numPoints = points.length / 3;
@@ -188,22 +192,14 @@ function buildPoints(points: number[], hullSet: Set<number>): g.Mesh {
     const instanceHullFlag = g.attribute(instanceHull, d.f32, { stride: 4, offset: 0, instanced: true });
 
     const pos = g.attribute('position', d.vec3f);
-    const nrm = g.attribute('normal', d.vec3f);
     const world = g.mul(instanceTransform, g.vec4(pos, g.f32(1)));
     const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
-    const vNormal = g.varying(g.normalize(nrm), 'v_snormal');
-    const vWorld = g.varying(world.xyz, 'v_pworld');
     const vHull = g.varying(instanceHullFlag, 'v_ishull');
+    const vWorld = g.varying(world.xyz, 'v_pworld');
 
-    const lightDirection = g.vec3(0.6, 1.0, 0.8).normalize();
-    const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
-    const light = g.Var('light', g.f32(0.4).add(diffuse.mul(g.f32(0.7))));
-    // interior points stay grey; on-hull points glow with the flowing rainbow
-    const grey = g.vec3(0.32, 0.32, 0.35);
-    const base = g.Var('base', g.mix(grey, rainbowRGB(vWorld), vHull));
-    const lit = g.Var('lit', base.mul(light));
+    const base = g.Var('base', g.mix(grey(g.f32(0.45)), hullColor(vWorld), vHull));
 
-    const material = new g.Material({ vertex: clip, fragment: g.vec4(lit, g.f32(1)) });
+    const material = new g.Material({ vertex: clip, fragment: g.vec4(base, g.f32(1)) });
     const mesh = new g.Mesh(sphereGeometry, material);
     mesh.count = numPoints;
     return mesh;
@@ -218,10 +214,14 @@ function buildHull(points: number[], hullIndices: number[]): g.Mesh {
     const world = g.mul(g.modelWorldMatrix, g.vec4(pos, g.f32(1)));
     const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
     const vWorld = g.varying(world.xyz, 'v_hworld');
+    // Face shading separates adjacent planes without drawing every triangulation edge.
+    const normal = g.normalize(g.cross(g.dpdx(vWorld), g.dpdy(vWorld)));
+    const diffuse = normal.dot(g.vec3(0.6, 1, 0.8).normalize()).abs();
+    const color = hullColor(vWorld).mul(g.f32(0.55).add(diffuse.mul(g.f32(0.45))));
 
     const material = new g.Material({
         vertex: clip,
-        fragment: g.vec4(rainbowRGB(vWorld), g.f32(HULL_OPACITY)),
+        fragment: g.vec4(color, g.f32(0.24)),
         transparent: true,
         cullMode: 'back',
         depthWrite: false,
@@ -268,7 +268,7 @@ async function select(name: string) {
     rebuild(await VARIATIONS[name]());
 }
 
-const panel = createPanel('convex hull 3d');
+const panel = createPanel('convex hull 3d', ACCENT);
 panel.add(settings, 'variation', { options: Object.keys(VARIATIONS), label: 'Point set' }).onChange((v: string) => select(v));
 panel.button('↻ Regenerate', () => select(settings.variation));
 panel.monitor(() => stats.points, { label: 'points' });
@@ -280,12 +280,11 @@ camera.updateViewMatrix();
 
 /* render loop */
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
 function frame() {
-    time.value = performance.now() / 1000;
     controls.update();
     renderPipeline.render();
     requestAnimationFrame(frame);

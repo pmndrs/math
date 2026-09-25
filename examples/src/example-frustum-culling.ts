@@ -1,18 +1,20 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { deltaAngle, mat4, type Vec3, vec3 } from 'math';
-import { type Color, color, hsl } from 'math/color';
 import { mulberry32, random } from 'math/random';
 import { type Box3, box3, frustum, type Sphere } from 'math/shapes';
 import { createPanel } from './common/dash';
+import { createInfo } from './common/info';
+import { ink, isoline, light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, palette, rgb, spectrum } from './common/theme';
 
 // A map of agents patrolling a little city, each seeing through a camera of its
 // own. Every agent's six planes come from math's frustum, extracted from its own
 // projection and view matrices, and every building and orb on the map is tested
 // against every agent once a frame - frustum.intersectsBox3 and
-// intersectsSphere. Whatever an agent can see takes that agent's colour, so the
-// map is painted by who is looking at what, and anything unseen stays dark.
+// intersectsSphere. Accent fills mark visible objects, while faint neutral
+// outlines keep unseen objects available for comparison.
 //
 // The cones are drawn from frustum.corners, which recovers the eight corners by
 // intersecting the planes three at a time.
@@ -24,6 +26,7 @@ import { createRenderer } from './common/renderer';
 // right, which is the worst way for it to fail.
 
 const MAX_AGENTS = 16;
+const ACCENT = spectrum[0];
 const BLOCKS = 8; // city blocks per side, so BLOCKS + 1 streets and intersections
 const BLOCK = 4; // centre to centre of neighbouring streets
 const FIELD = BLOCKS * BLOCK;
@@ -118,14 +121,9 @@ type Agent = {
     along: number; // 0 at the last intersection, 1 at the next
     pace: number;
     facing: number;
-    color: Color;
 };
 
-const _agent_hsl = hsl.create();
-
-function createAgent(index: number): Agent {
-    // hue is 0 to 1 here, not degrees
-    hsl.set(_agent_hsl, index / MAX_AGENTS, 0.9, 0.62);
+function createAgent(): Agent {
     const dir = random.int(nextRandom, 0, 3);
     return {
         frustum: frustum.create(),
@@ -147,12 +145,11 @@ function createAgent(index: number): Agent {
         along: 0,
         pace: random.float(nextRandom, 0.8, 1.3),
         facing: Math.atan2(DIRS[dir][0], DIRS[dir][1]),
-        color: hsl.toColor(color.create(), _agent_hsl),
     };
 }
 
 const agents: Agent[] = [];
-for (let i = 0; i < MAX_AGENTS; i++) agents.push(createAgent(i));
+for (let i = 0; i < MAX_AGENTS; i++) agents.push(createAgent());
 
 /** Picks the next street at an intersection, favouring straight on and never doubling back. */
 function turn(agent: Agent): void {
@@ -251,8 +248,8 @@ const scene = new g.Scene();
 // high and angled, so the map reads flat but the buildings still have height
 const camera = new g.PerspectiveCamera(Math.PI / 5, window.innerWidth / window.innerHeight, 0.1, 200);
 camera.position[0] = 0;
-camera.position[1] = 27;
-camera.position[2] = 27;
+camera.position[1] = 36;
+camera.position[2] = 36;
 scene.add(camera);
 
 const controls = new g.OrbitControls(camera, canvas);
@@ -268,9 +265,9 @@ window.addEventListener('resize', () => {
 /* the city */
 
 // three per-instance vec4s: where the object sits, how big it is on each axis,
-// and how it is lit. Extent has to be a vector rather than one scale or a tower
+// and its outline colour. Extent must be a vector rather than one scale or a tower
 // would come out a cube
-function createField(geometry: g.Geometry, count: number) {
+function createField(geometry: g.Geometry, count: number, box: boolean) {
     const placement = new Float32Array(count * 4);
     const extent = new Float32Array(count * 4);
     const lighting = new Float32Array(count * 4);
@@ -280,31 +277,30 @@ function createField(geometry: g.Geometry, count: number) {
 
     const place = g.index(g.storage(placementBuffer), g.instanceIndex);
     const size = g.index(g.storage(extentBuffer), g.instanceIndex);
-    const light = g.index(g.storage(lightingBuffer), g.instanceIndex);
+    const shading = g.index(g.storage(lightingBuffer), g.instanceIndex);
     const position = g.attribute('position', d.vec3f);
     const normal = g.attribute('normal', d.vec3f);
     const world = g.add(g.mul(position, size.xyz), place.xyz);
     const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(world, g.f32(1))));
-    const vNormal = g.varying(g.normalize(normal), 'v_n');
-    const vLevel = g.varying(light.x, 'v_level');
-    const vTint = g.varying(light.yzw, 'v_tint');
-    const diffuse = g.Var('diffuse', vNormal.dot(g.vec3(0.35, 0.85, 0.4).normalize()).max(g.f32(0)));
-    const lit = g.Var(
-        'lit',
-        g
-            .f32(0.4)
-            .add(diffuse.mul(g.f32(0.65)))
-            .mul(vLevel),
-    );
-    const mesh = new g.Mesh(geometry, new g.Material({ vertex: clip, fragment: g.vec4(vTint.mul(lit), g.f32(1)) }));
+    const vNormal = g.varying(g.mul(g.cameraViewMatrix, g.vec4(normal, g.f32(0))).xyz, 'v_n');
+    const vSeen = g.varying(shading.x, 'v_seen').setInterpolation('flat');
+    const vTint = g.varying(shading.yzw, 'v_tint');
+    const uv = g.varying(g.attribute('uv', d.vec2f), 'v_uv');
+    const edge = box
+        ? g.max(isoline(uv.x, 1.25), isoline(uv.y, 1.25))
+        : g.f32(1).sub(g.smoothstep(g.f32(0.35), g.f32(0.55), vNormal.z.abs()));
+    const unseenColor = g.mix(ink(palette.base), light, edge.mul(g.f32(0.28)));
+    const seenColor = g.mix(vTint, ink(palette.base), edge.mul(g.f32(0.65)));
+    const color = g.mix(unseenColor, seenColor, vSeen);
+    const mesh = new g.Mesh(geometry, new g.Material({ vertex: clip, fragment: g.vec4(color, g.f32(1)) }));
     mesh.count = count;
     scene.add(mesh);
 
     return { placement, extent, lighting, placementBuffer, extentBuffer, lightingBuffer };
 }
 
-const cityField = createField(g.createBoxGeometry(1, 1, 1), buildings.length);
-const orbField = createField(g.createSphereGeometry(1, 10, 8), orbs.length);
+const cityField = createField(g.createBoxGeometry(1, 1, 1), buildings.length, true);
+const orbField = createField(g.createSphereGeometry(1, 10, 8), orbs.length, false);
 
 const _center = vec3.create();
 const _size = vec3.create();
@@ -336,17 +332,14 @@ orbField.extentBuffer.needsUpdate = true;
 // the twelve edges of the eight corners: near ring, far ring, and the struts
 const EDGES = [0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7];
 
-const cones = agents.map((agent) => {
+const coneMaterial = new g.LineMaterial({ color: g.vec4(light, g.f32(1)), lineWidth: pixels(1.75), transparent: true });
+coneMaterial.depthTest = false;
+coneMaterial.depthWrite = false;
+
+const cones = agents.map(() => {
     const points = new Float32Array(EDGES.length * 3);
     const geometry = new g.LineSegmentsGeometry(points, EDGES.length);
-    const line = new g.LineSegments(
-        geometry,
-        new g.LineMaterial({
-            color: g.vec4f(agent.color[0], agent.color[1], agent.color[2], 0.95),
-            lineWidth: 4,
-            transparent: true,
-        }),
-    );
+    const line = new g.LineSegments(geometry, coneMaterial);
     scene.add(line);
     return { points, geometry, line };
 });
@@ -356,7 +349,7 @@ const cones = agents.map((agent) => {
 let lookMs = 0;
 let seen = 0;
 
-const panel = createPanel('frustum culling');
+const panel = createPanel('frustum culling', ACCENT);
 panel.add(settings, 'agents', { min: 1, max: MAX_AGENTS, step: 1, label: 'Agents' });
 panel.add(settings, 'fov', { min: 15, max: 110, step: 1, label: 'Field of view' });
 panel.add(settings, 'range', { min: 1.5, max: 12, step: 0.1, label: 'Sight range' });
@@ -366,25 +359,31 @@ panel.monitor(() => `${seen} / ${seenBy.length}`, { label: 'seen' });
 panel.monitor(() => settings.agents * seenBy.length, { label: 'tests' });
 panel.monitor(() => lookMs, { label: 'culling', unit: 'duration' });
 
+const readout = createInfo();
+readout.innerHTML =
+    `<span style="color:${ACCENT}">■</span> Seen by an agent · <span style="opacity:0.4">□ Unseen</span>` + '<br>━ Camera bounds';
+
 /* render */
 
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
+
+const seenTint = rgb(ACCENT);
+const unseen = rgb(palette.light);
 
 function paint(field: { lighting: Float32Array; lightingBuffer: g.GpuBuffer }, offset: number, count: number): void {
     for (let i = 0; i < count; i++) {
         const agent = seenBy[offset + i];
-        const tint = agent >= 0 ? agents[agent].color : null;
-        // unseen is dimmed rather than hidden, so you can see what the planes
-        // rejected and how close it came
-        field.lighting[i * 4] = tint ? 1.15 : 0.16;
-        field.lighting[i * 4 + 1] = tint ? tint[0] : 0.42;
-        field.lighting[i * 4 + 2] = tint ? tint[1] : 0.46;
-        field.lighting[i * 4 + 3] = tint ? tint[2] : 0.56;
+        const tint = agent >= 0 ? seenTint : null;
+        // Neutral outlines keep rejected objects visible for comparison.
+        field.lighting[i * 4] = tint ? 1 : 0;
+        field.lighting[i * 4 + 1] = tint ? tint[0] : unseen[0];
+        field.lighting[i * 4 + 2] = tint ? tint[1] : unseen[1];
+        field.lighting[i * 4 + 3] = tint ? tint[2] : unseen[2];
     }
     field.lightingBuffer.needsUpdate = true;
 }

@@ -2,17 +2,20 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { type Euler, euler, type Quat, quat } from 'math';
 import { mulberry32 } from 'math/random';
+import { createInfo } from './common/info';
+import { ink, light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, spectrum } from './common/theme';
 
-// One orientation, two ways to interpolate it between random keyframes. The solid
-// colour-cube uses math's quat.slerp (constant-speed shortest arc). The
-// translucent white ghost around it lerps euler angles instead
-// (euler.fromQuat -> lerp -> quat.fromEuler) — the naive approach. They coincide
+// One orientation, two ways to interpolate it between random keyframes. The
+// accent outline uses quat.slerp. The neutral wireframe lerps euler angles
+// (euler.fromQuat -> lerp -> quat.fromEuler). They coincide
 // at every keyframe, but between them the ghost twists off-axis: that gap is the
 // error, and the readout reports it as the angle between the two orientations.
 
 const KEYFRAMES = 5;
 const SEG_DURATION = 2.2; // seconds per keyframe transition
+const ACCENT = spectrum[4];
 
 // random keyframe orientations (seeded)
 const rng = mulberry32.create(3);
@@ -59,49 +62,68 @@ window.addEventListener('resize', () => {
 
 /* boxes */
 
-// solid colour-cube (slerp): local position -> rgb, lit for depth
+// A flat translucent fill makes the SLERP outline easier to follow.
 const boxGeometry = g.createBoxGeometry(1, 1, 1);
 const pos = g.attribute('position', d.vec3f);
-const nrm = g.attribute('normal', d.vec3f);
 const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.mul(g.modelWorldMatrix, g.vec4(pos, g.f32(1)))));
-const vNormal = g.varying(g.normalize(g.mul(g.modelNormalMatrix, nrm)), 'v_n');
-const vColor = g.varying(g.add(pos, g.vec3(0.5, 0.5, 0.5)), 'v_c'); // [-0.5,0.5] -> [0,1]
-const lightDirection = g.vec3(0.45, 0.8, 0.6).normalize();
-const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
-const light = g.Var('light', g.f32(0.4).add(diffuse.mul(g.f32(0.7))));
-const boxMaterial = new g.Material({ vertex: clip, fragment: g.vec4(vColor.mul(light), g.f32(1)) });
+const boxMaterial = new g.Material({
+    vertex: clip,
+    fragment: g.vec4(ink(ACCENT), g.f32(0.08)),
+    transparent: true,
+    depthWrite: false,
+});
 
 const slerpBox = new g.Mesh(boxGeometry, boxMaterial);
 scene.add(slerpBox);
 
-// translucent white ghost (euler lerp): a slightly larger shell around the cube
-const ghostGeometry = g.createBoxGeometry(1.22, 1.22, 1.22);
-const ghostPos = g.attribute('position', d.vec3f);
-const ghostClip = g.mul(
-    g.cameraProjectionMatrix,
-    g.mul(g.cameraViewMatrix, g.mul(g.modelWorldMatrix, g.vec4(ghostPos, g.f32(1)))),
+function boxEdges(halfExtent: number) {
+    const points: number[] = [];
+    for (const a of [-halfExtent, halfExtent]) {
+        for (const b of [-halfExtent, halfExtent]) {
+            points.push(
+                -halfExtent,
+                a,
+                b,
+                halfExtent,
+                a,
+                b,
+                a,
+                -halfExtent,
+                b,
+                a,
+                halfExtent,
+                b,
+                a,
+                b,
+                -halfExtent,
+                a,
+                b,
+                halfExtent,
+            );
+        }
+    }
+    return new g.LineSegmentsGeometry(new Float32Array(points), points.length / 3);
+}
+
+const slerpEdges = new g.LineSegments(
+    boxEdges(0.5),
+    new g.LineMaterial({ color: g.vec4(ink(ACCENT), g.f32(1)), lineWidth: pixels(2) }),
 );
-const ghostMaterial = new g.Material({
-    vertex: ghostClip,
-    fragment: g.vec4f(0.95, 0.96, 1, 0.22),
-    transparent: true,
-    cullMode: 'back',
-    depthWrite: false,
-    blend: {
-        color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha', operation: 'add' },
-        alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' },
-    },
-});
-const eulerBox = new g.Mesh(ghostGeometry, ghostMaterial);
+scene.add(slerpEdges);
+
+// The Euler outline is slightly larger so both paths remain visible at keyframes.
+const eulerBox = new g.LineSegments(
+    boxEdges(0.61),
+    new g.LineMaterial({ color: g.vec4(light, g.f32(1)), lineWidth: pixels(1.5) }),
+);
 scene.add(eulerBox);
 
 /* readout */
 
-const readout = document.createElement('div');
-readout.className = 'mc-info';
-readout.style.left = '16px';
-readout.style.bottom = '16px';
-document.body.appendChild(readout);
+const readout = createInfo();
+readout.innerHTML =
+    `<span style="color:${ACCENT}">━</span> Quaternion SLERP` + '<br>━ Euler interpolation' + '<br><span class="mc-dim"></span>';
+const errorReadout = readout.lastElementChild as HTMLSpanElement;
 
 /* render */
 
@@ -112,7 +134,7 @@ const eL: Euler = [0, 0, 0, 'xyz'];
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -125,6 +147,7 @@ function frame(tms: number) {
 
     // math: slerp — constant angular velocity along the shortest arc
     quat.slerp(slerpBox.quaternion, keyframes[k], keyframes[kn], local);
+    quat.copy(slerpEdges.quaternion, slerpBox.quaternion);
 
     // naive: interpolate euler angles instead
     euler.fromQuat(eA, keyframes[k], 'xyz');
@@ -139,8 +162,7 @@ function frame(tms: number) {
     const qb = eulerBox.quaternion;
     const dot = Math.min(1, Math.abs(qa[0] * qb[0] + qa[1] * qb[1] + qa[2] * qb[2] + qa[3] * qb[3]));
     const errorDeg = (2 * Math.acos(dot) * 180) / Math.PI;
-    readout.textContent = `slerp (solid) vs euler-lerp (ghost)\nerror: ${errorDeg.toFixed(1)}°`;
-    readout.style.whiteSpace = 'pre';
+    errorReadout.textContent = `Orientation difference: ${errorDeg.toFixed(1)}°`;
 
     scene.updateWorldMatrix();
     camera.updateViewMatrix();

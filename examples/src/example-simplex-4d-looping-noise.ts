@@ -2,8 +2,9 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { simplex4d } from 'math/noise';
 import { createPanel } from './common/dash';
-import { palette, time } from './common/rainbow';
+import { grey, ink, isoline } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, spectrum } from './common/theme';
 
 // A grid of tiles whose heights come from math's simplex4d, animated so it loops
 // seamlessly. The trick is 4D: the two extra axes trace a circle of radius
@@ -12,6 +13,7 @@ import { createRenderer } from './common/renderer';
 // by just sliding a time offset can never close the loop like this.)
 
 const TAU = Math.PI * 2;
+const ACCENT = spectrum[1];
 const GRID = 48;
 const SPACING = 0.24;
 const TILE = 0.2;
@@ -30,8 +32,8 @@ const scene = new g.Scene();
 
 const camera = new g.PerspectiveCamera(Math.PI / 4, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.position[0] = 2;
-camera.position[1] = 5.5;
-camera.position[2] = 9.5;
+camera.position[1] = 7.5;
+camera.position[2] = 13;
 scene.add(camera);
 
 const controls = new g.OrbitControls(camera, canvas);
@@ -89,16 +91,17 @@ const nrm = g.attribute('normal', d.vec3f);
 const world0 = g.mul(instanceTransform, g.vec4(pos, g.f32(1)));
 const worldPos = g.Var('world', g.add(world0.xyz, g.vec3(0, 1, 0).mul(instanceHeight.mul(amp))));
 const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(worldPos, g.f32(1))));
-const vNormal = g.varying(g.normalize(nrm), 'v_n');
 const vHeight = g.varying(instanceHeight, 'v_h');
+const vTop = g.varying(nrm.y.max(g.f32(0)), 'v_top');
+const vSide = g.varying(nrm.z.abs(), 'v_side');
 
-const lightDirection = g.vec3(0.4, 1.0, 0.6).normalize();
-const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
-const shade = g.Var('shade', g.f32(0.42).add(diffuse.mul(g.f32(0.62))));
-// colour by height: elevation walks through the brand palette, so valleys and
-// peaks read as distinct rainbow bands (a topographic look)
-const base = g.Var('base', palette(g.add(vHeight.mul(g.f32(0.9)), g.f32(0.5))));
-const material = new g.Material({ vertex: clip, fragment: g.vec4(base.mul(shade), g.f32(1)) });
+// Soft face tones and subtle edges keep each tile readable without harsh contrast.
+const uv = g.varying(g.attribute('uv', d.vec2f), 'v_uv');
+const edges = g.max(isoline(uv.x, 0.75), isoline(uv.y, 0.75));
+const tinted = g.step(g.f32(0.65), vHeight).mul(vTop);
+const face = grey(g.mix(g.f32(0.38).add(vSide.mul(g.f32(0.14))), g.f32(0.8), vTop));
+const color = g.mix(g.mix(face, ink(ACCENT), tinted), grey(g.f32(0.25)), edges.mul(g.f32(0.4)));
+const material = new g.Material({ vertex: clip, fragment: g.vec4(color, g.f32(1)) });
 
 const tiles = new g.Mesh(tileGeometry, material);
 tiles.count = COUNT;
@@ -113,7 +116,7 @@ let phase = 0; // loop position in [0, 1)
 
 /* ui */
 
-const panel = createPanel('simplex 4d looping noise');
+const panel = createPanel('simplex 4d looping noise', ACCENT);
 panel.add(settings, 'loop', { min: 2, max: 20, step: 0.1, label: 'Loop (s)' });
 panel.add(settings, 'height', { min: 0, max: 3, step: 0.01, label: 'Height' });
 panel.add(settings, 'detail', { min: 0.15, max: 1, step: 0.01, label: 'Detail' });
@@ -122,7 +125,7 @@ panel.monitor(() => phase, { label: 'loop', format: (v) => `${Math.round(v * 100
 
 /* render loop */
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -132,7 +135,6 @@ function frame() {
     const now = performance.now();
     const dt = Math.min(0.05, (now - lastT) / 1000);
     lastT = now;
-    time.value = now / 1000;
     amp.value = settings.height;
 
     // advance the loop phase and walk the two extra axes around a circle, so the

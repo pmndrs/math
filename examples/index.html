@@ -4,28 +4,28 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#191712" />
     <title>math examples</title>
+    <link rel="stylesheet" href="./src/theme.css" />
     <style>
         /* mobile-first base styles */
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                sans-serif;
+            font-family: var(--mc-sans);
             background: var(--color-background);
             height: 100vh;
             display: flex;
             overflow: hidden;
 
             /* vars */
-            --color-background: #131518;
-            --color-card: #1c1f25;
-            --color-border: rgba(255, 255, 255, 0.1);
-            --color-viewer: #000;
-            --color-ink: #e8eaed;
-            --color-glass: rgba(22, 25, 31, 0.72);
-            --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas,
-                monospace;
+            --color-background: var(--mc-page);
+            --color-card: var(--mc-base);
+            --color-border: rgba(234, 229, 218, 0.08);
+            --color-viewer: var(--mc-base);
+            --color-ink: var(--mc-ink);
+            --color-glass: rgba(20, 18, 14, 0.72);
+            --mono: var(--mc-mono);
         }
 
         /* sidebar - mobile first (hidden by default) */
@@ -42,7 +42,7 @@
             transform: translateX(-100%);
             transition: transform 0.3s ease;
             z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 2px 0 10px rgba(20, 18, 14, 0.3);
             /* hidden scrollbar */
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -69,11 +69,29 @@
         }
 
         .sidebar-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             margin: 0;
+            font-family: var(--mc-sans);
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            line-height: 1;
+        }
+
+        .sidebar-header h1 svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .sidebar-header p {
+            margin: 8px 0 0;
             font-family: var(--mono);
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 0.01em;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            color: var(--mc-dim);
         }
 
         .search-container {
@@ -83,10 +101,10 @@
 
         .search-input {
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(234, 229, 218, 0.12);
             border-radius: 0;
             padding: 9px 12px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(234, 229, 218, 0.04);
             color: var(--color-ink);
             font-size: 11px;
             font-family: var(--mono);
@@ -96,13 +114,13 @@
         }
 
         .search-input::placeholder {
-            color: #7d848c;
+            color: #6f6a5e;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.28);
-            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(234, 229, 218, 0.28);
+            background: rgba(234, 229, 218, 0.07);
         }
 
         .examples-list {
@@ -125,10 +143,10 @@
             font-weight: 500;
             letter-spacing: 0.04em;
             text-transform: lowercase;
-            color: #8a95a1;
+            color: var(--mc-dim);
             margin: 0 0 10px 0;
             padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid var(--color-border);
             list-style: none;
         }
 
@@ -142,22 +160,22 @@
 
         .example-item {
             display: block;
-            color: #cfd8dc;
+            color: var(--color-ink);
             background-color: var(--color-card);
             text-decoration: none;
             cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(234, 229, 218, 0.12);
             border-radius: 0;
             overflow: hidden;
             transition: border-color 0.16s ease;
         }
 
         .example-item:hover {
-            border-color: rgba(255, 255, 255, 0.5);
+            border-color: rgba(234, 229, 218, 0.5);
         }
 
         .example-item.active {
-            border-color: #fff;
+            border-color: var(--mc-accent);
         }
 
         .example-preview {
@@ -166,7 +184,7 @@
             overflow: hidden;
             /* placeholder gradient shown until (or if) the screenshot loads */
             background: radial-gradient(120% 120% at 30% 20%,
-                    #313c44 0%, #262d34 55%, #1a2025 100%);
+                    #2a2721 0%, #1d1b16 55%, #14120e 100%);
         }
 
         .example-screenshot {
@@ -188,38 +206,12 @@
             pointer-events: none;
         }
 
-        /* animated wordmark rainbow (from makecat.io) */
-        .rainbow-text {
-            background-image: linear-gradient(90deg, #ff3ea5, #ffd23f, #3fa7ff, #8a2be2, #ff3ea5);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: wordmark-rainbow-slide 2s linear infinite;
-        }
-
-        @keyframes wordmark-rainbow-slide {
-            from {
-                background-position: 0% center;
-            }
-
-            to {
-                background-position: -200% center;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .rainbow-text {
-                animation: none;
-            }
-        }
-
         .example-title {
             display: inline-block;
             margin: 0;
             padding: 4px 9px;
-            background: #fff;
-            color: #111;
+            background: var(--mc-ink);
+            color: var(--mc-base);
             font-family: var(--mono);
             font-weight: 500;
             font-size: 13px;
@@ -290,11 +282,11 @@
 
         .viewer-title h2 {
             margin: 0;
-            font-family: var(--mono);
-            font-size: 17px;
-            font-weight: 500;
-            letter-spacing: 0.02em;
-            text-transform: lowercase;
+            font-family: var(--mc-sans);
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            color: var(--color-ink);
         }
 
         /* source / open / fullscreen buttons, bottom-right of the demo */
@@ -315,9 +307,9 @@
             background: var(--color-glass);
             -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(234, 229, 218, 0.14);
             border-radius: 0;
-            color: #e8eaed;
+            color: #c9c3b5;
             font-family: var(--mono);
             font-size: 11px;
             font-weight: 500;
@@ -329,8 +321,9 @@
         }
 
         .viewer-btn:hover {
-            background: rgba(35, 39, 47, 0.92);
-            border-color: rgba(255, 255, 255, 0.28);
+            background: rgba(34, 31, 25, 0.92);
+            border-color: rgba(234, 229, 218, 0.28);
+            color: var(--color-ink);
         }
 
         .viewer-btn svg {
@@ -345,7 +338,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(20, 18, 14, 0.6);
             z-index: 999;
         }
 
@@ -370,7 +363,7 @@
 
             .viewer {
                 border-radius: 0;
-                box-shadow: 0 12px 34px rgba(0, 0, 0, 0.16);
+                box-shadow: 0 0 0 1px rgba(234, 229, 218, 0.08);
             }
 
             .viewer-title {
@@ -402,7 +395,12 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-top">
             <div class="sidebar-header">
-                <h1 class="rainbow-text">math</h1>
+                <h1>
+                    <!-- the pmndrs mark, github.com/pmndrs/branding (MIT) -->
+                    <svg viewBox="0 0 800 800" aria-hidden="true"><path d="M560 0H280V240H560V520H800V0Z"/><rect y="280" width="240" height="240"/><rect x="280" y="280" width="240" height="240"/><rect x="280" y="560" width="240" height="240"/></svg>
+                    math
+                </h1>
+                <p>npm i math</p>
             </div>
             <div class="search-container">
                 <input type="text" id="search-input" class="search-input" placeholder="search examples..." />
@@ -419,7 +417,7 @@
         <div class="viewer" id="viewer">
             <iframe class="example-frame" id="example-frame"></iframe>
             <div class="viewer-title">
-                <h2 id="viewer-title-text" class="rainbow-text"></h2>
+                <h2 id="viewer-title-text"></h2>
             </div>
             <div class="viewer-toolbar">
                 <a class="viewer-btn" id="btn-source" target="_blank" rel="noopener" title="View source on GitHub">

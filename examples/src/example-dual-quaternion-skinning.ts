@@ -2,7 +2,10 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { mat4, quat, quat2, type Vec3, vec3 } from 'math';
 import { createPanel } from './common/dash';
+import { createInfo } from './common/info';
+import { ink, light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, palette, spectrum } from './common/theme';
 
 // The candy wrapper, side by side. Two identical tubes are bound to the same
 // two bones and twisted by the same angle, and the only difference is how the
@@ -29,7 +32,6 @@ const SEGMENTS = 28; // around it
 const RADIUS = 0.34;
 const HEIGHT = 2.6;
 const SPLIT = 1.05; // how far each tube sits from the middle
-const BANDS = 7; // stripes around the tube, so the twist is legible
 
 type Settings = { twist: number; auto: boolean; rate: number; falloff: number };
 
@@ -37,14 +39,9 @@ const settings: Settings = { twist: 180, auto: true, rate: 0.7, falloff: 0.5 };
 
 /* the tube */
 
-/** A closed tube along y, with enough rows that the weights vary smoothly down it. */
+/** A tube along y, with enough rows that the weights vary smoothly down it. */
 function createTube() {
     const positions: number[] = [];
-    const normals: number[] = [];
-    // where a vertex started around the tube. A bare cylinder is rotationally
-    // symmetric, so without stripes to carry around with it a twist is
-    // invisible and only the collapse shows
-    const stripes: number[] = [];
     const indices: number[] = [];
 
     for (let r = 0; r < RINGS; r++) {
@@ -54,8 +51,6 @@ function createTube() {
             const nx = Math.cos(angle);
             const nz = Math.sin(angle);
             positions.push(nx * RADIUS, y, nz * RADIUS);
-            normals.push(nx, 0, nz);
-            stripes.push(s / SEGMENTS);
         }
     }
 
@@ -71,8 +66,6 @@ function createTube() {
 
     return {
         positions: new Float32Array(positions),
-        normals: new Float32Array(normals),
-        stripes: new Float32Array(stripes),
         indices: new Uint32Array(indices),
     };
 }
@@ -124,10 +117,10 @@ function setBone(angle: number): void {
 }
 
 const _skin_position = vec3.create();
-const _skin_normal = vec3.create();
+const _skin_rotated = vec3.create();
 
 /** Linear blend skinning: average the matrices, then transform. */
-function skinWithMatrices(positions: Float32Array, normals: Float32Array): void {
+function skinWithMatrices(positions: Float32Array): void {
     for (let i = 0; i < VERTICES; i++) {
         const w = weights[i];
         // a weighted sum of two rotation matrices, which is not itself a
@@ -137,19 +130,12 @@ function skinWithMatrices(positions: Float32Array, normals: Float32Array): void 
 
         vec3.set(_skin_position, rest.positions[i * 3], rest.positions[i * 3 + 1], rest.positions[i * 3 + 2]);
         vec3.transformMat4(_skin_position, _skin_position, blendedMatrix);
-        vec3.set(_skin_normal, rest.normals[i * 3], rest.normals[i * 3 + 1], rest.normals[i * 3 + 2]);
-        // the bones carry no translation, so the same transform serves for
-        // directions. Normalising afterwards hides none of the collapse, since
-        // that shows in the silhouette rather than the shading
-        vec3.transformMat4(_skin_normal, _skin_normal, blendedMatrix);
-        vec3.normalize(_skin_normal, _skin_normal);
-
-        write(positions, normals, i, _skin_position, _skin_normal);
+        vec3.toBuffer(positions, _skin_position, i * 3);
     }
 }
 
 /** Dual quaternion linear blending: lerp the dual quats, normalise, then transform. */
-function skinWithDualQuaternions(positions: Float32Array, normals: Float32Array): void {
+function skinWithDualQuaternions(positions: Float32Array): void {
     // a dual quaternion and its negation are the same transform, so blending
     // toward the wrong sign takes the long way round. One dot decides it, and
     // the fix is to negate the operand - negating the weight instead is a
@@ -166,24 +152,12 @@ function skinWithDualQuaternions(positions: Float32Array, normals: Float32Array)
         quat2.getReal(blendedReal, blendedDual);
         quat2.getTranslation(_skin_position, blendedDual);
 
-        vec3.set(_skin_normal, rest.positions[i * 3], rest.positions[i * 3 + 1], rest.positions[i * 3 + 2]);
-        vec3.transformQuat(_skin_normal, _skin_normal, blendedReal);
-        vec3.add(_skin_position, _skin_normal, _skin_position);
+        vec3.set(_skin_rotated, rest.positions[i * 3], rest.positions[i * 3 + 1], rest.positions[i * 3 + 2]);
+        vec3.transformQuat(_skin_rotated, _skin_rotated, blendedReal);
+        vec3.add(_skin_position, _skin_rotated, _skin_position);
 
-        vec3.set(_skin_normal, rest.normals[i * 3], rest.normals[i * 3 + 1], rest.normals[i * 3 + 2]);
-        vec3.transformQuat(_skin_normal, _skin_normal, blendedReal);
-
-        write(positions, normals, i, _skin_position, _skin_normal);
+        vec3.toBuffer(positions, _skin_position, i * 3);
     }
-}
-
-function write(positions: Float32Array, normals: Float32Array, i: number, p: Vec3, n: Vec3): void {
-    positions[i * 3] = p[0];
-    positions[i * 3 + 1] = p[1];
-    positions[i * 3 + 2] = p[2];
-    normals[i * 3] = n[0];
-    normals[i * 3 + 1] = n[1];
-    normals[i * 3 + 2] = n[2];
 }
 
 /* renderer */
@@ -215,55 +189,86 @@ window.addEventListener('resize', () => {
 
 /* the two tubes */
 
-function createTubeMesh(tint: [number, number, number], x: number) {
-    const positions = new Float32Array(rest.positions);
-    const normals = new Float32Array(rest.normals);
-    const positionBuffer = g.createVertexBuffer(d.vec3f, positions);
-    const normalBuffer = g.createVertexBuffer(d.vec3f, normals);
+// Sample the surface grid without drawing the triangulation diagonals.
+const edgeIndices: number[] = [];
+for (let r = 0; r < RINGS; r++) {
+    for (let s = 0; s < SEGMENTS; s++) {
+        if (r % 6 === 0 || r === RINGS - 1) {
+            edgeIndices.push(r * SEGMENTS + s, r * SEGMENTS + ((s + 1) % SEGMENTS));
+        }
+        if (r < RINGS - 1 && s % 2 === 0) {
+            edgeIndices.push(r * SEGMENTS + s, (r + 1) * SEGMENTS + s);
+        }
+    }
+}
 
+function createTubeMesh(x: number) {
+    const positions = new Float32Array(rest.positions);
+    const positionBuffer = g.createVertexBuffer(d.vec3f, positions);
     const geometry = new g.Geometry();
     geometry.setBuffer('position', positionBuffer);
-    geometry.setBuffer('normal', normalBuffer);
-    // the stripe rides along with its vertex and is never rewritten, so the
-    // bands spiral exactly as far as the skinning carried them
-    geometry.setBuffer('stripe', g.createVertexBuffer(d.f32, rest.stripes));
     geometry.setIndex(g.createIndexBuffer(rest.indices));
 
     const localPosition = g.attribute('position', d.vec3f);
-    const localNormal = g.attribute('normal', d.vec3f);
     const world = g.mul(g.modelWorldMatrix, g.vec4(localPosition, g.f32(1)));
     const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
-    const vNormal = g.varying(g.normalize(localNormal), 'v_n');
-    const vStripe = g.varying(g.attribute('stripe', d.f32), 'v_stripe');
-    const diffuse = g.Var('diffuse', vNormal.dot(g.vec3(0.4, 0.75, 0.55).normalize()).abs());
-    const band = g.Var('band', g.step(g.f32(0.5), g.fract(g.mul(vStripe, g.f32(BANDS)))));
-    const lit = g.Var(
-        'lit',
-        g
-            .f32(0.32)
-            .add(diffuse.mul(g.f32(0.72)))
-            .mul(g.f32(0.45).add(band.mul(g.f32(0.55)))),
-    );
+    // The unlit surface hides rear lines, keeping the visible grid uncluttered.
     const mesh = new g.Mesh(
         geometry,
         new g.Material({
             vertex: clip,
-            fragment: g.vec4(g.vec3(tint[0], tint[1], tint[2]).mul(lit), g.f32(1)),
+            fragment: g.vec4(ink(palette.base), g.f32(1)),
             cullMode: 'none',
+            depthBias: 1,
+            depthBiasSlopeScale: 1,
         }),
     );
     mesh.position[0] = x;
     scene.add(mesh);
 
-    return { positions, normals, positionBuffer, normalBuffer };
+    const linePositions = new Float32Array(edgeIndices.length * 3);
+    const lineGeometry = new g.LineSegmentsGeometry(linePositions, edgeIndices.length);
+    const lines = new g.LineSegments(
+        lineGeometry,
+        new g.LineMaterial({ color: g.vec4(light, g.f32(1)), lineWidth: pixels(1.25) }),
+    );
+    lines.position[0] = x;
+    scene.add(lines);
+
+    return { positions, positionBuffer, linePositions, lineGeometry };
 }
 
-const matrixTube = createTubeMesh([0.35, 0.62, 1], -SPLIT);
-const dualTube = createTubeMesh([1, 0.3, 0.62], SPLIT);
+const matrixTube = createTubeMesh(-SPLIT);
+const dualTube = createTubeMesh(SPLIT);
+
+const ringPositions = new Float32Array(SEGMENTS * 12);
+const ringGeometry = new g.LineSegmentsGeometry(ringPositions, SEGMENTS * 4);
+const ring = new g.LineSegments(
+    ringGeometry,
+    new g.LineMaterial({ color: g.vec4(ink(spectrum[5]), g.f32(1)), lineWidth: pixels(2) }),
+);
+scene.add(ring);
+
+function updateTube(tube: ReturnType<typeof createTubeMesh>): void {
+    tube.positionBuffer.needsUpdate = true;
+    for (let i = 0; i < edgeIndices.length; i++) {
+        const source = edgeIndices[i] * 3;
+        tube.linePositions[i * 3] = tube.positions[source];
+        tube.linePositions[i * 3 + 1] = tube.positions[source + 1];
+        tube.linePositions[i * 3 + 2] = tube.positions[source + 2];
+    }
+    tube.lineGeometry.update(tube.linePositions);
+}
+
+const readout = createInfo();
+readout.innerHTML =
+    'Same twist, two blending methods' +
+    '<br>Left · Linear blend / pinches at the middle' +
+    '<br>Right · Dual quaternion / preserves volume';
 
 /* panel */
 
-const panel = createPanel('dual quaternion skinning');
+const panel = createPanel('dual quaternion skinning', palette.light);
 panel.add(settings, 'twist', { min: -360, max: 360, step: 1, label: 'Twist' });
 panel.add(settings, 'auto', { label: 'Animate' });
 panel.add(settings, 'rate', { min: 0.05, max: 3, step: 0.05, label: 'Rate' });
@@ -279,7 +284,7 @@ panel.monitor(() => VERTICES * 2, { label: 'vertices skinned' });
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -306,12 +311,25 @@ function frame(tms: number) {
     }
 
     setBone((settings.twist * Math.PI) / 180);
-    skinWithMatrices(matrixTube.positions, matrixTube.normals);
-    skinWithDualQuaternions(dualTube.positions, dualTube.normals);
-    matrixTube.positionBuffer.needsUpdate = true;
-    matrixTube.normalBuffer.needsUpdate = true;
-    dualTube.positionBuffer.needsUpdate = true;
-    dualTube.normalBuffer.needsUpdate = true;
+    skinWithMatrices(matrixTube.positions);
+    skinWithDualQuaternions(dualTube.positions);
+    updateTube(matrixTube);
+    updateTube(dualTube);
+    // Matching rings show how each blend changes the same cross section.
+    for (let tube = 0; tube < 2; tube++) {
+        const positions = tube === 0 ? matrixTube.positions : dualTube.positions;
+        const offset = tube === 0 ? -SPLIT : SPLIT;
+        for (let s = 0; s < SEGMENTS; s++) {
+            for (let end = 0; end < 2; end++) {
+                const source = (24 * SEGMENTS + ((s + end) % SEGMENTS)) * 3;
+                const target = (tube * SEGMENTS + s) * 6 + end * 3;
+                ringPositions[target] = positions[source] * 1.002 + offset;
+                ringPositions[target + 1] = positions[source + 1];
+                ringPositions[target + 2] = positions[source + 2] * 1.002;
+            }
+        }
+    }
+    ringGeometry.update(ringPositions);
 
     controls.update();
     scene.updateWorldMatrix();

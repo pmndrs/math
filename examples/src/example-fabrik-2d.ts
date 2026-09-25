@@ -3,8 +3,10 @@ import { d } from 'gpucat';
 import { type Vec2, vec2 } from 'math';
 import { fabrik2 } from 'math/ik';
 import { createPanel } from './common/dash';
-import { time } from './common/rainbow';
+import { createInfo } from './common/info';
+import { ink, light } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, palette, spectrum } from './common/theme';
 
 // A gallery of 2D IK setups solved with math's FABRIK solver, following the scenarios in Caliko's
 // own demo app - Caliko being the reference implementation that accompanies Aristidou & Lasenby's
@@ -128,7 +130,7 @@ const SCENARIOS: Scenario[] = [
     },
     {
         name: 'Embedded targets',
-        hint: 'five chains, each ignoring the pointer and reaching for a target of its own (yellow)',
+        hint: 'five chains, each ignoring the pointer and reaching for a target of its own (white)',
         build: () => {
             const structure = fabrik2.createStructure2();
 
@@ -223,25 +225,19 @@ const normal = g.attribute('normal', d.vec3f);
 
 const world = g.mul(g.modelWorldMatrix, g.vec4(position, g.f32(1)));
 const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
-const worldNormal = g.varying(g.normalize(g.mul(g.modelNormalMatrix, normal)), 'v_n');
+const viewNormal = g.varying(
+    g.mul(g.cameraViewMatrix, g.vec4(g.normalize(g.mul(g.modelNormalMatrix, normal)), g.f32(0))).xyz,
+    'v_n',
+);
 
-const lightDirection = g.vec3(0.35, 0.6, 1.0).normalize();
-const diffuse = g.Var('diffuse', worldNormal.dot(lightDirection).max(g.f32(0)));
-const shade = g.Var('shade', g.f32(0.5).add(diffuse.mul(g.f32(0.6))));
-
-function solidMaterial(r: number, gr: number, b: number): g.Material {
-    return new g.Material({ vertex: clip, fragment: g.vec4(g.vec3(r, gr, b).mul(shade), g.f32(1)) });
+function solidMaterial(color: g.Node<typeof d.vec3f>): g.Material {
+    return new g.Material({ vertex: clip, fragment: g.vec4(color, g.f32(1)) });
 }
 
-// pink / yellow / blue / purple, matching the palette the other examples flow through
-const CHAIN_MATERIALS = [
-    solidMaterial(1.0, 0.243, 0.647),
-    solidMaterial(1.0, 0.824, 0.247),
-    solidMaterial(0.247, 0.655, 1.0),
-    solidMaterial(0.541, 0.169, 0.886),
-    solidMaterial(0.35, 0.85, 0.6),
-];
-const JOINT_MATERIAL = solidMaterial(0.13, 0.14, 0.18);
+// White bones and outlined joints keep the accent target easy to find.
+const ACCENT = spectrum[6];
+const BONE_MATERIAL = solidMaterial(light);
+const JOINT_MATERIAL = solidMaterial(g.mix(light, ink(palette.base), g.smoothstep(g.f32(0.45), g.f32(0.6), viewNormal.z)));
 
 const boneGeometry = g.createCylinderGeometry(1, 1, 1, 14);
 const jointGeometry = g.createSphereGeometry(1, 16, 12);
@@ -258,7 +254,7 @@ let structure = scenario.build();
 let chainMeshes: ChainMeshes[] = [];
 let embeddedMeshes: g.Mesh[] = [];
 
-const embeddedMaterial = new g.Material({ vertex: clip, fragment: g.vec4f(1, 0.85, 0.2, 1) });
+const embeddedMaterial = new g.Material({ vertex: clip, fragment: g.vec4(light, g.f32(1)) });
 const targetGeometry = g.createSphereGeometry(0.14, 18, 12);
 
 function buildMeshes(): void {
@@ -273,13 +269,12 @@ function buildMeshes(): void {
 
     for (let c = 0; c < structure.chains.length; c++) {
         const chain = structure.chains[c];
-        const material = CHAIN_MATERIALS[c % CHAIN_MATERIALS.length];
 
         const bones: g.Mesh[] = [];
         const joints: g.Mesh[] = [];
 
         for (let b = 0; b < chain.bones.length; b++) {
-            const bone = new g.Mesh(boneGeometry, material);
+            const bone = new g.Mesh(boneGeometry, BONE_MATERIAL);
             bone.scale[0] = BONE_RADIUS;
             bone.scale[1] = chain.bones[b].length;
             bone.scale[2] = BONE_RADIUS;
@@ -331,7 +326,7 @@ function updateMeshes(): void {
 
 /* the pointer target */
 
-const targetMesh = new g.Mesh(targetGeometry, new g.Material({ vertex: clip, fragment: g.vec4f(1, 1, 1, 1) }));
+const targetMesh = new g.Mesh(targetGeometry, new g.Material({ vertex: clip, fragment: g.vec4(ink(ACCENT), g.f32(1)) }));
 scene.add(targetMesh);
 
 /* ui */
@@ -341,12 +336,7 @@ for (let i = 0; i < SCENARIOS.length; i++) names[SCENARIOS[i].name] = i;
 
 const settings = { scenario: 0 };
 
-const hint = document.createElement('div');
-hint.className = 'mc-info';
-hint.style.left = '16px';
-hint.style.bottom = '16px';
-hint.style.maxWidth = 'min(760px, calc(100vw - 32px))';
-document.body.appendChild(hint);
+const hint = createInfo();
 
 function selectScenario(index: number): void {
     scenario = SCENARIOS[index];
@@ -355,7 +345,7 @@ function selectScenario(index: number): void {
     hint.textContent = `${scenario.name} — ${scenario.hint}`;
 }
 
-const panel = createPanel('fabrik 2d');
+const panel = createPanel('fabrik 2d', ACCENT);
 panel.add(settings, 'scenario', { options: names, label: 'Scenario' }).onChange((value) => selectScenario(value));
 panel.monitor(() => structure.chains.map((chain) => chain.solveDistance.toFixed(2)).join('  '), { label: 'Shortfall' });
 
@@ -363,7 +353,7 @@ selectScenario(settings.scenario);
 
 /* render */
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -375,7 +365,6 @@ function frame() {
     const dt = Math.min(0.05, (now - lastT) / 1000);
     lastT = now;
     clock += dt;
-    time.value = now / 1000;
 
     // idle: sweep the target until the pointer takes over
     if (!everMoved) {

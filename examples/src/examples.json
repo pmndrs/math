@@ -1,73 +1,73 @@
 {
     "example-look-at": {
         "title": "Quaternion Look At",
-        "description": "A grid of hand-built arrows that all turn to point at a glowing orb as it drifts overhead — like sunflowers tracking the sun. Each aims with math's quat.rotationTo, the shortest rotation from its +Y tip onto the target direction.",
+        "description": "A grid of hand-built arrows that all turn to point at an orb as it drifts overhead \u2014 like sunflowers tracking the sun. Each aims with math's quat.rotationTo, the shortest rotation from its +Y tip onto the target direction.",
         "tags": ["quaternion", "rotationTo", "look-at", "vec3"],
         "category": "basics"
     },
     "example-fibonacci-sphere": {
         "title": "Fibonacci Sphere",
-        "description": "Points spread evenly over a sphere with the Fibonacci lattice, built in math's spherical coordinates (spherical.toVec3) — each steps one equal-area band down while turning by the golden angle, so sunflower-like spiral arms emerge. Nudge the twist off φ to shear them into spokes.",
+        "description": "Points spread evenly over a sphere with the Fibonacci lattice, built in math's spherical coordinates (spherical.toVec3) \u2014 each steps one equal-area band down while turning by the golden angle, so sunflower-like spiral arms emerge. Nudge the twist off \u03c6 to shear them into spokes.",
         "tags": ["spherical", "fibonacci", "golden-angle", "vec3"],
         "category": "basics"
     },
     "example-contains-point": {
         "title": "OBB3 Contains Point",
-        "description": "An oriented box (math's obb3) tumbles through a lattice of points. Each point asks obb3.containsPoint every frame; inside points glow the rainbow, so the never-drawn box is revealed as the tumbling slab of lit points it carves out.",
+        "description": "An outlined oriented box (math's obb3) tumbles through a sparse lattice of fixed sample points. obb3.containsPoint colors each point green inside the box and grey outside. Hide outside points or pause the motion to inspect the result.",
         "tags": ["shapes", "containsPoint", "obb3"],
         "category": "shapes"
     },
     "example-convex-hull-3d": {
         "title": "Convex Hull 3D",
-        "description": "A point cloud (the Stanford bunny, primitives, or random) and its convex hull, computed with math's quickhull3 and drawn as a rainbow shell over the points.",
+        "description": "A point cloud and its convex hull, computed with math's quickhull3. Cyan and purple connect hull vertices to a translucent faceted shell, preserving depth cues as the cloud rotates. Choose the Stanford bunny, primitives, or random points.",
         "tags": ["quickhull3", "geometry", "convex-hull", "vec3"],
         "category": "geometry"
     },
     "example-convex-hull-2d": {
         "title": "Convex Hull 2D",
-        "description": "A drifting 2D point cloud with its convex hull recomputed live (math's quickhull2) — points light up as they wander onto the hull.",
+        "description": "A drifting 2D point cloud with its convex hull recomputed live (math's quickhull2) \u2014 points light up as they wander onto the hull.",
         "tags": ["quickhull2", "geometry", "convex-hull", "vec2"],
         "category": "geometry"
     },
     "example-polygon2-decomposition": {
         "title": "Polygon2 Decomposition",
-        "description": "Drag to draw a shape, release to watch it split into convex pieces with math's convex decomposition (decomposePolygon2Quick / decomposePolygon2Quality). Each piece is filled a distinct hue, the interior cuts drawn in white, and the concave outline glows the flowing rainbow.",
+        "description": "Draw a concave polygon and see how math's decomposePolygon2Quick or decomposePolygon2Quality partitions it into convex pieces. The colored border is the original polygon and light lines are the internal cuts. Hover to highlight a piece, or switch between the original shape and the result.",
         "tags": ["decompose", "polygon2", "convex", "geometry", "vec2"],
         "category": "geometry"
     },
     "example-polygon2-triangulation": {
         "title": "Polygon2 Triangulation",
-        "description": "Drag to draw a shape, release to watch it triangulate with math's ear clipping (triangulatePolygon2) — no new vertices, just triangle indices into the drawn points. Each triangle is filled an on-palette hue, the shared edges drawn in white, and the outline glows the flowing rainbow.",
+        "description": "Draw a polygon and see math's triangulatePolygon2 partition its interior into triangles without adding vertices. The colored border is the original polygon and light lines are the internal cuts. Hover to highlight a triangle, or switch between the original shape and the result.",
         "tags": ["triangulate", "polygon2", "ear-clipping", "geometry", "vec2"],
         "category": "geometry"
     },
     "example-circumcircle": {
         "title": "Circumcircle",
-        "description": "A triangle that morphs between shapes with its circumcircle recomputed live (math's circumcircle) — watch the circle balloon as the triangle flattens.",
+        "description": "A triangle that morphs between shapes with its circumcircle recomputed live (math's circumcircle) \u2014 watch the circle balloon as the triangle flattens.",
         "tags": ["circumcircle", "geometry", "vec2", "easing"],
         "category": "geometry"
     },
     "example-fabrik-2d": {
         "title": "FABRIK 2D",
-        "description": "A gallery of 2D inverse-kinematics setups solved with math's fabrik2, following the scenarios in Caliko's own demo app. Move the pointer to lead the chain. Every scenario runs the full solver — forward pass, backward pass, pinned base — through free joints, wedge limits, world-space headings, a trunk with branches wired into a Structure2, and a row of chains each reaching a target of its own.",
+        "description": "A gallery of 2D inverse-kinematics setups solved with math's fabrik2, following the scenarios in Caliko's own demo app. Move the pointer to lead the chain. Every scenario runs the full solver \u2014 forward pass, backward pass, pinned base \u2014 through free joints, wedge limits, world-space headings, a trunk with branches wired into a Structure2, and a row of chains each reaching a target of its own.",
         "tags": ["fabrik", "ik", "fabrik2", "constraints", "structures", "vec2"],
         "category": "ik"
     },
     "example-fabrik-2d-snek": {
         "title": "FABRIK 2D Snek",
-        "description": "A snake led by the pointer, driven by one half of math's FABRIK solver — fabrik2.forward alone, which snaps the head onto the target and drags the body after it. No backward pass and no pinned base, so it follows rather than solves; per-joint bend limits keep the body reading as a spine. Eat a pellet and the tail grows at the base end.",
+        "description": "A snake led by the pointer, driven by one half of math's FABRIK solver \u2014 fabrik2.forward alone, which snaps the head onto the target and drags the body after it. No backward pass and no pinned base, so it follows rather than solves; per-joint bend limits keep the body reading as a spine. Eat a pellet and the tail grows at the base end.",
         "tags": ["fabrik", "ik", "fabrik2", "vec2"],
         "category": "ik"
     },
     "example-fabrik-3d": {
         "title": "FABRIK 3D",
-        "description": "A gallery of 3D inverse-kinematics setups solved with math's fabrik3, following the scenarios in Caliko's own demo app — the reference implementation behind the FABRIK paper. Switch between free ball joints, cone rotors, global and local hinges with reference-axis limits, and connected chains whose base rides on a bone of another chain, one of them reaching for a target of its own.",
+        "description": "A gallery of 3D inverse-kinematics setups solved with math's fabrik3, following the scenarios in Caliko's own demo app \u2014 the reference implementation behind the FABRIK paper. Switch between free ball joints, cone rotors, global and local hinges with reference-axis limits, and connected chains whose base rides on a bone of another chain, one of them reaching for a target of its own.",
         "tags": ["fabrik", "ik", "fabrik3", "constraints", "structures", "vec3"],
         "category": "ik"
     },
     "example-flow-field": {
         "title": "Flow Field",
-        "description": "Hundreds of particles advected along an angle field from math's simplex2d noise, leaving flowing rainbow trails.",
+        "description": "Particles advected along an angle field from math's simplex2d noise. Thin warm-white trails reveal the flow, with one particle in sixteen tracing a thicker cyan path.",
         "tags": ["simplex2d", "noise", "flow-field", "particles"],
         "category": "noise"
     },
@@ -79,31 +79,31 @@
     },
     "example-ridged-noise-voxel-terrain": {
         "title": "Ridged Noise Voxel Terrain",
-        "description": "A big voxel landscape whose mountains come from math's ridged fBm, meshed by a tiny culled mesher that emits a quad only for exposed solid faces.",
+        "description": "A voxel landscape from math's ridged fBm, with soft neutral face tones and purple summit caps. A culled mesher emits a quad only for exposed solid faces.",
         "tags": ["noise", "fbm", "ridged", "voxel"],
         "category": "noise"
     },
     "example-simplex-4d-looping-noise": {
         "title": "Simplex 4D Looping Noise",
-        "description": "A grid of tiles whose heights come from math's simplex4d, coloured by elevation and animated so it loops seamlessly. The two extra axes trace a circle as the loop phase goes 0 to 1, so the field returns exactly to its start with no visible seam - something a 3D field animated by a sliding time offset can never do.",
+        "description": "A grid of tiles with soft neutral face tones and subtle edges whose heights come from math's simplex4d. The highest tiles turn pink. Two noise axes trace a circle, making the field return exactly to its starting shape with no seam.",
         "tags": ["simplex4d", "noise", "looping", "4d"],
         "category": "noise"
     },
     "example-simplex-2d-noise-terrain": {
         "title": "Simplex 2D Noise Terrain",
-        "description": "A rolling terrain whose heights come from math's simplex2d noise, scrolling like a fly-over; lit and coloured by the flowing rainbow.",
+        "description": "A rolling terrain from math's simplex2d noise, drawn as a softly lit neutral surface with fine elevation contours and heavier lines every fourth level. One amber contour tracks a fixed height as the landscape scrolls.",
         "tags": ["simplex2d", "noise", "terrain"],
         "category": "noise"
     },
     "example-quaternion-slerp": {
         "title": "Quaternion Slerp",
-        "description": "Two boxes interpolate between the same random orientations — one with math's quat.slerp (smooth shortest arc), one lerping euler angles (the wobbly, long-way-round naive approach).",
+        "description": "Two boxes interpolate between the same random orientations \u2014 one with math's quat.slerp (smooth shortest arc), one lerping euler angles (the wobbly, long-way-round naive approach).",
         "tags": ["quaternion", "slerp", "euler"],
         "category": "basics"
     },
     "example-spring": {
         "title": "Spring2 Tail",
-        "description": "A springy tail that chases the pointer — the head springs to the cursor and each bead springs to the one ahead (math's spring2, under-damped so it overshoots and settles).",
+        "description": "A springy tail that chases the pointer \u2014 the head springs to the cursor and each bead springs to the one ahead (math's spring2, under-damped so it overshoots and settles).",
         "tags": ["spring", "time", "vec2"],
         "category": "time"
     },
@@ -121,14 +121,14 @@
     },
     "example-polygon2-signed-distance": {
         "title": "Polygon2 Signed Distance",
-        "description": "The shape is never drawn as a shape. A lattice of probes asks math's polygon2 how far it is from a wobbling blob: hue carries the sign, and banded brightness turns the bright rings into contours, the innermost one the outline. Needles aim one from every probe with polygon2.closestPoint. The blob is a radius per angle, from polar.toVec2.",
+        "description": "A lattice of probes visualizes math's polygon2.signedDistance. Cyan marks inside and white marks outside. Larger probes trace distance contours. Turn on needles to see the direction to polygon2.closestPoint.",
         "tags": ["polygon2", "signedDistance", "closestPoint", "polar", "shapes", "vec2"],
         "category": "shapes"
     },
     "example-frustum-culling": {
         "title": "Frustum Culling",
-        "description": "Agents patrolling a little city, each seeing through a camera of its own. Every agent's six planes come from math's frustum, and every building and orb is tested against every agent once a frame with intersectsBox3 and intersectsSphere. Whatever an agent can see takes that agent's colour, so the map is painted by who is looking at what, and anything unseen stays dark. The cones are recovered from frustum.corners.",
-        "tags": ["frustum", "culling", "box3", "sphere", "mat4", "color", "shapes"],
+        "description": "Agents patrol an outlined city, each with a camera of its own. Every building and orb is tested with math's frustum.intersectsBox3 and intersectsSphere. Purple fills mark objects seen by any agent, while faint outlines mark unseen objects. Bright camera bounds come from frustum.corners.",
+        "tags": ["frustum", "culling", "box3", "sphere", "mat4", "shapes"],
         "category": "shapes"
     },
     "example-dual-quaternion-skinning": {

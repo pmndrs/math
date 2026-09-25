@@ -3,20 +3,23 @@ import { d } from 'gpucat';
 import { mat4, vec4 } from 'math';
 import { quickhull2 } from 'math/geometry';
 import { mulberry32 } from 'math/random';
-import { rainbowLineColor, rainbowRGB, time } from './common/rainbow';
+import { createInfo } from './common/info';
+import { ink, light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, spectrum } from './common/theme';
 
 // A drifting 2D point cloud with its convex hull (math's quickhull2)
 // recomputed every frame. As points wander in and out of the boundary the hull
-// polygon morphs and points light up (rainbow markers) when they join it.
+// polygon morphs and points light up (accent markers) when they join it.
 // One point is yours: move the mouse (or drag a finger) and it steers to the
 // pointer, so you can push it onto the hull and watch quickhull2 re-solve live.
-// Nothing special about that point's look - it's driven by data, so it goes grey
+// Nothing special about that point's look - it's driven by data, so it stays light
 // like the rest when off the hull and lights up like the rest when on it. The
 // screen point is unprojected onto the z=0 plane with math (inverse view*proj).
 
 const POINT_COUNT = 16;
 const CONTROLLED = 0; // this point follows the pointer while you interact
+const ACCENT = spectrum[1];
 
 /* drifters */
 
@@ -71,26 +74,21 @@ window.addEventListener('resize', () => {
 
 /* objects */
 
-// hull outline (rainbow, closed) - allocated for the worst case (all points on hull)
+// hull outline (warm white, closed) - allocated for the worst case (all points on hull)
 const hullPoints = new Float32Array(POINT_COUNT * 3);
 const hullGeometry = new g.LineGeometry(hullPoints, true, POINT_COUNT);
-const hullLine = new g.Line(hullGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2.5), lineWidth: 10 }));
+const hullLine = new g.Line(hullGeometry, new g.LineMaterial({ color: g.vec4(light, g.f32(1)), lineWidth: pixels(2.25) }));
 scene.add(hullLine);
 
-// two shared materials: grey for interior points, rainbow for hull vertices
+// two shared materials: the brand light for every point, the accent for hull vertices
 function unlitMaterial(fragment: g.Node<typeof d.vec4f>): g.Material {
     const pos = g.attribute('position', d.vec3f);
     const world = g.mul(g.modelWorldMatrix, g.vec4(pos, g.f32(1)));
     const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
     return new g.Material({ vertex: clip, fragment });
 }
-const greyMaterial = unlitMaterial(g.vec4f(0.42, 0.42, 0.48, 1));
-
-const rainbowPos = g.attribute('position', d.vec3f);
-const rainbowWorld = g.mul(g.modelWorldMatrix, g.vec4(rainbowPos, g.f32(1)));
-const rainbowClip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, rainbowWorld));
-const rainbowVWorld = g.varying(rainbowWorld.xyz, 'v_mworld');
-const markerMaterial = new g.Material({ vertex: rainbowClip, fragment: g.vec4(rainbowRGB(rainbowVWorld, 2.5), g.f32(1)) });
+const pointMaterial = unlitMaterial(g.vec4(light, g.f32(1)));
+const markerMaterial = unlitMaterial(g.vec4(ink(ACCENT), g.f32(1)));
 
 const dotGeometry = g.createSphereGeometry(0.04, 16, 12);
 const markerGeometry = g.createSphereGeometry(0.07, 16, 12);
@@ -98,7 +96,7 @@ const markerGeometry = g.createSphereGeometry(0.07, 16, 12);
 const pointDots: g.Mesh[] = [];
 const hullMarkers: g.Mesh[] = [];
 for (let i = 0; i < POINT_COUNT; i++) {
-    const dot = new g.Mesh(dotGeometry, greyMaterial);
+    const dot = new g.Mesh(dotGeometry, pointMaterial);
     scene.add(dot);
     pointDots.push(dot);
     const marker = new g.Mesh(markerGeometry, markerMaterial);
@@ -175,23 +173,18 @@ canvas.addEventListener('pointerleave', () => {
 
 /* readout */
 
-const readout = document.createElement('div');
-readout.className = 'mc-info';
-readout.style.left = '16px';
-readout.style.bottom = '16px';
-document.body.appendChild(readout);
+const readout = createInfo();
 
 /* render */
 
 const points: number[] = new Array(POINT_COUNT * 2).fill(0);
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
 function frame(tms: number) {
     const t = tms / 1000;
-    time.value = t;
 
     // advance the points; the controlled one eases toward the pointer while
     // steering, and eases back into its drift orbit once released
@@ -224,7 +217,7 @@ function frame(tms: number) {
     }
     hullGeometry.update(hullPoints.subarray(0, hull.length * 3), true);
 
-    // rainbow markers on the current hull vertices; hide the rest
+    // accent markers on the current hull vertices; hide the rest
     for (let j = 0; j < POINT_COUNT; j++) {
         const marker = hullMarkers[j];
         if (j < hull.length) {

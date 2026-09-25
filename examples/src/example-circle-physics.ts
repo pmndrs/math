@@ -3,8 +3,9 @@ import { d } from 'gpucat';
 import { type Vec2, vec2 } from 'math';
 import { mulberry32, random } from 'math/random';
 import { createPanel } from './common/dash';
-import { palette } from './common/rainbow';
+import { ink, light } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, palette, spectrum } from './common/theme';
 
 // A cluster of circles held together by its own gravity, solved with substepped
 // XPBD - the small-steps formulation from "Detailed Rigid Body Simulation with
@@ -313,26 +314,41 @@ window.addEventListener('resize', () => {
 
 /* bodies */
 
-// instanced spheres, per-body vec4 = (x, y, radius, palette phase)
+// Instanced discs, per-body vec4 = (x, y, radius, isPointer).
+const ACCENT = spectrum[1];
 const bodyData = new Float32Array(world.capacity * 4);
 const bodyBuffer = new g.GpuBuffer(d.array(d.vec4f), { data: bodyData, usage: 'storage' });
 const instance = g.index(g.storage(bodyBuffer), g.instanceIndex);
 
 const position = g.attribute('position', d.vec3f);
-const normal = g.attribute('normal', d.vec3f);
 const worldPosition = g.add(g.mul(position, instance.z), g.vec3(instance.xy, g.f32(0)));
 const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(worldPosition, g.f32(1))));
-const vNormal = g.varying(g.normalize(normal), 'v_n');
-const vPhase = g.varying(instance.w, 'v_p');
-const lightDirection = g.vec3(0.35, 0.8, 0.5).normalize();
-const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
-const lit = g.Var('lit', g.f32(0.4).add(diffuse.mul(g.f32(0.7))));
-const spheres = new g.Mesh(
-    g.createSphereGeometry(1, 16, 12),
-    new g.Material({ vertex: clip, fragment: g.vec4(palette(vPhase).mul(lit), g.f32(1)) }),
+const vPosition = g.varying(position.xy, 'v_position');
+const vPointer = g.varying(instance.w, 'v_pointer').setInterpolation('flat');
+
+// Measure the stroke in screen pixels so the pointer radius cannot blur or widen it.
+const radius = g.length(vPosition);
+const footprint = g.length(g.vec2(g.dpdx(radius), g.dpdy(radius))).max(g.f32(1e-5));
+const edgeDistance = g.f32(1).sub(radius).div(footprint);
+const strokeWidth = g.mix(g.f32(1.5 * devicePixelRatio), g.f32(3 * devicePixelRatio), vPointer);
+const stroke = g.f32(1).sub(g.smoothstep(strokeWidth.sub(g.f32(0.5)), strokeWidth.add(g.f32(0.5)), edgeDistance));
+const discGeometry = new g.Geometry();
+discGeometry.setBuffer('position', g.createVertexBuffer(d.vec3f, new Float32Array([-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0])));
+discGeometry.setIndex(g.createIndexBuffer(new Uint16Array([0, 1, 2, 0, 2, 3])));
+const discs = new g.Mesh(
+    discGeometry,
+    new g.Material({
+        vertex: clip,
+        fragment: g.vec4(
+            g.mix(ink(palette.base), g.select(ink(ACCENT), light, g.greaterThanEqual(vPointer, g.f32(0.5))), stroke),
+            g.smoothstep(g.f32(-0.5), g.f32(0.5), edgeDistance),
+        ),
+        transparent: true,
+        depthWrite: false,
+    }),
 );
-spheres.count = world.count;
-scene.add(spheres);
+discs.count = world.count;
+scene.add(discs);
 
 /* pointer */
 
@@ -356,7 +372,7 @@ canvas.addEventListener('pointerleave', () => vec2.set(pointerTarget, PARKED, PA
 
 let stepMs = 0;
 
-const panel = createPanel('circle physics');
+const panel = createPanel('circle physics', ACCENT);
 panel
     .add(settings, 'grains', { min: 100, max: 880, step: 10, label: 'Grains' })
     .onChange(() => spawn(world, settings.grains, settings.pointer));
@@ -378,7 +394,7 @@ panel.monitor(() => stepMs, { label: 'step', unit: 'duration' });
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -415,12 +431,11 @@ function frame(tms: number) {
         bodyData[i * 4] = body.position[0];
         bodyData[i * 4 + 1] = body.position[1];
         bodyData[i * 4 + 2] = body.radius;
-        // settled grains sit at the blue end of the palette and fast ones run to
-        // yellow, while the pointer holds the far end of it to stay legible
-        bodyData[i * 4 + 3] = i === 0 ? 0.02 : 0.56 - Math.min(vec2.length(body.velocity) / 2.2, 1) * 0.3;
+        // Small balls carry the accent and the pointer stays neutral.
+        bodyData[i * 4 + 3] = i === 0 ? 1 : 0;
     }
     bodyBuffer.needsUpdate = true;
-    spheres.count = world.count;
+    discs.count = world.count;
 
     scene.updateWorldMatrix();
     camera.updateViewMatrix();

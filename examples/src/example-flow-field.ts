@@ -1,13 +1,15 @@
 import * as g from 'gpucat';
 import { simplex2d } from 'math/noise';
 import { mulberry32 } from 'math/random';
-import { rainbowLineColor, time } from './common/rainbow';
+import { ink, light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, spectrum } from './common/theme';
 
 // A flow field: hundreds of particles advected along an angle field derived from
-// math's simplex2d noise, leaving fading rainbow trails. Each particle reads
+// math's simplex2d noise, leaving trails in the brand light. Each particle reads
 // the noise at its position to pick a heading, drifts along it, and respawns when
 // it wanders off or ages out - so the field is continuously traced by streams.
+// One particle in sixteen is a tracer, its trail drawn in the accent.
 
 const PARTICLES = 2200;
 const TRAIL = 20; // positions kept per particle
@@ -19,6 +21,8 @@ const SPAWN_X = 3; // particles spawn in this rectangle...
 const SPAWN_Y = 2;
 const BOUND_X = 3.4; // ...and respawn once they drift past this one
 const BOUND_Y = 2.4;
+const TRACER = 16; // every this many particles, one traces in the accent
+const ACCENT = spectrum[6];
 
 const noise = simplex2d.create(1);
 const rng = mulberry32.create(42);
@@ -72,16 +76,23 @@ window.addEventListener('resize', () => {
 
 /* trails */
 
-// one line segment per consecutive pair of trail positions, across all particles
-const SEGMENTS = PARTICLES * (TRAIL - 1);
-const segmentPoints = new Float32Array(SEGMENTS * 2 * 3);
-const trailsGeometry = new g.LineSegmentsGeometry(segmentPoints, SEGMENTS * 2);
-const trails = new g.LineSegments(trailsGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2.5), lineWidth: 5 }));
-scene.add(trails);
+// one line segment per consecutive pair of trail positions, split into the
+// tracers and everything else so each set draws with its own ink
+const TRACERS = Math.ceil(PARTICLES / TRACER);
+
+function createTrails(particles: number, color: g.Node<typeof g.d.vec4f>, width: number) {
+    const points = new Float32Array(particles * (TRAIL - 1) * 2 * 3);
+    const geometry = new g.LineSegmentsGeometry(points, particles * (TRAIL - 1) * 2);
+    scene.add(new g.LineSegments(geometry, new g.LineMaterial({ color, lineWidth: pixels(width), transparent: true })));
+    return { points, geometry };
+}
+
+const trails = createTrails(PARTICLES - TRACERS, g.vec4(light, g.f32(1)), 1);
+const tracers = createTrails(TRACERS, g.vec4(ink(ACCENT), g.f32(1)), 2);
 
 /* render */
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -89,7 +100,6 @@ let last = -1;
 
 function frame(tms: number) {
     const t = tms / 1000;
-    time.value = t;
     if (last < 0) last = t;
     const dt = Math.min(t - last, 0.05);
     last = t;
@@ -115,20 +125,27 @@ function frame(tms: number) {
         }
     }
 
-    // rebuild the segment buffer
+    // rebuild the segment buffers
     let s = 0;
+    let r = 0;
     for (let p = 0; p < PARTICLES; p++) {
         const base = p * TRAIL;
+        const tracer = p % TRACER === 0;
+        const out = tracer ? tracers.points : trails.points;
         for (let k = 0; k < TRAIL - 1; k++) {
-            segmentPoints[s++] = trailX[base + k];
-            segmentPoints[s++] = trailY[base + k];
-            segmentPoints[s++] = 0;
-            segmentPoints[s++] = trailX[base + k + 1];
-            segmentPoints[s++] = trailY[base + k + 1];
-            segmentPoints[s++] = 0;
+            let i = tracer ? r : s;
+            out[i++] = trailX[base + k];
+            out[i++] = trailY[base + k];
+            out[i++] = 0;
+            out[i++] = trailX[base + k + 1];
+            out[i++] = trailY[base + k + 1];
+            out[i++] = 0;
+            if (tracer) r = i;
+            else s = i;
         }
     }
-    trailsGeometry.update(segmentPoints);
+    trails.geometry.update(trails.points);
+    tracers.geometry.update(tracers.points);
 
     scene.updateWorldMatrix();
     camera.updateViewMatrix();

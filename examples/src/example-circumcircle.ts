@@ -4,13 +4,15 @@ import { type Vec2, vec2 } from 'math';
 import { circumcircle } from 'math/geometry';
 import { circle } from 'math/shapes';
 import { easing } from 'math/time';
-import { rainbowLineColor, time } from './common/rainbow';
+import { createInfo } from './common/info';
+import { light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, palette, rgb, spectrum } from './common/theme';
 
 // A triangle that morphs between shapes, with its circumcircle (math's
 // circumcircle) recomputed every frame. As the triangle flattens toward
-// degenerate the circumcircle balloons - watch the circumradius readout. The
-// ring is drawn with the flowing brand rainbow (see common/rainbow).
+// degenerate the circumcircle balloons - watch the circumradius readout. Faint
+// radii from the circumcenter show every vertex at the same distance.
 
 /* shapes */
 
@@ -86,30 +88,40 @@ window.addEventListener('resize', () => {
 
 /* objects */
 
-// morphing triangle outline (neutral) and its circumcircle (rainbow ring)
+// morphing triangle outline (accent), its circumcircle (brand light), and the three
+// equal radii from the circumcenter as faint guides
+const ACCENT = spectrum[4];
 const triPoints = new Float32Array(9);
 const triGeometry = new g.LineGeometry(triPoints, true, 3);
-const triangle = new g.Line(triGeometry, new g.LineMaterial({ color: g.vec4f(0.85, 0.88, 0.95, 1), lineWidth: 4 }));
+const triangle = new g.Line(triGeometry, new g.LineMaterial({ color: g.vec4(light, g.f32(1)), lineWidth: pixels(2.25) }));
 scene.add(triangle);
 
 const CIRCLE_SEGMENTS = 128;
 const circlePoints = new Float32Array(CIRCLE_SEGMENTS * 3);
 const circleGeometry = new g.LineGeometry(circlePoints, true, CIRCLE_SEGMENTS);
-const circleLine = new g.Line(circleGeometry, new g.LineMaterial({ color: rainbowLineColor(1, 2), lineWidth: 5 }));
+const circleLine = new g.Line(circleGeometry, new g.LineMaterial({ color: g.vec4(light, g.f32(1)), lineWidth: pixels(1.5) }));
 scene.add(circleLine);
+
+const radiiPoints = new Float32Array(6 * 3);
+const radiiGeometry = new g.LineSegmentsGeometry(radiiPoints, 6);
+const radii = new g.LineSegments(
+    radiiGeometry,
+    new g.LineMaterial({ color: g.vec4(light, g.f32(0.35)), lineWidth: pixels(1.25), transparent: true }),
+);
+scene.add(radii);
 
 // dots: 3 triangle vertices + the circumcenter
 const dotGeometry = g.createSphereGeometry(0.05, 16, 12);
-function makeDot(rgb: [number, number, number]): g.Mesh {
+function makeDot(color: [number, number, number]): g.Mesh {
     const pos = g.attribute('position', d.vec3f);
     const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.mul(g.modelWorldMatrix, g.vec4(pos, g.f32(1)))));
-    const material = new g.Material({ vertex: clip, fragment: g.vec4f(rgb[0], rgb[1], rgb[2], 1) });
+    const material = new g.Material({ vertex: clip, fragment: g.vec4f(...color, 1) });
     const mesh = new g.Mesh(dotGeometry, material);
     scene.add(mesh);
     return mesh;
 }
-const vertexDots = [makeDot([0.95, 0.96, 1]), makeDot([0.95, 0.96, 1]), makeDot([0.95, 0.96, 1])];
-const centerDot = makeDot([1.0, 0.243, 0.647]);
+const vertexDots = [makeDot(rgb(ACCENT)), makeDot(rgb(ACCENT)), makeDot(rgb(ACCENT))];
+const centerDot = makeDot(rgb(palette.light));
 
 /* name wheel + readout */
 
@@ -118,12 +130,13 @@ const centerDot = makeDot([1.0, 0.243, 0.647]);
 // distance - driven from the same eased morph index as the triangle.
 const ROW_HEIGHT = 46;
 const wheel = document.createElement('div');
-wheel.style.cssText = 'position:absolute;left:40px;top:50%;width:220px;height:0;pointer-events:none;font-family:var(--mc-mono)';
+wheel.style.cssText = 'position:absolute;left:40px;top:50%;width:220px;height:0;pointer-events:none;font-family:var(--mc-sans)';
 document.body.appendChild(wheel);
 const wheelRows = SHAPES.map((shape) => {
     const el = document.createElement('div');
     el.textContent = shape.name;
-    el.style.cssText = 'position:absolute;left:0;white-space:nowrap;transform-origin:left center;text-shadow:0 1px 3px #000';
+    el.style.cssText =
+        'position:absolute;left:0;white-space:nowrap;transform-origin:left center;text-shadow:0 1px 3px var(--mc-base)';
     wheel.appendChild(el);
     return el;
 });
@@ -141,18 +154,14 @@ function updateWheel(continuousIndex: number) {
         wheelRows[i].style.transform = `translateY(${y}px) translateY(-50%) scale(${1 - k * 0.4})`;
         wheelRows[i].style.opacity = `${1 - k * 0.82}`;
         const isActive = Math.abs(dist) < 0.5;
-        wheelRows[i].style.color = isActive ? '#ff3ea5' : '#eceff1';
-        wheelRows[i].style.fontWeight = isActive ? '700' : '500';
+        wheelRows[i].style.color = isActive ? ACCENT : palette.light;
+        wheelRows[i].style.fontWeight = isActive ? '800' : '500';
         wheelRows[i].style.fontSize = '26px';
     }
 }
 
 // small circumradius readout
-const readout = document.createElement('div');
-readout.className = 'mc-info';
-readout.style.left = '40px';
-readout.style.bottom = '24px';
-document.body.appendChild(readout);
+const readout = createInfo();
 
 /* render */
 
@@ -161,7 +170,7 @@ const b = vec2.create();
 const c = vec2.create();
 const circ = circle.create();
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -173,7 +182,6 @@ function setDot(dot: g.Mesh, x: number, y: number) {
 
 function frame(tms: number) {
     const t = tms / 1000;
-    time.value = t;
 
     // morph between shapes with an eased blend
     const tt = t / SHAPE_DURATION;
@@ -203,6 +211,16 @@ function frame(tms: number) {
         circlePoints[i * 3 + 1] = circ.center[1] + Math.sin(ang) * circ.radius;
     }
     circleGeometry.update(circlePoints, true);
+
+    // radii from the circumcenter, all the same length
+    for (let i = 0; i < 3; i++) {
+        const vertex = i === 0 ? a : i === 1 ? b : c;
+        radiiPoints[i * 6] = circ.center[0];
+        radiiPoints[i * 6 + 1] = circ.center[1];
+        radiiPoints[i * 6 + 3] = vertex[0];
+        radiiPoints[i * 6 + 4] = vertex[1];
+    }
+    radiiGeometry.update(radiiPoints);
 
     setDot(vertexDots[0], a[0], a[1]);
     setDot(vertexDots[1], b[0], b[1]);

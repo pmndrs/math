@@ -21,11 +21,13 @@ export function pinTopRight(panel: Panel, margin = 16): void {
 }
 
 /**
- * The common example setup: a dashboard with a single panel, pinned top-right.
- * Fill the returned panel directly with `.add` / `.monitor` / `.button`.
+ * The common example setup: a dashboard with a single panel, pinned top-right,
+ * its controls tinted with the example's accent. Fill the returned panel
+ * directly with `.add` / `.monitor` / `.button`.
  */
-export function createPanel(title: string): Panel {
+export function createPanel(title: string, accent: string): Panel {
     const panel = dashboard().panel({ title });
+    panel.root.style.setProperty('--dc-accent', accent);
     pinTopRight(panel);
     return panel;
 }

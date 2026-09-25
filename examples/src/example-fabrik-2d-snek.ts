@@ -2,8 +2,10 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import type { Vec2 } from 'math';
 import { fabrik2 } from 'math/ik';
-import { rainbowRGB, time } from './common/rainbow';
+import { createInfo } from './common/info';
+import { ink, light } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, palette, rgb, spectrum } from './common/theme';
 
 // A snake built on ONE HALF of the FABRIK solver.
 //
@@ -128,6 +130,7 @@ function placePellet() {
 
 // generous headroom so growth never reallocates the GPU buffer
 const MAX_SEGMENTS = 400;
+const ACCENT = spectrum[0];
 
 // per-sphere vec4 = (x, y, z, radius), rewritten each frame
 const bodyData = new Float32Array(MAX_SEGMENTS * 4);
@@ -142,15 +145,10 @@ const bodyWorld = g.add(g.mul(position, bodyInstance.w), bodyInstance.xyz);
 const bodyClip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(bodyWorld, g.f32(1))));
 
 const bodyNormal = g.varying(g.normalize(normal), 'v_n');
-const bodyWorldVarying = g.varying(bodyWorld, 'v_w');
-
-const lightDirection = g.vec3(0.4, 0.8, 0.6).normalize();
-const diffuse = g.Var('diffuse', bodyNormal.dot(lightDirection).max(g.f32(0)));
-const lit = g.Var('lit', g.f32(0.45).add(diffuse.mul(g.f32(0.6))));
 
 const bodyMaterial = new g.Material({
     vertex: bodyClip,
-    fragment: g.vec4(rainbowRGB(bodyWorldVarying, 2.5).mul(lit), g.f32(1)),
+    fragment: g.vec4(g.mix(ink(palette.base), light, g.smoothstep(g.f32(0.35), g.f32(0.5), bodyNormal.z)), g.f32(1)),
 });
 
 const body = new g.Mesh(sphere, bodyMaterial);
@@ -164,13 +162,10 @@ const pelletInstance = g.index(g.storage(pelletBuffer), g.instanceIndex);
 
 const pelletWorld = g.add(g.mul(position, pelletInstance.w), pelletInstance.xyz);
 const pelletClip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(pelletWorld, g.f32(1))));
-const pelletNormal = g.varying(g.normalize(normal), 'p_n');
-const pelletDiffuse = g.Var('pdiffuse', pelletNormal.dot(lightDirection).max(g.f32(0)));
-const pelletLit = g.Var('plit', g.f32(0.55).add(pelletDiffuse.mul(g.f32(0.5))));
 
 const pelletMaterial = new g.Material({
     vertex: pelletClip,
-    fragment: g.vec4(g.vec3(1, 1, 1).mul(pelletLit), g.f32(1)),
+    fragment: g.vec4(ink(ACCENT), g.f32(1)),
 });
 
 const pelletMesh = new g.Mesh(g.createSphereGeometry(1, 16, 12), pelletMaterial);
@@ -186,7 +181,7 @@ const eyeInstance = g.index(g.storage(eyeBuffer), g.instanceIndex);
 const eyeWorld = g.add(g.mul(position, eyeInstance.w), eyeInstance.xyz);
 const eyeMaterial = new g.Material({
     vertex: g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, g.vec4(eyeWorld, g.f32(1)))),
-    fragment: g.vec4(0.05, 0.05, 0.08, 1),
+    fragment: g.vec4(...rgb(palette.base), 1),
 });
 
 const eyes = new g.Mesh(g.createSphereGeometry(1, 12, 8), eyeMaterial);
@@ -199,25 +194,17 @@ const EYE_SIDE = 0.14; // across it
 
 /* hint */
 
-const hint = document.createElement('div');
-hint.className = 'mc-info';
-hint.style.left = '16px';
-hint.style.bottom = '16px';
-hint.textContent = 'move the pointer to lead the snake — eat the white pellet to grow';
-document.body.appendChild(hint);
+const hint = createInfo();
+hint.textContent = 'move the pointer to lead the snake — eat the purple pellet to grow';
 
-const counter = document.createElement('div');
-counter.className = 'mc-info';
-counter.style.right = '16px';
-counter.style.bottom = '16px';
-document.body.appendChild(counter);
+const counter = createInfo();
 
 /* render */
 
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -225,7 +212,6 @@ let last = -1;
 
 function frame(tms: number) {
     const t = tms / 1000;
-    time.value = t;
     if (last < 0) last = t;
     const dt = Math.min(t - last, 0.05);
     last = t;

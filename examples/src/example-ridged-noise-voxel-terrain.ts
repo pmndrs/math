@@ -3,22 +3,24 @@ import { d } from 'gpucat';
 import { quat } from 'math';
 import { ridged, simplex2d } from 'math/noise';
 import { createPanel } from './common/dash';
-import { palette, time } from './common/rainbow';
+import { grey, ink } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, spectrum } from './common/theme';
 
 // A big voxel landscape whose mountains come from math's ridged fBm (ridged
 // folds each octave into sharp crests). It's turned into a mesh by a tiny
 // "culled mesher" - it emits a quad only for a solid voxel face whose neighbour
 // is empty, so the interior of the block is never drawn. Being one block type,
-// the whole surface is just a vessel for the rainbow material, coloured by
-// elevation and lit by the face normals.
+// soft neutral face tones describe the relief without directional lighting. Only
+// the tops of the tallest columns catch the accent.
 
-const GX = 110;
+const GX = 72;
 const GY = 44;
-const GZ = 110;
-const VOXEL = 0.08;
+const GZ = 72;
+const VOXEL = 0.12;
+const ACCENT = spectrum[0];
 const BASE = 6; // minimum terrain height
-const H_FREQ = 0.03; // terrain horizontal frequency
+const H_FREQ = 0.045; // terrain horizontal frequency
 
 // the six cube faces: outward normal, neighbour offset, and 4 corner offsets
 const FACES = [
@@ -163,21 +165,23 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
 });
 
-/* rainbow-lit material (shared; the geometry is rebuilt on change) */
+/* flat material, shared across geometry rebuilds */
+
+// model-space height above which a top face takes the accent, set from each rebuild's crests
+const peak = g.uniform(g.f32(0), 'peak');
 
 function makeMaterial(): g.Material {
     const pos = g.attribute('position', d.vec3f);
     const nrm = g.attribute('normal', d.vec3f);
     const world = g.mul(g.modelWorldMatrix, g.vec4(pos, g.f32(1)));
     const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
-    const vNormal = g.varying(g.normalize(g.mul(g.modelNormalMatrix, nrm)), 'v_n');
-    const vHeight = g.varying(pos.y, 'v_h'); // model-space height -> stable colour bands while spinning
-    const lightDirection = g.vec3(0.35, 1.0, 0.5).normalize();
-    const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
-    const shade = g.Var('shade', g.f32(0.4).add(diffuse.mul(g.f32(0.62))));
-    // colour by elevation (topographic rainbow bands)
-    const base = g.Var('base', palette(g.add(vHeight.mul(g.f32(0.6)), g.f32(0.5))));
-    return new g.Material({ vertex: clip, fragment: g.vec4(base.mul(shade), g.f32(1)) });
+    const vHeight = g.varying(pos.y, 'v_h'); // model-space height, stable while spinning
+    const vTop = g.varying(nrm.y.max(g.f32(0)), 'v_top');
+    const vSide = g.varying(nrm.z.abs(), 'v_side');
+    const clay = grey(g.mix(g.f32(0.38).add(vSide.mul(g.f32(0.14))), g.f32(0.8), vTop));
+    const crest = ink(ACCENT);
+    const tinted = g.step(peak, vHeight).mul(vTop);
+    return new g.Material({ vertex: clip, fragment: g.vec4(g.mix(clay, crest, tinted), g.f32(1)) });
 }
 const material = makeMaterial();
 
@@ -195,6 +199,10 @@ function rebuild() {
         chunk.geometry.dispose();
     }
     chunk = new g.Mesh(geometry, material);
+    // the highest two layers carry the accent
+    let top = -Infinity;
+    for (let i = 1; i < m.positions.length; i += 3) top = Math.max(top, m.positions[i]);
+    peak.value = top - VOXEL * 1.5;
     scene.add(chunk);
     scene.updateWorldMatrix();
     faceCount = m.indices.length / 6;
@@ -205,7 +213,7 @@ function rebuild() {
 const settings = { seed: 1337, height: 24, detail: 1, spin: true };
 let faceCount = 0;
 
-const panel = createPanel('ridged noise voxel terrain');
+const panel = createPanel('ridged noise voxel terrain', ACCENT);
 panel.add(settings, 'height', { min: 8, max: 34, step: 0.1, label: 'Mountains' }).onChange(rebuild);
 panel.add(settings, 'detail', { min: 0.5, max: 2, step: 0.01, label: 'Detail' }).onChange(rebuild);
 panel.add(settings, 'spin', { label: 'Auto-spin' });
@@ -219,7 +227,7 @@ rebuild();
 
 /* render loop */
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -230,7 +238,6 @@ function frame() {
     const now = performance.now();
     const dt = Math.min(0.05, (now - lastT) / 1000);
     lastT = now;
-    time.value = now / 1000;
 
     if (settings.spin && chunk) {
         spinAngle += dt * 0.2;

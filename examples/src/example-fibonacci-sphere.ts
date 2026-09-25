@@ -2,19 +2,22 @@ import * as g from 'gpucat';
 import { d } from 'gpucat';
 import { mat4, quat, type Spherical, spherical, vec3 as v3 } from 'math';
 import { createPanel } from './common/dash';
-import { rainbowRGB, time } from './common/rainbow';
+import { ink, light } from './common/ink';
 import { createRenderer } from './common/renderer';
+import { clearColor, palette, spectrum } from './common/theme';
 
 // Points spread evenly over a sphere with the Fibonacci lattice, built directly
 // in math's spherical coordinates (spherical.toVec3). Each point steps one band
 // down in equal-area height while turning by the golden angle (~137.5 deg, the
 // "most irrational" turn) - so nothing ever lines up and the gaps stay even.
 // The interlocking spiral arms that emerge are the same phyllotaxis a sunflower
-// head uses; their counts are consecutive Fibonacci numbers. Nudge the twist
-// off the golden angle and watch the spirals shear into bare spokes.
+// head uses; their counts are consecutive Fibonacci numbers. Every 21st point
+// from the pole lies on one arm, drawn in the accent. Nudge the twist off the
+// golden angle and watch the spirals shear into bare spokes.
 
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)); // ~137.507 deg
 const SPHERE_RADIUS = 2.3;
+const ACCENT = spectrum[3];
 
 // N points on the unit sphere via the Fibonacci lattice. `turn` is the azimuthal
 // step per point (radians) - the golden angle gives the even spread; anything
@@ -63,18 +66,32 @@ window.addEventListener('resize', () => {
 
 const sphereGeometry = g.createSphereGeometry(1, 12, 8);
 
+// Hide the rear hemisphere so overlapping projections cannot merge the dots.
+const shellPosition = g.attribute('position', d.vec3f);
+const shellClip = g.mul(
+    g.cameraProjectionMatrix,
+    g.mul(g.cameraViewMatrix, g.mul(g.modelWorldMatrix, g.vec4(shellPosition, g.f32(1)))),
+);
+scene.add(
+    new g.Mesh(
+        g.createSphereGeometry(SPHERE_RADIUS * 0.997, 64, 48),
+        new g.Material({ vertex: shellClip, fragment: g.vec4(ink(palette.base), g.f32(1)) }),
+    ),
+);
+
 /* build the instanced point cloud */
 
 // nearest-neighbour spacing on the sphere scales as ~1/sqrt(n); size the dots to
 // match so the shell stays dense-but-distinct as N changes.
 function markerRadius(n: number): number {
-    return Math.max(0.009, Math.min(0.09, (SPHERE_RADIUS * 1.4) / Math.sqrt(n)));
+    return Math.max(0.006, Math.min(0.06, (SPHERE_RADIUS * 0.42) / Math.sqrt(n)));
 }
 
 function buildPoints(points: number[]): g.Mesh {
     const numPoints = points.length / 3;
     const r = markerRadius(numPoints);
     const instanceMatrices = new Float32Array(numPoints * 16);
+    const instanceArm = new Float32Array(numPoints); // 1 = on the accent arm
     const t = v3.create();
     const s = v3.fromValues(r, r, r);
     const q = quat.create();
@@ -83,6 +100,7 @@ function buildPoints(points: number[]): g.Mesh {
         v3.set(t, points[i * 3], points[i * 3 + 1], points[i * 3 + 2]);
         mat4.fromRotationTranslationScale(m, q, t, s);
         instanceMatrices.set(m, i * 16);
+        instanceArm[i] = i % 21 === 0 ? 1 : 0;
     }
 
     const stride = 16 * 4;
@@ -91,21 +109,16 @@ function buildPoints(points: number[]): g.Mesh {
     const col2 = g.attribute(instanceMatrices, d.vec4f, { stride, offset: 32, instanced: true });
     const col3 = g.attribute(instanceMatrices, d.vec4f, { stride, offset: 48, instanced: true });
     const instanceTransform = g.mat4(col0, col1, col2, col3);
+    const instanceOnArm = g.attribute(instanceArm, d.f32, { stride: 4, offset: 0, instanced: true });
 
     const pos = g.attribute('position', d.vec3f);
-    const nrm = g.attribute('normal', d.vec3f);
     // instanceTransform is model-local; modelWorldMatrix carries the auto-spin
     const local = g.mul(instanceTransform, g.vec4(pos, g.f32(1)));
     const world = g.mul(g.modelWorldMatrix, local);
     const clip = g.mul(g.cameraProjectionMatrix, g.mul(g.cameraViewMatrix, world));
-    const vNormal = g.varying(g.normalize(nrm), 'v_snormal');
-    const vWorld = g.varying(world.xyz, 'v_pworld');
+    const vArm = g.varying(instanceOnArm, 'v_arm');
 
-    const lightDirection = g.vec3(0.6, 1.0, 0.8).normalize();
-    const diffuse = g.Var('diffuse', vNormal.dot(lightDirection).max(g.f32(0)));
-    const light = g.Var('light', g.f32(0.45).add(diffuse.mul(g.f32(0.65))));
-    const base = g.Var('base', rainbowRGB(vWorld));
-    const lit = g.Var('lit', base.mul(light));
+    const lit = g.Var('lit', g.mix(light, ink(ACCENT), vArm));
 
     const material = new g.Material({ vertex: clip, fragment: g.vec4(lit, g.f32(1)) });
     const mesh = new g.Mesh(sphereGeometry, material);
@@ -131,7 +144,7 @@ const settings = {
     spin: true,
 };
 
-const panel = createPanel('fibonacci sphere');
+const panel = createPanel('fibonacci sphere', ACCENT);
 panel.add(settings, 'points', { min: 24, max: 3000, step: 1, label: 'Points' }).onChange(rebuild);
 panel.add(settings, 'twist', { min: -4, max: 4, step: 0.001, label: 'Twist off phi (deg)' }).onChange(rebuild);
 panel.add(settings, 'spin', { label: 'Auto-spin' });
@@ -148,7 +161,7 @@ camera.updateViewMatrix();
 
 /* render loop */
 
-const scenePass = g.pass(scene, camera);
+const scenePass = g.pass(scene, camera, { clearColor, samples: 4 });
 const outputNode = g.fxaa(scenePass.getTextureNode());
 const renderPipeline = new g.RenderPipeline(renderer, outputNode);
 
@@ -160,7 +173,6 @@ function frame() {
     const dt = (now - lastT) / 1000;
     lastT = now;
 
-    time.value = now / 1000;
     if (settings.spin && cloud) {
         spinAngle += dt * 0.25;
         quat.setAxisAngle(cloud.quaternion, [0, 1, 0], spinAngle);
