@@ -29,6 +29,18 @@ export function clone(a: Const<Euler>): Euler {
 }
 
 /**
+ * Creates a new Euler from the given values.
+ * @param x The x rotation in radians.
+ * @param y The y rotation in radians.
+ * @param z The z rotation in radians.
+ * @param order The order of rotation.
+ * @returns A new Euler.
+ */
+export function fromValues(x: number, y: number, z: number, order: EulerOrder): Euler {
+    return [x, y, z, order];
+}
+
+/**
  * Copies values from one Euler to another.
  * @param out The receiving Euler.
  * @param a The source Euler.
@@ -46,18 +58,6 @@ export function copy(out: Euler, a: Const<Euler>): Euler {
     }
 
     return out;
-}
-
-/**
- * Creates a new Euler from the given values.
- * @param x The x rotation in radians.
- * @param y The y rotation in radians.
- * @param z The z rotation in radians.
- * @param order The order of rotation.
- * @returns A new Euler.
- */
-export function fromValues(x: number, y: number, z: number, order: EulerOrder): Euler {
-    return [x, y, z, order];
 }
 
 /**

@@ -51,6 +51,13 @@ describe('euler', () => {
         });
     });
 
+    describe('fromValues', () => {
+        it('should create Euler from values', () => {
+            const result = euler.fromValues(Math.PI / 4, Math.PI / 3, Math.PI / 6, 'yxz');
+            expect(result).toEqual([Math.PI / 4, Math.PI / 3, Math.PI / 6, 'yxz']);
+        });
+    });
+
     describe('copy', () => {
         it('should copy values into and return the output Euler', () => {
             const out: Euler = [0, 0, 0];
@@ -69,10 +76,13 @@ describe('euler', () => {
         });
     });
 
-    describe('fromValues', () => {
-        it('should create Euler from values', () => {
-            const result = euler.fromValues(Math.PI / 4, Math.PI / 3, Math.PI / 6, 'yxz');
-            expect(result).toEqual([Math.PI / 4, Math.PI / 3, Math.PI / 6, 'yxz']);
+    describe('set', () => {
+        it('should set components and order, returning the same instance', () => {
+            const out = euler.create();
+            const result = euler.set(out, 1, 2, 3, 'zyx');
+
+            expect(result).toBe(out);
+            expect(out).toEqual([1, 2, 3, 'zyx']);
         });
     });
 
@@ -313,16 +323,6 @@ describe('euler', () => {
             expect(result[1]).toBeCloseTo(originalEuler[1]);
             expect(result[2]).toBeCloseTo(originalEuler[2]);
             expect(result[3]).toBe('xyz');
-        });
-    });
-
-    describe('set', () => {
-        it('should set components and order, returning the same instance', () => {
-            const out = euler.create();
-            const result = euler.set(out, 1, 2, 3, 'zyx');
-
-            expect(result).toBe(out);
-            expect(out).toEqual([1, 2, 3, 'zyx']);
         });
     });
 
