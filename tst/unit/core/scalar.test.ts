@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { binomial, lagrange } from '../../../src';
+import { binomial, lagrange, smootherstep, smoothstep } from '../../../src';
 
 describe('scalar', () => {
     describe('lagrange', () => {
@@ -46,6 +46,34 @@ describe('scalar', () => {
         it('should return 0 when k is out of range', () => {
             expect(binomial(3, 5)).toBe(0);
             expect(binomial(5, -1)).toBe(0);
+        });
+    });
+
+    describe('smoothstep', () => {
+        it('should ease from 0 to 1 between the edges', () => {
+            expect(smoothstep(10, 20, 10)).toBe(0);
+            expect(smoothstep(10, 20, 12.5)).toBeCloseTo(0.15625);
+            expect(smoothstep(10, 20, 15)).toBeCloseTo(0.5);
+            expect(smoothstep(10, 20, 20)).toBe(1);
+        });
+
+        it('should clamp outside the edges', () => {
+            expect(smoothstep(10, 20, 5)).toBe(0);
+            expect(smoothstep(10, 20, 25)).toBe(1);
+        });
+    });
+
+    describe('smootherstep', () => {
+        it('should ease from 0 to 1 between the edges', () => {
+            expect(smootherstep(10, 20, 10)).toBe(0);
+            expect(smootherstep(10, 20, 12.5)).toBeCloseTo(0.103515625);
+            expect(smootherstep(10, 20, 15)).toBeCloseTo(0.5);
+            expect(smootherstep(10, 20, 20)).toBe(1);
+        });
+
+        it('should clamp outside the edges', () => {
+            expect(smootherstep(10, 20, 5)).toBe(0);
+            expect(smootherstep(10, 20, 25)).toBe(1);
         });
     });
 });
