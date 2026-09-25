@@ -1,7 +1,37 @@
 import { describe, expect, it } from 'vitest';
-import { binomial, lagrange } from '../../../src';
+import { binomial, lagrange, repeat } from '../../../src';
 
 describe('scalar', () => {
+    describe('repeat', () => {
+        it('should wrap values into [0, length)', () => {
+            expect(repeat(5, 3)).toBe(2);
+            expect(repeat(5.5, 2)).toBe(1.5);
+            expect(repeat(3, 3)).toBe(0);
+        });
+
+        it('should wrap negative values to positive ones', () => {
+            expect(repeat(-1, 3)).toBe(2);
+            expect(repeat(-6, 3)).toBe(0);
+            expect(repeat(-0.1, 1)).toBeCloseTo(0.9);
+        });
+
+        it('should never return length itself', () => {
+            // the floor-divide form rounded this up to exactly `length`
+            expect(repeat(-1e-17, 1)).toBe(0);
+        });
+
+        it('should stay exact for integers beyond 2^53', () => {
+            // the floor-divide form lost the remainder to fp rounding
+            expect(repeat(1e16, 3)).toBe(1);
+        });
+
+        it('should return NaN for length 0 and non-finite inputs', () => {
+            expect(repeat(7, 0)).toBeNaN();
+            expect(repeat(Infinity, 3)).toBeNaN();
+            expect(repeat(7, Infinity)).toBeNaN();
+        });
+    });
+
     describe('lagrange', () => {
         it('should return the first value at t=0', () => {
             expect(lagrange(1, 5, 2, 0)).toBeCloseTo(1);

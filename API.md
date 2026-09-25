@@ -46,7 +46,7 @@ overview, installation, and examples, see the [README](./README.md).
 - <a id="lagrange"></a>`lagrange(v0: number, v1: number, v2: number, t: number)`
 - <a id="binomial"></a>`binomial(n: number, k: number): number`
 - <a id="clamp"></a>`clamp(value: number, min: number, max: number): number` — Clamp a value between min and max
-- <a id="repeat"></a>`repeat(t: number, length: number): number` — Loops `t` so that it is never larger than `length` and never smaller than 0.
+- <a id="repeat"></a>`repeat(t: number, length: number): number` — Loops `t` so that it wraps into the range `[0, length)`.
 - <a id="remap"></a>`remap(number: number, inLow: number, inHigh: number, outLow: number, outHigh: number): number` — Remaps a number from one range to another.
 - <a id="remapclamp"></a>`remapClamp(value: number, inLow: number, inHigh: number, outLow: number, outHigh: number): number` — Remaps a number from one range to another, clamping the result to the output range.
 - <a id="degrees_to_radians"></a>`DEGREES_TO_RADIANS`
