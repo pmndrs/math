@@ -817,3 +817,83 @@ export const setAxes = /* @__PURE__ */ (() => {
         return normalize(out, fromMat3(out, matr));
     };
 })();
+
+/**
+ * Sets a quaternion to the rotation that makes something at `eye` look at `target`.
+ * Its -Z axis faces `target` and its +Y axis leans toward `up`.
+ *
+ * @param out the receiving quaternion
+ * @param eye position of the viewer
+ * @param target point to look at
+ * @param up vec3 pointing up
+ * @returns out
+ */
+export function targetTo(out: Quat, eye: Const<Vec3>, target: Const<Vec3>, up: Const<Vec3>): Quat {
+    const upx = up[0];
+    const upy = up[1];
+    const upz = up[2];
+
+    let z0 = eye[0] - target[0];
+    let z1 = eye[1] - target[1];
+    let z2 = eye[2] - target[2];
+
+    let len = z0 * z0 + z1 * z1 + z2 * z2;
+    if (len > 0) {
+        len = 1 / Math.sqrt(len);
+        z0 *= len;
+        z1 *= len;
+        z2 *= len;
+    }
+
+    let x0 = upy * z2 - upz * z1;
+    let x1 = upz * z0 - upx * z2;
+    let x2 = upx * z1 - upy * z0;
+
+    len = x0 * x0 + x1 * x1 + x2 * x2;
+    if (len > 0) {
+        len = 1 / Math.sqrt(len);
+        x0 *= len;
+        x1 *= len;
+        x2 *= len;
+    }
+
+    const y0 = z1 * x2 - z2 * x1;
+    const y1 = z2 * x0 - z0 * x2;
+    const y2 = z0 * x1 - z1 * x0;
+
+    // Shoemake conversion of the rotation matrix with columns x, y, z
+    const trace = x0 + y1 + z2;
+    let root: number;
+
+    if (trace > 0.0) {
+        root = Math.sqrt(trace + 1.0);
+        out[3] = 0.5 * root;
+        root = 0.5 / root;
+        out[0] = (y2 - z1) * root;
+        out[1] = (z0 - x2) * root;
+        out[2] = (x1 - y0) * root;
+    } else if (z2 > (y1 > x0 ? y1 : x0)) {
+        root = Math.sqrt(z2 - x0 - y1 + 1.0);
+        out[2] = 0.5 * root;
+        root = 0.5 / root;
+        out[3] = (x1 - y0) * root;
+        out[0] = (x2 + z0) * root;
+        out[1] = (y2 + z1) * root;
+    } else if (y1 > x0) {
+        root = Math.sqrt(y1 - z2 - x0 + 1.0);
+        out[1] = 0.5 * root;
+        root = 0.5 / root;
+        out[3] = (z0 - x2) * root;
+        out[2] = (z1 + y2) * root;
+        out[0] = (x1 + y0) * root;
+    } else {
+        root = Math.sqrt(x0 - y1 - z2 + 1.0);
+        out[0] = 0.5 * root;
+        root = 0.5 / root;
+        out[3] = (y2 - z1) * root;
+        out[1] = (y0 + x1) * root;
+        out[2] = (z0 + x2) * root;
+    }
+
+    return out;
+}
