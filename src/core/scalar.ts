@@ -116,7 +116,7 @@ export function repeat(t: number, length: number): number {
  * wrap(4, -Math.PI, Math.PI) // 4 - 2π
  * ```
  *
- * Inspired by Godot's `wrapf`: https://github.com/godotengine/godot/blob/master/core/math/math_funcs.h
+ * Inspired by Godot's `wrapf`: https://godot-rust.github.io/docs/gdext/master/godot/global/fn.wrapf.html
  */
 export function wrap(value: number, min: number, max: number): number {
     const wrapped = min + repeat(value - min, max - min);
