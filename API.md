@@ -54,7 +54,7 @@ overview, installation, and examples, see the [README](./README.md).
 - <a id="radians_to_degrees"></a>`RADIANS_TO_DEGREES`
 - <a id="degreestoradians"></a>`degreesToRadians(degrees: number): number` — Converts Degrees To Radians
 - <a id="radianstodegrees"></a>`radiansToDegrees(radians: number): number` — Converts Radians To Degrees
-- <a id="wrapangle"></a>`wrapAngle(a: number): number` — Wraps an angle (in radians) into the range (-π, π].
+- <a id="wrapangle"></a>`wrapAngle(a: number): number` — Wraps an angle (in radians) into the range [-π, π).
 - <a id="deltaangle"></a>`deltaAngle(current: number, target: number): number` — Calculates the shortest signed difference between two angles (in radians).
 
 **Query**
