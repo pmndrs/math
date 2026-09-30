@@ -106,6 +106,26 @@ export function repeat(t: number, length: number): number {
 }
 
 /**
+ * Wraps `value` into the range `[min, max)`, looping around at either end.
+ * `repeat` is the `min = 0` special case. Expects `min < max`.
+ *
+ * @example
+ * ```ts
+ * wrap(370, 0, 360)          // 10
+ * wrap(-10, 0, 360)          // 350
+ * wrap(4, -Math.PI, Math.PI) // 4 - 2π
+ * ```
+ *
+ * Inspired by Godot's `wrapf`: https://github.com/godotengine/godot/blob/master/core/math/math_funcs.h
+ */
+export function wrap(value: number, min: number, max: number): number {
+    const wrapped = min + repeat(value - min, max - min);
+    // min + r can round up to exactly max when value is 1 ulp below min;
+    // written so NaN falls through instead of being swallowed as min
+    return wrapped >= max ? min : wrapped;
+}
+
+/**
  * Remaps a number from one range to another.
  */
 export function remap(number: number, inLow: number, inHigh: number, outLow: number, outHigh: number): number {
