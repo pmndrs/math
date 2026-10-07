@@ -1834,11 +1834,13 @@ export function perspectiveNO(out: Mat4, fovy: number, aspect: number, near: num
  * The near/far clip planes correspond to a normalized device coordinate Z range of [0, 1],
  * which matches WebGPU/Vulkan/DirectX/Metal's clip volume.
  * Passing null/undefined/no value for far will generate infinite projection matrix.
+ * For reverse-Z, swap near and far. Passing Infinity for near and a finite positive
+ * distance for far maps that distance to depth 1 and infinite distance to depth 0.
  *
  * @param out mat4 frustum matrix will be written into
  * @param fovy Vertical field of view in radians
  * @param aspect Aspect ratio. typically viewport width/height
- * @param near Near bound of the frustum
+ * @param near Near bound of the frustum, can be Infinity for reverse-Z
  * @param far Far bound of the frustum, can be null or Infinity
  * @returns out
  */
@@ -1859,9 +1861,14 @@ export function perspectiveZO(out: Mat4, fovy: number, aspect: number, near: num
     out[13] = 0;
     out[15] = 0;
     if (far != null && far !== Number.POSITIVE_INFINITY) {
-        const nf = 1 / (near - far);
-        out[10] = far * nf;
-        out[14] = far * near * nf;
+        if (near === Number.POSITIVE_INFINITY) {
+            out[10] = 0;
+            out[14] = far;
+        } else {
+            const nf = 1 / (near - far);
+            out[10] = far * nf;
+            out[14] = far * near * nf;
+        }
     } else {
         out[10] = -1;
         out[14] = -near;
