@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { binomial, lagrange, repeat, smootherstep, smoothstep, wrap } from '../../../src';
+import { binomial, lagrange, repeat, round, smootherstep, smoothstep, wrap } from '../../../src';
 
 describe('scalar', () => {
     describe('wrap', () => {
@@ -72,6 +72,31 @@ describe('scalar', () => {
             expect(repeat(7, 0)).toBeNaN();
             expect(repeat(Infinity, 3)).toBeNaN();
             expect(repeat(7, Infinity)).toBeNaN();
+        });
+    });
+
+    describe('round', () => {
+        it('should round halves away from zero, unlike Math.round', () => {
+            expect(round(0.5)).toBe(1);
+            expect(round(-0.5)).toBe(-1);
+            expect(round(1.5)).toBe(2);
+            expect(round(-1.5)).toBe(-2);
+            expect(round(2.5)).toBe(3);
+            expect(round(-2.5)).toBe(-3);
+        });
+
+        it('should round everything else to nearest', () => {
+            expect(round(1.4)).toBe(1);
+            expect(round(-1.4)).toBe(-1);
+            expect(round(2.6)).toBe(3);
+            expect(round(-2.6)).toBe(-3);
+            expect(round(7)).toBe(7);
+        });
+
+        it('should pass through non-finite values', () => {
+            expect(round(Infinity)).toBe(Infinity);
+            expect(round(-Infinity)).toBe(-Infinity);
+            expect(round(NaN)).toBeNaN();
         });
     });
 
