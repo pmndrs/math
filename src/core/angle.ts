@@ -51,7 +51,5 @@ export function wrapAngle(a: number): number {
  * @returns the shortest signed difference in (-π, π]
  */
 export function deltaAngle(current: number, target: number): number {
-    const diff = target - current;
-    const delta = diff - TAU * Math.floor(diff / TAU);
-    return delta > Math.PI ? delta - TAU : delta;
+    return 0 - wrapAngle(current - target);
 }
