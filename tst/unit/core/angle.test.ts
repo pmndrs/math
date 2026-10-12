@@ -26,7 +26,7 @@ describe('angle', () => {
     });
 
     describe('wrapAngle', () => {
-        it('is a no-op inside (-pi, pi]', () => {
+        it('is a no-op inside [-pi, pi)', () => {
             expect(wrapAngle(0)).toBe(0);
             expect(wrapAngle(PI / 2)).toBeCloseTo(PI / 2);
             expect(wrapAngle(-PI / 2)).toBeCloseTo(-PI / 2);
@@ -40,11 +40,12 @@ describe('angle', () => {
             expect(wrapAngle(-4 * PI)).toBeCloseTo(0);
         });
 
-        it('always returns a value in (-pi, pi]', () => {
-            for (const a of [-1000, -50.5, -10, -3, 1, 7, 50.5, 1000]) {
+        it('always returns a value in [-pi, pi)', () => {
+            // PI - 4.44e-16 is 1 ulp below pi: the floor form used to push it below -pi
+            for (const a of [-1000, -50.5, -10, -3, 1, 7, 50.5, 1000, PI - 4.440892098500626e-16, 1e16]) {
                 const wrapped = wrapAngle(a);
-                expect(wrapped).toBeGreaterThan(-PI);
-                expect(wrapped).toBeLessThanOrEqual(PI);
+                expect(wrapped).toBeGreaterThanOrEqual(-PI);
+                expect(wrapped).toBeLessThan(PI);
                 expect(wrapAngle(wrapped)).toBeCloseTo(wrapped);
             }
         });

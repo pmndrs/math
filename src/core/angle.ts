@@ -1,3 +1,5 @@
+import { wrap } from './scalar';
+
 const TAU = Math.PI * 2;
 
 export const DEGREES_TO_RADIANS = Math.PI / 180;
@@ -23,13 +25,13 @@ export function radiansToDegrees(radians: number): number {
 }
 
 /**
- * Wraps an angle (in radians) into the range (-π, π].
+ * Wraps an angle (in radians) into the range [-π, π).
  *
  * @param a the angle to wrap
- * @returns the angle wrapped into (-π, π]
+ * @returns the angle wrapped into [-π, π)
  */
 export function wrapAngle(a: number): number {
-    return a - TAU * Math.floor((a + Math.PI) / TAU);
+    return wrap(a, -Math.PI, Math.PI);
 }
 
 /**

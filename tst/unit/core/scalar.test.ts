@@ -1,7 +1,32 @@
 import { describe, expect, it } from 'vitest';
-import { binomial, lagrange, repeat, smootherstep, smoothstep } from '../../../src';
+import { binomial, lagrange, repeat, smootherstep, smoothstep, wrap } from '../../../src';
 
 describe('scalar', () => {
+    describe('wrap', () => {
+        it('should wrap values into [min, max)', () => {
+            expect(wrap(370, 0, 360)).toBe(10);
+            expect(wrap(-10, 0, 360)).toBe(350);
+            expect(wrap(5, 1, 2)).toBe(1);
+            expect(wrap(2, 1, 2)).toBe(1);
+            expect(wrap(1, 1, 2)).toBe(1);
+        });
+
+        it('should wrap into a negative range', () => {
+            expect(wrap(4, -Math.PI, Math.PI)).toBeCloseTo(4 - 2 * Math.PI);
+            expect(wrap(-15, -10, 10)).toBe(5);
+        });
+
+        it('should never return max itself', () => {
+            // min + repeat(...) rounds up to exactly max for values 1 ulp below min
+            expect(wrap(0.9999999999999999, 1, 2)).toBe(1);
+        });
+
+        it('should return NaN for an empty range and non-finite inputs', () => {
+            expect(wrap(5, 3, 3)).toBeNaN();
+            expect(wrap(Infinity, 0, 1)).toBeNaN();
+        });
+    });
+
     describe('repeat', () => {
         it('should wrap values into [0, length)', () => {
             expect(repeat(5, 3)).toBe(2);

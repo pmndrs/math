@@ -1,6 +1,6 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { type Vec2, vec2 } from 'math';
+import { repeat, type Vec2, vec2, wrap } from 'math';
 import { circumcircle } from 'math/geometry';
 import { circle } from 'math/shapes';
 import { easing } from 'math/time';
@@ -142,12 +142,10 @@ const wheelRows = SHAPES.map((shape) => {
 
 function updateWheel(continuousIndex: number) {
     const n = SHAPES.length;
-    const active = ((continuousIndex % n) + n) % n;
+    const active = repeat(continuousIndex, n);
     for (let i = 0; i < n; i++) {
-        // shortest signed distance from the active row, wrapped into [-n/2, n/2)
-        let dist = i - active;
-        dist = ((dist % n) + n) % n;
-        if (dist > n / 2) dist -= n;
+        // shortest signed distance from the active row
+        const dist = wrap(i - active, -n / 2, n / 2);
         const k = Math.min(Math.abs(dist) / 2.5, 1);
         const y = dist * ROW_HEIGHT;
         wheelRows[i].style.transform = `translateY(${y}px) translateY(-50%) scale(${1 - k * 0.4})`;
