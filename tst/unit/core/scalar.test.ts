@@ -21,6 +21,18 @@ describe('scalar', () => {
             expect(wrap(0.9999999999999999, 1, 2)).toBe(1);
         });
 
+        it('should return a value already inside the range unchanged', () => {
+            for (const [value, min, max] of [
+                [0.1, 0, 1],
+                [359.9, 0, 360],
+                [359.99999999999994, 0, 360],
+                [1.9999999999999998, 1, 2],
+                [2.8999999999999995, -7.3, 2.9],
+            ] as const) {
+                expect(wrap(value, min, max)).toBe(value);
+            }
+        });
+
         it('should return NaN for an empty range and non-finite inputs', () => {
             expect(wrap(5, 3, 3)).toBeNaN();
             expect(wrap(Infinity, 0, 1)).toBeNaN();
@@ -48,6 +60,12 @@ describe('scalar', () => {
         it('should stay exact for integers beyond 2^53', () => {
             // the floor-divide form lost the remainder to fp rounding
             expect(repeat(1e16, 3)).toBe(1);
+        });
+
+        it('should leave a value below length untouched', () => {
+            expect(repeat(0.1, 1)).toBe(0.1);
+            expect(repeat(0.7, 3)).toBe(0.7);
+            expect(repeat(3.3, 10)).toBe(3.3);
         });
 
         it('should return NaN for length 0 and non-finite inputs', () => {
