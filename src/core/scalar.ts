@@ -99,15 +99,23 @@ export const clamp = (value: number, min: number, max: number): number => {
  * Unlike the `%` operator (a remainder), this is a true floored modulo, so
  * negative `t` wraps to a positive value: `repeat(-1, 3) === 2`.
  *
+ * A value already inside the range is returned unchanged, bit for bit.
+ *
  * Based on https://github.com/angus-c/just/blob/master/packages/number-modulo/index.mjs
  */
 export function repeat(t: number, length: number): number {
-    return ((t % length) + length) % length;
+    if (length === Infinity || length === -Infinity) return Number.NaN;
+    let r = t % length;
+    if (r !== 0 && r < 0 !== length < 0) r += length;
+    if (r === length) return 0;
+    return r + 0;
 }
 
 /**
  * Wraps `value` into the range `[min, max)`, looping around at either end.
  * `repeat` is the `min = 0` special case. Expects `min < max`.
+ *
+ * A value already inside the range is returned unchanged, bit for bit.
  *
  * @example
  * ```ts
@@ -119,9 +127,8 @@ export function repeat(t: number, length: number): number {
  * Inspired by Godot's `wrapf`: https://godot-rust.github.io/docs/gdext/master/godot/global/fn.wrapf.html
  */
 export function wrap(value: number, min: number, max: number): number {
+    if (value >= min && value < max) return value;
     const wrapped = min + repeat(value - min, max - min);
-    // min + r can round up to exactly max when value is 1 ulp below min;
-    // written so NaN falls through instead of being swallowed as min
     return wrapped >= max ? min : wrapped;
 }
 
