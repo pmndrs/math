@@ -101,7 +101,7 @@ export function scale(out: Polar, a: Const<Polar>, s: number): Polar {
 }
 
 /**
- * Rotates a Polar by an angle (in radians), wrapping theta into (-pi, pi].
+ * Rotates a Polar by an angle (in radians), wrapping theta into [-pi, pi).
  *
  * @param out the receiving Polar
  * @param a the source Polar

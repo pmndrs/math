@@ -24,6 +24,29 @@ group('angle ops 10k @core @angle', () => {
         return sum;
     });
 
+    bench('wrapAngle inside the range', function* () {
+        const rand = mulberry32.create(1);
+        const angles: number[] = [];
+        for (let i = 0; i < N; i++) angles.push(mulberry32.sample(rand) * 2 * Math.PI - Math.PI);
+        const sum = yield () => {
+            let sum = 0;
+            for (let i = 0; i < N; i++) sum += wrapAngle(angles[i]);
+            return sum;
+        };
+        return sum;
+    });
+
+    bench('wrapAngle of an angle difference', function* () {
+        const a = makeAngles(1);
+        const b = makeAngles(2);
+        const sum = yield () => {
+            let sum = 0;
+            for (let i = 0; i < N; i++) sum += wrapAngle(wrapAngle(b[i]) - wrapAngle(a[i]));
+            return sum;
+        };
+        return sum;
+    });
+
     bench('deltaAngle', function* () {
         const a = makeAngles(1);
         const b = makeAngles(2);
