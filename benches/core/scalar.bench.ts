@@ -1,6 +1,6 @@
 import { bench, group } from '@pmndrs/labs';
 import * as mulberry32 from '../../src/random/mulberry32';
-import { repeat, wrap } from '../../src/core/scalar';
+import { repeat, round, wrap } from '../../src/core/scalar';
 
 const N = 10_000;
 
@@ -59,6 +59,18 @@ group('scalar wrap 10k @core @scalar', () => {
         const sum = yield () => {
             let sum = 0;
             for (let i = 0; i < N; i++) sum += repeat(values[i], 2 * Math.PI);
+            return sum;
+        };
+        return sum;
+    });
+});
+
+group('scalar round 10k @core @scalar', () => {
+    bench('round', function* () {
+        const values = makeValues(1, 1000);
+        const sum = yield () => {
+            let sum = 0;
+            for (let i = 0; i < N; i++) sum += round(values[i]);
             return sum;
         };
         return sum;

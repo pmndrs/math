@@ -7,9 +7,7 @@ export const EPSILON = 0.000001;
  * @param a value to round
  */
 export function round(a: number): number {
-    if (a >= 0) return Math.round(a);
-
-    return a % 0.5 === 0 ? Math.floor(a) : Math.round(a);
+    return Math.sign(a) * Math.round(Math.abs(a));
 }
 
 /**
