@@ -425,6 +425,55 @@ describe('quat', () => {
         });
     });
 
+    describe('targetTo', () => {
+        it('should match the rotation of mat4.targetTo exactly', () => {
+            const inputs: [Vec3, Vec3, Vec3][] = [
+                [
+                    [1, 2, 3],
+                    [-4, 0.5, 7],
+                    [0, 1, 0],
+                ],
+                [
+                    [0, 5, 0],
+                    [0.1, 0, -0.2],
+                    [0, 1, 0],
+                ],
+                [
+                    [3, -1, 2],
+                    [3, -1, -8],
+                    [0.3, 0.9, 0.1],
+                ],
+                [
+                    [2, 2, 2],
+                    [2, 2, 2],
+                    [0, 1, 0],
+                ],
+            ];
+
+            for (const [eye, target, up] of inputs) {
+                const expected = quat.fromMat4(quat.create(), mat4.targetTo(mat4.create(), eye, target, up));
+                expect(quat.targetTo(quat.create(), eye, target, up)).toEqual(expected);
+            }
+        });
+
+        it('should point -Z from eye to target', () => {
+            const eye: Vec3 = [1, 2, 3];
+            const target: Vec3 = [-4, 0.5, 7];
+            const q = quat.targetTo(quat.create(), eye, target, [0, 1, 0]);
+
+            const forward = vec3.transformQuat(vec3.create(), [0, 0, -1], q);
+            const expected = vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), target, eye));
+            expect(forward[0]).toBeCloseTo(expected[0]);
+            expect(forward[1]).toBeCloseTo(expected[1]);
+            expect(forward[2]).toBeCloseTo(expected[2]);
+        });
+
+        it('should return out', () => {
+            const out = quat.create();
+            expect(quat.targetTo(out, [0, 0, 5], [0, 0, 0], [0, 1, 0])).toBe(out);
+        });
+    });
+
     describe('vec4 aliases', () => {
         it('should work with clone', () => {
             const q: Quat = [1, 2, 3, 4];
