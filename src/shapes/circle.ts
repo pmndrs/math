@@ -133,6 +133,7 @@ export function setFromPoints(out: Circle, points: readonly number[], n: number)
 /**
  * Expands a Circle by the least amount needed to also enclose a point
  * The center moves toward the point. A circle with radius 0 is treated as a single point at its center.
+ * NaN coordinates or radii are not supported and give an unspecified result.
  * @param out - The output Circle
  * @param circle - The input Circle
  * @param point - The point to include
@@ -174,6 +175,7 @@ export function expandByPoint(out: Circle, circle: Const<Circle>, point: Const<V
 
 /**
  * Computes the smallest Circle that encloses two circles
+ * NaN coordinates or radii are not supported and give an unspecified result.
  * @param out - The output Circle
  * @param circleA - The first Circle
  * @param circleB - The second Circle

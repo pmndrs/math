@@ -151,6 +151,7 @@ export function setFromPoints(out: Sphere, points: readonly number[], n: number)
 /**
  * Expands a Sphere by the least amount needed to also enclose a point
  * The center moves toward the point. A sphere with radius 0 is treated as a single point at its center.
+ * NaN coordinates or radii are not supported and give an unspecified result.
  * @param out - The output Sphere
  * @param sphere - The input Sphere
  * @param point - The point to include
@@ -198,6 +199,7 @@ export function expandByPoint(out: Sphere, sphere: Const<Sphere>, point: Const<V
 
 /**
  * Computes the smallest Sphere that encloses two spheres
+ * NaN coordinates or radii are not supported and give an unspecified result.
  * @param out - The output Sphere
  * @param sphereA - The first Sphere
  * @param sphereB - The second Sphere
