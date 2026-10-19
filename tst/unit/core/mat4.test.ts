@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Mat4, Vec3 } from '../../../src';
-import { mat4, quat } from '../../../src';
+import { mat4, quat, vec3 } from '../../../src';
 
 describe('mat4', () => {
     describe('create', () => {
@@ -671,6 +671,25 @@ describe('mat4', () => {
 
             expect(result[15]).toBe(0);
             expect(result[10]).not.toBe(mat4.perspectiveNO(mat4.create(), Math.PI / 4, 16 / 9, 0.1, 100)[10]);
+        });
+
+        it('perspectiveReverseZ should map near to depth 1 and far to depth 0', () => {
+            const projection = mat4.perspectiveReverseZ(mat4.create(), Math.PI / 3, 2, 0.1, 100);
+            const point: Vec3 = [0, 0, 0];
+
+            expect(projection).toEqual(mat4.perspectiveZO(mat4.create(), Math.PI / 3, 2, 100, 0.1));
+            expect(vec3.transformMat4(point, [0, 0, -0.1], projection)[2]).toBeCloseTo(1);
+            expect(vec3.transformMat4(point, [0, 0, -100], projection)[2]).toBeCloseTo(0);
+        });
+
+        it('perspectiveReverseZ should support an infinite far plane', () => {
+            const projection = mat4.perspectiveReverseZ(mat4.create(), Math.PI / 3, 2, 0.1, Infinity);
+            const point: Vec3 = [0, 0, 0];
+
+            expect(projection.every(Number.isFinite)).toBe(true);
+            expect(vec3.transformMat4(point, [0, 0, -0.1], projection)[2]).toBeCloseTo(1);
+            expect(vec3.transformMat4(point, [0, 0, -0.2], projection)[2]).toBeCloseTo(0.5);
+            expect(vec3.transformMat4(point, [0, 0, -1e9], projection)[2]).toBeCloseTo(0, 8);
         });
 
         it('orthoZO should create zero-to-one depth range orthographic', () => {

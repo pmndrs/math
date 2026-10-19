@@ -616,6 +616,7 @@ import { mat4 } from 'math';
 - `mat4.frustumZO(out: Mat4, left: number, right: number, bottom: number, top: number, near: number, far: number): Mat4` — Generates a frustum matrix with the given bounds, suitable for WebGPU.
 - `mat4.perspectiveNO(out: Mat4, fovy: number, aspect: number, near: number, far: number): Mat4` — Generates a perspective projection matrix with the given bounds.
 - `mat4.perspectiveZO(out: Mat4, fovy: number, aspect: number, near: number, far: number): Mat4` — Generates a perspective projection matrix suitable for WebGPU with the given bounds.
+- `mat4.perspectiveReverseZ(out: Mat4, fovy: number, aspect: number, near: number, far: number): Mat4` — Generates a reverse-Z perspective projection matrix with the given bounds.
 - `mat4.perspectiveFromFieldOfViewNO(out: Mat4, fov: { upDegrees: number; downDegrees: number; leftDegrees: number; rightDegrees: number; }, near: number, far: number): Mat4` — Generates a perspective projection matrix with the given field of view.
 - `mat4.perspectiveFromFieldOfViewZO(out: Mat4, fov: { upDegrees: number; downDegrees: number; leftDegrees: number; rightDegrees: number; }, near: number, far: number): Mat4` — Generates a perspective projection matrix with the given field of view, suitable for WebGPU.
 - `mat4.orthoNO(out: Mat4, left: number, right: number, bottom: number, top: number, near: number, far: number): Mat4` — Generates a orthogonal projection matrix with the given bounds.
