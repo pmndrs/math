@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Mat4, Vec3 } from '../../../src';
-import { mat4, quat } from '../../../src';
+import { mat4, quat, vec3 } from '../../../src';
 
 describe('mat4', () => {
     describe('create', () => {
@@ -480,6 +480,48 @@ describe('mat4', () => {
             expect(result[5]).toBeCloseTo(1 / Math.tan(fovy / 2));
             expect(result[0]).toBeCloseTo(1 / Math.tan(fovy / 2) / aspect);
             expect(result[15]).toBe(0);
+        });
+    });
+
+    describe('perspectiveZO reverse-Z', () => {
+        it.each([0.1, 1])('supports an infinite far plane with near distance %s', (near) => {
+            const projection = mat4.create();
+            const result = mat4.perspectiveZO(projection, Math.PI / 3, 2, Infinity, near);
+
+            expect(result).toBe(projection);
+            expect(projection.every(Number.isFinite)).toBe(true);
+            expect(projection[0]).toBeCloseTo(1 / Math.tan(Math.PI / 6) / 2);
+            expect(projection[5]).toBeCloseTo(1 / Math.tan(Math.PI / 6));
+
+            const point: Vec3 = [0, 0, 0];
+            vec3.transformMat4(point, [0, 0, -near], projection);
+            expect(point[2]).toBeCloseTo(1);
+            vec3.transformMat4(point, [0, 0, -2 * near], projection);
+            expect(point[2]).toBeCloseTo(0.5);
+            vec3.transformMat4(point, [0, 0, -1e10 * near], projection);
+            expect(point[2]).toBeCloseTo(0, 8);
+        });
+
+        it('preserves finite reverse-Z depth mapping', () => {
+            const projection = mat4.perspectiveZO(mat4.create(), Math.PI / 3, 2, 100, 0.1);
+            const point: Vec3 = [0, 0, 0];
+
+            vec3.transformMat4(point, [0, 0, -0.1], projection);
+            expect(point[2]).toBeCloseTo(1);
+            vec3.transformMat4(point, [0, 0, -100], projection);
+            expect(point[2]).toBeCloseTo(0);
+        });
+
+        it('preserves infinite forward-Z depth mapping', () => {
+            const projection = mat4.perspectiveZO(mat4.create(), Math.PI / 3, 2, 0.1, Infinity);
+            const point: Vec3 = [0, 0, 0];
+
+            vec3.transformMat4(point, [0, 0, -0.1], projection);
+            expect(point[2]).toBeCloseTo(0);
+            vec3.transformMat4(point, [0, 0, -0.2], projection);
+            expect(point[2]).toBeCloseTo(0.5);
+            vec3.transformMat4(point, [0, 0, -1e9], projection);
+            expect(point[2]).toBeCloseTo(1, 8);
         });
     });
 
