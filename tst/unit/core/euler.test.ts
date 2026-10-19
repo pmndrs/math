@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import type { Euler, EulerOrder, Quat } from '../../../src';
-import { euler, mat4, quat } from '../../../src';
+import type { Euler, Quat } from '../../../src';
+import { EulerOrder, euler, mat4, quat } from '../../../src';
 import * as mulberry32 from '../../../src/random/mulberry32';
 
-const ORDERS: EulerOrder[] = ['xyz', 'xzy', 'yxz', 'yzx', 'zxy', 'zyx'];
+const ORDERS: EulerOrder[] = [EulerOrder.XYZ, EulerOrder.XZY, EulerOrder.YXZ, EulerOrder.YZX, EulerOrder.ZXY, EulerOrder.ZYX];
 
 // The axis whose ±90° rotation drives each order into its gimbal-lock (degenerate) branch,
 // i.e. the axis of the middle rotation that gates the asin() singularity for that order.
 const SINGULAR_AXIS: Record<EulerOrder, [number, number, number]> = {
-    xyz: [0, 1, 0],
-    zyx: [0, 1, 0],
-    yxz: [1, 0, 0],
-    zxy: [1, 0, 0],
-    yzx: [0, 0, 1],
-    xzy: [0, 0, 1],
+    [EulerOrder.XYZ]: [0, 1, 0],
+    [EulerOrder.ZYX]: [0, 1, 0],
+    [EulerOrder.YXZ]: [1, 0, 0],
+    [EulerOrder.ZXY]: [1, 0, 0],
+    [EulerOrder.YZX]: [0, 0, 1],
+    [EulerOrder.XZY]: [0, 0, 1],
 };
 
 /** A deterministic, uniformly-distributed random unit quaternion. */
@@ -27,79 +27,75 @@ function randomQuat(rand: mulberry32.Mulberry32): Quat {
 }
 
 describe('euler', () => {
+    describe('order', () => {
+        it('should convert between order strings and EulerOrder', () => {
+            expect(euler.order('yxz')).toBe(EulerOrder.YXZ);
+            expect(euler.orderString(EulerOrder.YXZ)).toBe('yxz');
+
+            for (const order of ORDERS) {
+                expect(euler.order(euler.orderString(order))).toBe(order);
+            }
+        });
+    });
+
     describe('create', () => {
         it('should create default Euler with xyz order', () => {
             const result = euler.create();
-            expect(result).toEqual([0, 0, 0, 'xyz']);
+            expect(result).toEqual([0, 0, 0, EulerOrder.XYZ]);
         });
     });
 
     describe('clone', () => {
         it('should create a separate Euler with the same values', () => {
-            const source: Euler = [1, 2, 3, 'yxz'];
+            const source: Euler = [1, 2, 3, EulerOrder.YXZ];
             const result = euler.clone(source);
 
             expect(result).toEqual(source);
             expect(result).not.toBe(source);
         });
-
-        it('should preserve an omitted order', () => {
-            const result = euler.clone([1, 2, 3]);
-
-            expect(result).toEqual([1, 2, 3]);
-            expect(result).toHaveLength(3);
-        });
     });
 
     describe('fromValues', () => {
         it('should create Euler from values', () => {
-            const result = euler.fromValues(Math.PI / 4, Math.PI / 3, Math.PI / 6, 'yxz');
-            expect(result).toEqual([Math.PI / 4, Math.PI / 3, Math.PI / 6, 'yxz']);
+            const result = euler.fromValues(Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.YXZ);
+            expect(result).toEqual([Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.YXZ]);
         });
     });
 
     describe('copy', () => {
         it('should copy values into and return the output Euler', () => {
-            const out: Euler = [0, 0, 0];
-            const result = euler.copy(out, [1, 2, 3, 'zyx']);
+            const out = euler.create();
+            const result = euler.copy(out, [1, 2, 3, EulerOrder.ZYX]);
 
             expect(result).toBe(out);
-            expect(out).toEqual([1, 2, 3, 'zyx']);
-        });
-
-        it('should remove the output order when it is omitted from the source', () => {
-            const out = euler.create();
-            euler.copy(out, [1, 2, 3]);
-
-            expect(out).toEqual([1, 2, 3]);
-            expect(out).toHaveLength(3);
+            expect(out).toEqual([1, 2, 3, EulerOrder.ZYX]);
         });
     });
 
     describe('set', () => {
         it('should set components and order, returning the same instance', () => {
             const out = euler.create();
-            const result = euler.set(out, 1, 2, 3, 'zyx');
+            const result = euler.set(out, 1, 2, 3, EulerOrder.ZYX);
 
             expect(result).toBe(out);
-            expect(out).toEqual([1, 2, 3, 'zyx']);
+            expect(out).toEqual([1, 2, 3, EulerOrder.ZYX]);
         });
     });
 
     describe('fromDegrees', () => {
         it('should convert degrees to radians and set order', () => {
             const result = euler.create();
-            euler.fromDegrees(result, 90, 180, 45, 'zxy');
+            euler.fromDegrees(result, 90, 180, 45, EulerOrder.ZXY);
 
             expect(result[0]).toBeCloseTo(Math.PI / 2);
             expect(result[1]).toBeCloseTo(Math.PI);
             expect(result[2]).toBeCloseTo(Math.PI / 4);
-            expect(result[3]).toBe('zxy');
+            expect(result[3]).toBe(EulerOrder.ZXY);
         });
 
         it('should modify the input Euler', () => {
             const eulerAngle = euler.create();
-            const result = euler.fromDegrees(eulerAngle, 30, 60, 90, 'xyz');
+            const result = euler.fromDegrees(eulerAngle, 30, 60, 90, EulerOrder.XYZ);
 
             expect(result).toBe(eulerAngle);
             expect(result[0]).toBeCloseTo(Math.PI / 6);
@@ -121,16 +117,23 @@ describe('euler', () => {
             mat4.rotateZ(matrix, matrix, rotZ);
 
             const result = euler.create();
-            euler.fromRotationMat4(result, matrix, 'xyz');
+            euler.fromRotationMat4(result, matrix, EulerOrder.XYZ);
 
             expect(result[0]).toBeCloseTo(rotX, 4);
             expect(result[1]).toBeCloseTo(rotY, 4);
             expect(result[2]).toBeCloseTo(rotZ, 4);
-            expect(result[3]).toBe('xyz');
+            expect(result[3]).toBe(EulerOrder.XYZ);
         });
 
         it('should handle different rotation orders', () => {
-            const orders: EulerOrder[] = ['xyz', 'yxz', 'zxy', 'zyx', 'yzx', 'xzy'];
+            const orders: EulerOrder[] = [
+                EulerOrder.XYZ,
+                EulerOrder.YXZ,
+                EulerOrder.ZXY,
+                EulerOrder.ZYX,
+                EulerOrder.YZX,
+                EulerOrder.XZY,
+            ];
 
             orders.forEach((order) => {
                 const matrix = mat4.create();
@@ -150,10 +153,10 @@ describe('euler', () => {
             const matrix = mat4.create();
             mat4.rotateX(matrix, matrix, Math.PI / 4);
 
-            const result: Euler = [0, 0, 0, 'yxz'];
+            const result: Euler = [0, 0, 0, EulerOrder.YXZ];
             euler.fromRotationMat4(result, matrix);
 
-            expect(result[3]).toBe('yxz');
+            expect(result[3]).toBe(EulerOrder.YXZ);
         });
 
         it('should handle gimbal lock situations', () => {
@@ -162,7 +165,7 @@ describe('euler', () => {
             mat4.rotateY(matrix, matrix, Math.PI / 2);
 
             const result = euler.create();
-            euler.fromRotationMat4(result, matrix, 'xyz');
+            euler.fromRotationMat4(result, matrix, EulerOrder.XYZ);
 
             expect(result[1]).toBeCloseTo(Math.PI / 2);
             // X and Z should be reasonable values (not NaN or Infinity)
@@ -173,22 +176,22 @@ describe('euler', () => {
 
     describe('exactEquals', () => {
         it('should return true for identical Euler angles', () => {
-            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, 'xyz'];
-            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, 'xyz'];
+            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.XYZ];
+            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.XYZ];
 
             expect(euler.exactEquals(a, b)).toBe(true);
         });
 
         it('should return false for different angles', () => {
-            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, 'xyz'];
-            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 5, 'xyz'];
+            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.XYZ];
+            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 5, EulerOrder.XYZ];
 
             expect(euler.exactEquals(a, b)).toBe(false);
         });
 
         it('should return false for different orders', () => {
-            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, 'xyz'];
-            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, 'yxz'];
+            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.XYZ];
+            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.YXZ];
 
             expect(euler.exactEquals(a, b)).toBe(false);
         });
@@ -196,29 +199,29 @@ describe('euler', () => {
 
     describe('equals', () => {
         it('should return true for nearly equal Euler angles', () => {
-            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, 'xyz'];
-            const b: Euler = [Math.PI / 4 + 1e-10, Math.PI / 3 + 1e-10, Math.PI / 6 + 1e-10, 'xyz'];
+            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.XYZ];
+            const b: Euler = [Math.PI / 4 + 1e-10, Math.PI / 3 + 1e-10, Math.PI / 6 + 1e-10, EulerOrder.XYZ];
 
             expect(euler.equals(a, b)).toBe(true);
         });
 
         it('should return false for significantly different angles', () => {
-            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, 'xyz'];
-            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 5, 'xyz'];
+            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.XYZ];
+            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 5, EulerOrder.XYZ];
 
             expect(euler.equals(a, b)).toBe(false);
         });
 
         it('should return false for different orders', () => {
-            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, 'xyz'];
-            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, 'yxz'];
+            const a: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.XYZ];
+            const b: Euler = [Math.PI / 4, Math.PI / 3, Math.PI / 6, EulerOrder.YXZ];
 
             expect(euler.equals(a, b)).toBe(false);
         });
 
         it('should handle edge cases with zero values', () => {
-            const a: Euler = [0, 0, 0, 'xyz'];
-            const b: Euler = [1e-10, 1e-10, 1e-10, 'xyz'];
+            const a: Euler = [0, 0, 0, EulerOrder.XYZ];
+            const b: Euler = [1e-10, 1e-10, 1e-10, EulerOrder.XYZ];
 
             expect(euler.equals(a, b)).toBe(true);
         });
@@ -229,16 +232,23 @@ describe('euler', () => {
             const q = quat.setAxisAngle(quat.create(), [0, 0, 1], Math.PI / 4);
             const result = euler.create();
 
-            euler.fromQuat(result, q, 'xyz');
+            euler.fromQuat(result, q, EulerOrder.XYZ);
 
-            expect(result[3]).toBe('xyz');
+            expect(result[3]).toBe(EulerOrder.XYZ);
             // Should have rotation around Z axis
             expect(Math.abs(result[2])).toBeCloseTo(Math.PI / 4, 5);
         });
 
         it('should work with different orders', () => {
             const q = quat.setAxisAngle(quat.create(), [1, 0, 0], Math.PI / 6);
-            const orders: EulerOrder[] = ['xyz', 'yxz', 'zxy', 'zyx', 'yzx', 'xzy'];
+            const orders: EulerOrder[] = [
+                EulerOrder.XYZ,
+                EulerOrder.YXZ,
+                EulerOrder.ZXY,
+                EulerOrder.ZYX,
+                EulerOrder.YZX,
+                EulerOrder.XZY,
+            ];
 
             orders.forEach((order) => {
                 const result = euler.create();
@@ -252,15 +262,15 @@ describe('euler', () => {
         });
 
         it('should be consistent with fromEuler round-trip', () => {
-            const originalEuler: Euler = [Math.PI / 6, Math.PI / 4, Math.PI / 8, 'xyz'];
+            const originalEuler: Euler = [Math.PI / 6, Math.PI / 4, Math.PI / 8, EulerOrder.XYZ];
             const q = quat.create();
             const resultEuler = euler.create();
 
             quat.fromEuler(q, originalEuler);
-            euler.fromQuat(resultEuler, q, 'xyz');
+            euler.fromQuat(resultEuler, q, EulerOrder.XYZ);
 
             // Should be approximately the same (accounting for potential sign flips or equivalent angles)
-            expect(resultEuler[3]).toBe('xyz');
+            expect(resultEuler[3]).toBe(EulerOrder.XYZ);
             expect(Number.isFinite(resultEuler[0])).toBe(true);
             expect(Number.isFinite(resultEuler[1])).toBe(true);
             expect(Number.isFinite(resultEuler[2])).toBe(true);
@@ -269,22 +279,22 @@ describe('euler', () => {
 
     describe('reorder', () => {
         it('should convert Euler from one order to another', () => {
-            const originalEuler: Euler = [Math.PI / 6, Math.PI / 4, Math.PI / 8, 'xyz'];
+            const originalEuler: Euler = [Math.PI / 6, Math.PI / 4, Math.PI / 8, EulerOrder.XYZ];
             const result = euler.create();
 
-            euler.reorder(result, originalEuler, 'yxz');
+            euler.reorder(result, originalEuler, EulerOrder.YXZ);
 
-            expect(result[3]).toBe('yxz');
+            expect(result[3]).toBe(EulerOrder.YXZ);
             expect(Number.isFinite(result[0])).toBe(true);
             expect(Number.isFinite(result[1])).toBe(true);
             expect(Number.isFinite(result[2])).toBe(true);
         });
 
         it('should preserve rotation when reordering', () => {
-            const originalEuler: Euler = [Math.PI / 6, Math.PI / 4, Math.PI / 8, 'xyz'];
+            const originalEuler: Euler = [Math.PI / 6, Math.PI / 4, Math.PI / 8, EulerOrder.XYZ];
             const reordered = euler.create();
 
-            euler.reorder(reordered, originalEuler, 'zyx');
+            euler.reorder(reordered, originalEuler, EulerOrder.ZYX);
 
             // Convert both to quaternions to verify they represent the same rotation
             const qOriginal = quat.create();
@@ -299,8 +309,15 @@ describe('euler', () => {
         });
 
         it('should handle all order combinations', () => {
-            const orders: EulerOrder[] = ['xyz', 'yxz', 'zxy', 'zyx', 'yzx', 'xzy'];
-            const originalEuler: Euler = [Math.PI / 8, Math.PI / 6, Math.PI / 4, 'xyz'];
+            const orders: EulerOrder[] = [
+                EulerOrder.XYZ,
+                EulerOrder.YXZ,
+                EulerOrder.ZXY,
+                EulerOrder.ZYX,
+                EulerOrder.YZX,
+                EulerOrder.XZY,
+            ];
+            const originalEuler: Euler = [Math.PI / 8, Math.PI / 6, Math.PI / 4, EulerOrder.XYZ];
 
             orders.forEach((targetOrder) => {
                 const result = euler.create();
@@ -314,15 +331,15 @@ describe('euler', () => {
         });
 
         it('should return same angles when reordering to same order', () => {
-            const originalEuler: Euler = [Math.PI / 6, Math.PI / 4, Math.PI / 8, 'xyz'];
+            const originalEuler: Euler = [Math.PI / 6, Math.PI / 4, Math.PI / 8, EulerOrder.XYZ];
             const result = euler.create();
 
-            euler.reorder(result, originalEuler, 'xyz');
+            euler.reorder(result, originalEuler, EulerOrder.XYZ);
 
             expect(result[0]).toBeCloseTo(originalEuler[0]);
             expect(result[1]).toBeCloseTo(originalEuler[1]);
             expect(result[2]).toBeCloseTo(originalEuler[2]);
-            expect(result[3]).toBe('xyz');
+            expect(result[3]).toBe(EulerOrder.XYZ);
         });
     });
 
@@ -403,14 +420,14 @@ describe('euler', () => {
 
     describe('integration tests', () => {
         it('should handle round-trip conversions correctly', () => {
-            const originalEuler: Euler = [Math.PI / 4, Math.PI / 6, Math.PI / 3, 'xyz'];
+            const originalEuler: Euler = [Math.PI / 4, Math.PI / 6, Math.PI / 3, EulerOrder.XYZ];
 
             // Euler -> Quat -> Euler
             const q = quat.create();
             const resultEuler = euler.create();
 
             quat.fromEuler(q, originalEuler);
-            euler.fromQuat(resultEuler, q, 'xyz');
+            euler.fromQuat(resultEuler, q, EulerOrder.XYZ);
 
             // Should represent the same rotation (may have different but equivalent angles)
             const qOriginal = quat.create();
@@ -424,7 +441,7 @@ describe('euler', () => {
         });
 
         it('should handle Euler -> Matrix -> Euler conversion', () => {
-            const originalEuler: Euler = [Math.PI / 8, Math.PI / 12, Math.PI / 16, 'xyz'];
+            const originalEuler: Euler = [Math.PI / 8, Math.PI / 12, Math.PI / 16, EulerOrder.XYZ];
 
             // Euler -> Quat -> Matrix -> Euler
             const q = quat.create();
@@ -433,7 +450,7 @@ describe('euler', () => {
 
             quat.fromEuler(q, originalEuler);
             mat4.fromQuat(matrix, q);
-            euler.fromRotationMat4(resultEuler, matrix, 'xyz');
+            euler.fromRotationMat4(resultEuler, matrix, EulerOrder.XYZ);
 
             // Should preserve the rotation
             const qOriginal = quat.create();
@@ -447,29 +464,29 @@ describe('euler', () => {
         });
 
         it('should handle extreme angles', () => {
-            const extremeEuler: Euler = [Math.PI * 1.5, Math.PI * 0.75, Math.PI * 1.25, 'xyz'];
+            const extremeEuler: Euler = [Math.PI * 1.5, Math.PI * 0.75, Math.PI * 1.25, EulerOrder.XYZ];
 
             const q = quat.create();
             const resultEuler = euler.create();
 
             quat.fromEuler(q, extremeEuler);
-            euler.fromQuat(resultEuler, q, 'xyz');
+            euler.fromQuat(resultEuler, q, EulerOrder.XYZ);
 
             // Should still be valid
             expect(Number.isFinite(resultEuler[0])).toBe(true);
             expect(Number.isFinite(resultEuler[1])).toBe(true);
             expect(Number.isFinite(resultEuler[2])).toBe(true);
-            expect(resultEuler[3]).toBe('xyz');
+            expect(resultEuler[3]).toBe(EulerOrder.XYZ);
         });
 
         it('should handle small angles', () => {
-            const smallEuler: Euler = [1e-6, 1e-7, 1e-8, 'xyz'];
+            const smallEuler: Euler = [1e-6, 1e-7, 1e-8, EulerOrder.XYZ];
 
             const q = quat.create();
             const resultEuler = euler.create();
 
             quat.fromEuler(q, smallEuler);
-            euler.fromQuat(resultEuler, q, 'xyz');
+            euler.fromQuat(resultEuler, q, EulerOrder.XYZ);
 
             // Should preserve small rotations
             expect(resultEuler[0]).toBeCloseTo(smallEuler[0], 10);
