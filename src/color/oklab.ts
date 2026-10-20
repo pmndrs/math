@@ -38,7 +38,7 @@ export function set(out: Oklab, l: number, a: number, b: number): Oklab {
     return out;
 }
 
-/** Write the Oklab of a linear Color into `out`. Returns `out`. */
+/** Write the Oklab of a linear-sRGB Color into `out`. Returns `out`. */
 export function fromColor(out: Oklab, c: Const<Color>): Oklab {
     const r = c[0];
     const g = c[1];
@@ -56,7 +56,7 @@ export function fromColor(out: Oklab, c: Const<Color>): Oklab {
 }
 
 /**
- * Write the linear Color of an Oklab into `out`. Returns `out`.
+ * Write the linear-sRGB Color of an Oklab into `out`. Returns `out`.
  * Colors outside the sRGB gamut yield channels outside [0, 1]. Clamp or gamut map if needed.
  */
 export function toColor(out: Color, a: Const<Oklab>): Color {

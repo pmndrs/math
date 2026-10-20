@@ -36,7 +36,7 @@ export function set(out: HSL, h: number, s: number, l: number): HSL {
     return out;
 }
 
-/** Write the HSL of a linear Color into `out`. Returns `out`. */
+/** Write the HSL of a linear-sRGB Color into `out`. Returns `out`. */
 export function fromColor(out: HSL, c: Const<Color>): HSL {
     // linear -> sRGB gamma; HSL is defined on gamma-encoded sRGB
     const r = linearToSrgb(c[0]);
@@ -64,7 +64,7 @@ export function fromColor(out: HSL, c: Const<Color>): HSL {
     return out;
 }
 
-/** Write the linear Color of an HSL into `out`. Returns `out`. */
+/** Write the linear-sRGB Color of an HSL into `out`. Returns `out`. */
 export function toColor(out: Color, a: Const<HSL>): Color {
     const h = a[0];
     const s = a[1];

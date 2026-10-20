@@ -67,7 +67,7 @@ export function fromSRGB(srgb: readonly [number, number, number]): Color {
     return setFromSRGB(create(), srgb);
 }
 
-/** Write the sRGB gamma-encoded [r, g, b] of a linear Color into `out` (values [0, 1]). */
+/** Write the sRGB gamma-encoded [r, g, b] of a linear-sRGB Color into `out` (values [0, 1]). */
 export function toSRGB(out: [number, number, number], c: Const<Color>): [number, number, number] {
     out[0] = linearToSrgb(c[0]);
     out[1] = linearToSrgb(c[1]);

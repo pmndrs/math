@@ -71,13 +71,13 @@ export function toOklab(out: Oklab, a: Const<Oklch>): Oklab {
     return out;
 }
 
-/** Write the Oklch of a linear Color into `out`. Returns `out`. */
+/** Write the Oklch of a linear-sRGB Color into `out`. Returns `out`. */
 export function fromColor(out: Oklch, c: Const<Color>): Oklch {
     return fromOklab(out, oklab.fromColor(_lab, c));
 }
 
 /**
- * Write the linear Color of an Oklch into `out`. Returns `out`.
+ * Write the linear-sRGB Color of an Oklch into `out`. Returns `out`.
  * Colors outside the sRGB gamut yield channels outside [0, 1]. Use `toColorInGamut` to map them
  * perceptually, or `color.clamp` for a cheaper clip that can shift hue.
  */
@@ -88,7 +88,7 @@ export function toColor(out: Color, a: Const<Oklch>): Color {
 const _lab: Oklab = [0, 0, 0];
 
 /**
- * Write the linear Color of an Oklch into `out`, mapped into the sRGB gamut. Returns `out`.
+ * Write the linear-sRGB Color of an Oklch into `out`, mapped into the sRGB gamut. Returns `out`.
  *
  * Out-of-gamut colors keep their lightness and hue and lose chroma until they reach the gamut surface
  * (the CSS Color 4 ray trace method). Results are within about 0.02 deltaE OK of the CSS `oklch()`
