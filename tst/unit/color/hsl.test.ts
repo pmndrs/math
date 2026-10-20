@@ -18,7 +18,7 @@ describe('hsl', () => {
         ];
         for (const linear of cases) {
             const h = hsl.fromColor(hsl.create(), linear);
-            const back = hsl.toColor(color.create(), h);
+            const back = color.fromHsl(color.create(), h);
             expect(back[0]).toBeCloseTo(linear[0], 6);
             expect(back[1]).toBeCloseTo(linear[1], 6);
             expect(back[2]).toBeCloseTo(linear[2], 6);
@@ -29,7 +29,7 @@ describe('hsl', () => {
         const gray = color.setScalar(color.create(), 0.5);
         const h = hsl.fromColor(hsl.create(), gray);
         expect(h[1]).toBe(0);
-        const back = hsl.toColor(color.create(), h);
+        const back = color.fromHsl(color.create(), h);
         expect(back[0]).toBeCloseTo(0.5, 6);
         expect(back[1]).toBeCloseTo(0.5, 6);
         expect(back[2]).toBeCloseTo(0.5, 6);
@@ -45,6 +45,13 @@ describe('hsl', () => {
         // within-range hue interpolates normally
         const mid = hsl.lerp(hsl.create(), [0.1, 0, 0], [0.3, 0, 0], 0.5);
         expect(mid[0]).toBeCloseTo(0.2, 6);
+    });
+
+    it('lerp from a gray keeps the other endpoint hue', () => {
+        // gray reports hue 0 (red), which would otherwise sweep 0.65 -> 0 through magenta
+        const out = hsl.lerp(hsl.create(), [0, 0, 0.5], [0.65, 1, 0.5], 0.5);
+        expect(out[0]).toBeCloseTo(0.65, 6);
+        expect(out[1]).toBeCloseTo(0.5, 6);
     });
 
     it('offset wraps hue and clamps s/l', () => {
