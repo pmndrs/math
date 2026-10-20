@@ -3,7 +3,7 @@ import { linearToSrgb, srgbToLinear } from './colorspace';
 
 export * from './parse';
 
-/** A linear-sRGB color: [r, g, b] floats in [0, 1]. */
+/** A linear-sRGB color: [r, g, b], nominally in [0, 1]. Out-of-gamut colors have channels outside that range. */
 export type Color = [r: number, g: number, b: number];
 
 /** Accepted input types for creating or parsing a Color. */
