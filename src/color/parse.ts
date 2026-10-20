@@ -1,6 +1,6 @@
 import type { Color, ColorInput } from './color';
 import { srgbToLinear } from './colorspace';
-import { hslToLinearSrgb, oklabToLinearSrgb } from './convert';
+import { hslToLinearSrgb, oklabToLinearSrgb } from './conversion';
 import * as oklch from './oklch';
 
 const CSS_COLORS: Record<string, number> = {

@@ -1,6 +1,6 @@
 import type { Const } from '../core/const';
 import { linearToSrgb, srgbToLinear } from './colorspace';
-import { hslToLinearSrgb, oklabToLinearSrgb } from './convert';
+import { hslToLinearSrgb, oklabToLinearSrgb } from './conversion';
 import type { HSL } from './hsl';
 import type { Oklab } from './oklab';
 import * as oklch from './oklch';
