@@ -47,6 +47,13 @@ describe('hsl', () => {
         expect(mid[0]).toBeCloseTo(0.2, 6);
     });
 
+    it('lerp from a gray keeps the other endpoint hue', () => {
+        // gray reports hue 0 (red), which would otherwise sweep 0.65 -> 0 through magenta
+        const out = hsl.lerp(hsl.create(), [0, 0, 0.5], [0.65, 1, 0.5], 0.5);
+        expect(out[0]).toBeCloseTo(0.65, 6);
+        expect(out[1]).toBeCloseTo(0.5, 6);
+    });
+
     it('offset wraps hue and clamps s/l', () => {
         const out = hsl.offset(hsl.create(), [0.9, 0.5, 0.5], 0.2, 0.8, -1);
         expect(out[0]).toBeCloseTo(0.1, 6); // 0.9 + 0.2 -> 1.1 -> 0.1

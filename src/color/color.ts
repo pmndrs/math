@@ -6,10 +6,9 @@ export * from './parse';
 /** A linear-sRGB color: [r, g, b] floats in [0, 1]. */
 export type Color = [r: number, g: number, b: number];
 
-
 /** Accepted input types for creating or parsing a Color. */
 export type ColorInput =
-    | string // '#f00', '#ff0000', 'red', 'rgb(255,0,0)', 'hsl(0,100%,50%)'
+    | string // '#f00', '#ff0000', 'red', 'rgb(255,0,0)', 'hsl(0,100%,50%)', 'oklch(70% 0.1 250)'
     | number // 0xff0000 integer (sRGB gamma)
     | [number, number, number]; // [r, g, b] linear floats [0, 1]
 

@@ -5,7 +5,6 @@ import { linearToSrgb, srgbToLinear } from './colorspace';
 /** A hue-saturation-lightness color: [h, s, l], all in [0, 1] (hue wraps). */
 export type HSL = [hue: number, saturation: number, lightness: number];
 
-
 /** Create a new HSL initialized to [0, 0, 0] (black). */
 export function create(): HSL {
     return [0, 0, 0];
@@ -90,14 +89,20 @@ export function toColor(out: Color, a: Const<HSL>): Color {
 /**
  * Interpolate from `a` to `b` by `t` into `out`, taking the shortest path around
  * the hue wheel (so e.g. 350°→10° passes through 0°, not all the way back).
+ * If only one endpoint is gray (s = 0), it has no hue and takes the other endpoint's hue.
  * Returns `out`.
  */
 export function lerp(out: HSL, a: Const<HSL>, b: Const<HSL>, t: number): HSL {
-    let dh = b[0] - a[0];
+    let ha = a[0];
+    let hb = b[0];
+    if (a[1] === 0 && b[1] !== 0) ha = hb;
+    else if (b[1] === 0 && a[1] !== 0) hb = ha;
+
+    let dh = hb - ha;
     if (dh > 0.5) dh -= 1;
     else if (dh < -0.5) dh += 1;
 
-    let h = a[0] + dh * t;
+    let h = ha + dh * t;
     h -= Math.floor(h); // wrap into [0, 1)
 
     out[0] = h;
