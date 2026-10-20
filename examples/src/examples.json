@@ -79,7 +79,7 @@
     },
     "example-perceptual-color": {
         "title": "Perceptual Color",
-        "description": "RGB and HSL side by side with Oklab and Oklch from math/color. A strip of perceived lightness under every band shows HSL hue sweeps and random RGB picks swinging between bright and dark while Oklch stays even. Gradients compare blending in each space, from RGB's grey dead zone to Oklab's even steps.",
+        "description": "RGB and HSL side by side with Oklab and Oklch from math/color. Under every band, a strip of equal-luminance grey and a CIE L* readout, independent of Oklab, show HSL hues swinging between bright and dark while Oklch stays far more even. Gradients compare blending in each space, from RGB's grey dead zone to Oklab's even steps. Click to reroll.",
         "tags": ["color", "oklab", "oklch", "hsl", "lerp"],
         "category": "color"
     },

@@ -4,10 +4,11 @@ import { createInfo } from './common/info';
 import { palette } from './common/theme';
 
 // RGB and HSL against Oklab and Oklch, drawn to a 2D canvas. Under every band sits a thin strip of
-// its perceived lightness (Oklab L as a neutral grey), so the difference is visible at a glance:
-// hue sweeps and random picks in HSL and RGB swing between bright and dark, while Oklch holds an
-// even lightness. Gradients compare blending in each space, where RGB and HSL fall through grey
-// or swing in brightness and Oklab and Oklch stay even. Every colour comes from math/color.
+// its lightness, drawn as the grey of equal luminance and summarised as CIE L*. That ruler comes
+// from luminance alone, not from Oklab, so it is a fair judge of the Oklab based rows. Hue sweeps
+// and random hues in HSL swing between bright and dark while Oklch stays far more even. Random RGB
+// swings in lightness as much as HSL and is less vivid on average. Gradients compare blending in
+// each space. Click anywhere to reroll the random picks and the gradient endpoints.
 
 const MONO = '"Geist Mono", ui-monospace, monospace';
 const SWATCHES = 32;
@@ -15,20 +16,25 @@ const SWATCHES = 32;
 // layout metrics (CSS pixels)
 const MARGIN = 32;
 const LABEL_W = 220;
-const STAT_W = 150;
+const STAT_W = 250;
 const BAND_H = 26;
 const STRIP_H = 6;
-const ROW_GAP = 10;
-const HEADER_H = 34;
+const ROW_GAP = 8;
+const HEADER_H = 50;
 
 type Row = { label: string; colors: Color[]; stat: string; discrete: boolean };
-type Section = { title: string; rows: Row[] };
+type Section = { title: string; caption: string; rows: Row[] };
 
-const _lab = oklab.create();
 const _lch = oklch.create();
 
+/** CIE L* (0 to 100) from relative luminance, independent of Oklab. */
 function lightness(c: Color): number {
-    return oklab.fromColor(_lab, c)[0];
+    const y = Math.max(color.luminance(c), 0);
+    return y > 216 / 24389 ? 116 * Math.cbrt(y) - 16 : (24389 / 27) * y;
+}
+
+function chroma(c: Color): number {
+    return oklch.fromColor(_lch, c)[1];
 }
 
 function lightnessStat(colors: Color[]): string {
@@ -37,12 +43,21 @@ function lightnessStat(colors: Color[]): string {
     const mean = sum / colors.length;
     let variance = 0;
     for (const c of colors) variance += (lightness(c) - mean) ** 2;
-    return `L ${mean.toFixed(2)} ± ${Math.sqrt(variance / colors.length).toFixed(2)}`;
+    return `L* ${mean.toFixed(0)} ± ${Math.sqrt(variance / colors.length).toFixed(1)}`;
+}
+
+function chromaStat(colors: Color[]): string {
+    let sum = 0;
+    for (const c of colors) sum += chroma(c);
+    const mean = sum / colors.length;
+    let variance = 0;
+    for (const c of colors) variance += (chroma(c) - mean) ** 2;
+    return `C ${mean.toFixed(2)} ± ${Math.sqrt(variance / colors.length).toFixed(2)}`;
 }
 
 function minChromaStat(colors: Color[]): string {
     let min = Infinity;
-    for (const c of colors) min = Math.min(min, oklch.fromColor(_lch, c)[1]);
+    for (const c of colors) min = Math.min(min, chroma(c));
     return `min C ${min.toFixed(3)}`;
 }
 
@@ -62,6 +77,7 @@ function hueSection(n: number): Section {
     ];
     return {
         title: 'hue sweep',
+        caption: 'strips show the grey of equal luminance. oklch is far more even than hsl, though not perfectly flat.',
         rows: rows.map(([label, at]) => {
             const colors = sweep(n, at);
             return { label, colors, stat: lightnessStat(colors), discrete: false };
@@ -71,11 +87,9 @@ function hueSection(n: number): Section {
 
 /* random picks */
 
-let seed = 7;
+let seed = 1;
 
-function randomSection(): Section {
-    const state = mulberry32.create(seed);
-    const rand = () => mulberry32.sample(state);
+function randomSection(rand: () => number): Section {
     const rows: [string, (out: Color) => Color][] = [
         ['rgb   uniform r g b', (out) => color.setFromSRGB(out, [rand(), rand(), rand()])],
         ['hsl   random h', (out) => hsl.toColor(out, [rand(), 1, 0.5])],
@@ -83,37 +97,24 @@ function randomSection(): Section {
     ];
     return {
         title: `random picks  seed ${seed}`,
+        caption: 'uniform rgb swings in lightness as much as hsl and is less vivid on average. hsl and oklch random h are the like-for-like pair.',
         rows: rows.map(([label, pick]) => {
             const colors: Color[] = [];
             for (let i = 0; i < SWATCHES; i++) colors.push(pick(color.create()));
-            return { label, colors, stat: lightnessStat(colors), discrete: true };
+            return { label, colors, stat: `${lightnessStat(colors)}  ${chromaStat(colors)}`, discrete: true };
         }),
     };
 }
 
 /* gradients */
 
-const PRESETS: [Color, Color][] = [
-    [
-        [0, 0, 1],
-        [1, 1, 0],
-    ],
-    [
-        [1, 1, 1],
-        [0, 0, 1],
-    ],
-    [
-        [1, 0, 1],
-        [0, 1, 0],
-    ],
-    [
-        [0, 0, 0],
-        [1, 1, 1],
-    ],
-];
-let preset = 0;
-const stopA = color.clone(PRESETS[0][0]);
-const stopB = color.clone(PRESETS[0][1]);
+// the first gradient is the classic blue to yellow, rerolls pick two random vivid colours
+const stopA: Color = [0, 0, 1];
+const stopB: Color = [1, 1, 0];
+
+function randomStop(out: Color, rand: () => number): Color {
+    return oklch.toColorInGamut(out, [0.45 + rand() * 0.45, 0.4, rand() * 360]);
+}
 
 function gradientSection(n: number): Section {
     const srgbA = color.toSRGB([0, 0, 0], stopA);
@@ -144,6 +145,7 @@ function gradientSection(n: number): Section {
     ];
     return {
         title: `gradients  #${color.toHexString(stopA)} → #${color.toHexString(stopB)}`,
+        caption: 'rgb blends can sag through grey. oklch blends round the hue circle the short way, so it can pass other hues.',
         rows: rows.map(([label, at]) => {
             const colors = sweep(n, at);
             return { label, colors, stat: minChromaStat(colors), discrete: false };
@@ -159,17 +161,13 @@ document.body.appendChild(canvas);
 const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 const info = createInfo();
-info.innerHTML =
-    'hold <b>space</b> to see perceived lightness only<br><b>r</b> reroll · <b>g</b> next gradient<br>click a colour to start a gradient there, shift+click to end it';
+info.innerHTML = 'click anywhere to reroll';
+canvas.style.cursor = 'pointer';
 
-let showLightness = false;
 let sections: Section[] = [];
 let originX = 0;
 let originY = 0;
 let bandW = 0;
-
-// where each band was drawn, for picking colours with the pointer
-const hits: { x: number; y: number; w: number; row: Row }[] = [];
 
 function layout() {
     const w = window.innerWidth;
@@ -188,7 +186,9 @@ function layout() {
 }
 
 function rebuild() {
-    sections = [hueSection(bandW), randomSection(), gradientSection(bandW)];
+    const state = mulberry32.create(seed);
+    const rand = () => mulberry32.sample(state);
+    sections = [hueSection(bandW), randomSection(rand), gradientSection(bandW)];
     const rows = sections.reduce((n, s) => n + s.rows.length, 0);
     const blockH = sections.length * HEADER_H + rows * (BAND_H + 2 + STRIP_H + ROW_GAP);
     originY = Math.max(MARGIN, Math.round((window.innerHeight - blockH) / 2));
@@ -197,44 +197,37 @@ function rebuild() {
 
 const _grey = color.create();
 
-function fillColor(c: Color) {
-    if (showLightness) {
-        const l = lightness(c);
-        ctx.fillStyle = color.toCSS(oklab.toColor(_grey, [l, 0, 0]));
-    } else {
-        ctx.fillStyle = color.toCSS(c);
-    }
+function fillColor(c: Color, asLightness: boolean) {
+    ctx.fillStyle = color.toCSS(asLightness ? color.setScalar(_grey, color.luminance(c)) : c);
 }
 
 function drawBand(row: Row, x: number, y: number, h: number, asLightness: boolean) {
     const n = row.colors.length;
-    const prev = showLightness;
-    showLightness = showLightness || asLightness;
     if (row.discrete) {
         const cell = bandW / n;
         for (let i = 0; i < n; i++) {
-            fillColor(row.colors[i]);
+            fillColor(row.colors[i], asLightness);
             ctx.fillRect(Math.round(x + i * cell), y, Math.max(1, Math.round(cell) - 2), h);
         }
     } else {
         for (let i = 0; i < n; i++) {
-            fillColor(row.colors[i]);
+            fillColor(row.colors[i], asLightness);
             ctx.fillRect(x + i, y, 1.5, h);
         }
     }
-    showLightness = prev;
 }
 
 function draw() {
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     ctx.textBaseline = 'middle';
-    hits.length = 0;
 
     let y = originY;
     for (const section of sections) {
         ctx.fillStyle = palette.muted;
         ctx.font = `11px ${MONO}`;
-        ctx.fillText(section.title.toUpperCase(), originX, y + HEADER_H / 2);
+        ctx.fillText(section.title.toUpperCase(), originX, y + 12);
+        ctx.fillStyle = palette.dim;
+        ctx.fillText(section.caption, originX, y + 30);
         y += HEADER_H;
 
         for (const row of section.rows) {
@@ -245,7 +238,6 @@ function draw() {
 
             drawBand(row, bandX, y, BAND_H, false);
             drawBand(row, bandX, y + BAND_H + 2, STRIP_H, true);
-            hits.push({ x: bandX, y, w: bandW, row });
 
             ctx.fillStyle = palette.muted;
             ctx.fillText(row.stat, bandX + bandW + 16, y + BAND_H / 2);
@@ -258,39 +250,16 @@ function draw() {
 
 window.addEventListener('resize', layout);
 
-window.addEventListener('keydown', (e) => {
-    if (e.key === ' ' && !showLightness) {
-        showLightness = true;
-        draw();
-        e.preventDefault();
-    } else if (e.key === 'r') {
-        seed = (seed * 48271) % 2147483647;
-        rebuild();
-    } else if (e.key === 'g') {
-        preset = (preset + 1) % PRESETS.length;
-        color.copy(stopA, PRESETS[preset][0]);
-        color.copy(stopB, PRESETS[preset][1]);
-        rebuild();
-    }
-});
+function reroll() {
+    seed++;
+    const state = mulberry32.create(seed * 7919);
+    const rand = () => mulberry32.sample(state);
+    randomStop(stopA, rand);
+    randomStop(stopB, rand);
+    rebuild();
+}
 
-window.addEventListener('keyup', (e) => {
-    if (e.key === ' ') {
-        showLightness = false;
-        draw();
-    }
-});
-
-canvas.addEventListener('pointerdown', (e) => {
-    for (const hit of hits) {
-        if (e.clientY < hit.y || e.clientY > hit.y + BAND_H || e.clientX < hit.x || e.clientX >= hit.x + hit.w) continue;
-        const n = hit.row.colors.length;
-        const i = Math.min(n - 1, Math.floor(((e.clientX - hit.x) / hit.w) * n));
-        color.copy(e.shiftKey ? stopB : stopA, hit.row.colors[i]);
-        rebuild();
-        return;
-    }
-});
+canvas.addEventListener('pointerdown', reroll);
 
 await document.fonts.ready;
 layout();
