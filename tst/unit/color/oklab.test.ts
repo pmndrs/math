@@ -30,7 +30,7 @@ describe('oklab', () => {
             [-0.1, 1.2, 0.3],
         ];
         for (const c of cases) {
-            const back = oklab.toColor(color.create(), oklab.fromColor(oklab.create(), c));
+            const back = color.fromOklab(color.create(), oklab.fromColor(oklab.create(), c));
             expect(back[0]).toBeCloseTo(c[0], 10);
             expect(back[1]).toBeCloseTo(c[1], 10);
             expect(back[2]).toBeCloseTo(c[2], 10);

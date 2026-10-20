@@ -73,7 +73,7 @@
     },
     "example-color-wheel": {
         "title": "Color Wheel",
-        "description": "An HSL colour wheel built with math/color (hsl.toColor). Move the pointer to pick a colour and read its HSL / RGB / hex.",
+        "description": "An HSL colour wheel built with math/color (color.fromHsl). Move the pointer to pick a colour and read its HSL / RGB / hex.",
         "tags": ["color", "hsl", "colorspace"],
         "category": "color"
     },
@@ -85,8 +85,8 @@
     },
     "example-oklch-gamut": {
         "title": "Oklch Gamut Mapping",
-        "description": "A slice of Oklch at one hue with the sRGB gamut boundary and its cusp. Colors outside it are brought back two ways: color.clamp clips each channel and drifts in hue, while oklch.toColorInGamut keeps lightness and hue and only gives up chroma. Hover to compare one color, drag the hue strip to turn the slice.",
-        "tags": ["color", "oklch", "gamut", "toColorInGamut"],
+        "description": "A slice of Oklch at one hue with the sRGB gamut boundary and its cusp. Colors outside it are brought back two ways: color.clamp clips each channel and drifts in hue, while color.fromOklchInGamut keeps lightness and hue and only gives up chroma. Hover to compare one color, drag the hue strip to turn the slice.",
+        "tags": ["color", "oklch", "gamut", "fromOklchInGamut"],
         "category": "color"
     },
     "example-ridged-noise-voxel-terrain": {

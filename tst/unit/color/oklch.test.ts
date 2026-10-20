@@ -28,7 +28,7 @@ describe('oklch', () => {
 
     it('Color <-> Oklch and Oklab <-> Oklch round-trip', () => {
         const c: [number, number, number] = [0.2, 0.5, 0.8];
-        const back = oklch.toColor(color.create(), oklch.fromColor(oklch.create(), c));
+        const back = color.fromOklch(color.create(), oklch.fromColor(oklch.create(), c));
         expect(back[0]).toBeCloseTo(c[0], 10);
         expect(back[1]).toBeCloseTo(c[1], 10);
         expect(back[2]).toBeCloseTo(c[2], 10);
@@ -57,15 +57,15 @@ describe('oklch', () => {
         }
     });
 
-    it('toColorInGamut leaves in-gamut colors unchanged', () => {
+    it('fromOklchInGamut leaves in-gamut colors unchanged', () => {
         const lch = oklch.fromColor(oklch.create(), [0.2, 0.5, 0.8]);
-        const out = oklch.toColorInGamut(color.create(), lch);
+        const out = color.fromOklchInGamut(color.create(), lch);
         expect(out[0]).toBeCloseTo(0.2, 10);
         expect(out[1]).toBeCloseTo(0.5, 10);
         expect(out[2]).toBeCloseTo(0.8, 10);
     });
 
-    it('toColorInGamut reduces chroma, keeping lightness and hue', () => {
+    it('fromOklchInGamut reduces chroma, keeping lightness and hue', () => {
         // reference values from the Color.js ray trace gamut mapper
         const cases: [[number, number, number], [number, number, number]][] = [
             [
@@ -78,7 +78,7 @@ describe('oklch', () => {
             ],
         ];
         for (const [lch, expected] of cases) {
-            const out = oklch.toColorInGamut(color.create(), lch);
+            const out = color.fromOklchInGamut(color.create(), lch);
             expect(out[0]).toBeCloseTo(expected[0], 6);
             expect(out[1]).toBeCloseTo(expected[1], 6);
             expect(out[2]).toBeCloseTo(expected[2], 6);
@@ -90,8 +90,8 @@ describe('oklch', () => {
         }
     });
 
-    it('toColorInGamut maps lightness past either end to white or black', () => {
-        expect(oklch.toColorInGamut(color.create(), [1.2, 0.2, 30])).toEqual([1, 1, 1]);
-        expect(oklch.toColorInGamut(color.create(), [-0.1, 0.2, 30])).toEqual([0, 0, 0]);
+    it('fromOklchInGamut maps lightness past either end to white or black', () => {
+        expect(color.fromOklchInGamut(color.create(), [1.2, 0.2, 30])).toEqual([1, 1, 1]);
+        expect(color.fromOklchInGamut(color.create(), [-0.1, 0.2, 30])).toEqual([0, 0, 0]);
     });
 });

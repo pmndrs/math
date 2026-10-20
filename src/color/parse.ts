@@ -1,6 +1,6 @@
 import type { Color, ColorInput } from './color';
 import { srgbToLinear } from './colorspace';
-import * as oklab from './oklab';
+import { hslToLinearSrgb, oklabToLinearSrgb } from './convert';
 import * as oklch from './oklch';
 
 const CSS_COLORS: Record<string, number> = {
@@ -258,7 +258,7 @@ function parseHslString(str: string): Color | null {
     const h = parseFloat(m[1]) / 360;
     const s = parseFloat(m[2]) / 100;
     const l = parseFloat(m[3]) / 100;
-    return hslToLinear(h, s, l);
+    return hslToLinearSrgb([0, 0, 0], h, s, l);
 }
 
 function parseOkString(str: string): Color | null {
@@ -270,39 +270,15 @@ function parseOkString(str: string): Color | null {
     const x = parseOkChannel(m[3], 0.4);
     if (m[1] === 'lab') {
         const y = parseOkChannel(m[4], 0.4);
-        return oklab.toColor([0, 0, 0], [l, x, y]);
+        return oklabToLinearSrgb([0, 0, 0], l, x, y);
     }
     const h = m[4] === 'none' ? 0 : parseFloat(m[4]);
-    return oklch.toColor([0, 0, 0], [l, x, h]);
+    const lab = oklch.toOklab([0, 0, 0], [l, x, h]);
+    return oklabToLinearSrgb(lab, lab[0], lab[1], lab[2]);
 }
 
 function parseOkChannel(s: string, percentScale: number): number {
     if (s === 'none') return 0;
     if (s.endsWith('%')) return (parseFloat(s) / 100) * percentScale;
     return parseFloat(s);
-}
-
-function hslToLinear(h: number, s: number, l: number): Color {
-    let r: number;
-    let g: number;
-    let b: number;
-    if (s === 0) {
-        r = g = b = l;
-    } else {
-        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        const p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1 / 3);
-        g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1 / 3);
-    }
-    return [srgbToLinear(r), srgbToLinear(g), srgbToLinear(b)];
-}
-
-function hue2rgb(p: number, q: number, t: number): number {
-    if (t < 0) t += 1;
-    if (t > 1) t -= 1;
-    if (t < 1 / 6) return p + (q - p) * 6 * t;
-    if (t < 1 / 2) return q;
-    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-    return p;
 }

@@ -5,7 +5,7 @@ import { palette } from './common/theme';
 // A slice of Oklch at one hue: chroma runs across, lightness up. Inside the drawn line the colours
 // fit in sRGB. Outside it they do not, and the two planes show two ways of bringing them back.
 // Clipping (color.clamp) cuts each RGB channel to [0, 1], which shifts hue and lightness, so the
-// region beyond the line smears into neighbouring hues. oklch.toColorInGamut keeps lightness and
+// region beyond the line smears into neighbouring hues. color.fromOklchInGamut keeps lightness and
 // hue and only reduces chroma, so each row beyond the line repeats the colour on the boundary.
 // Hover to compare one colour, drag the hue strip to turn the slice.
 
@@ -94,14 +94,14 @@ function renderPlanes() {
         const l = 1 - (y + 0.5) / RES_H;
         for (let x = 0; x < RES_W; x++) {
             oklch.set(lch, l, ((x + 0.5) / RES_W) * C_MAX, hue);
-            oklch.toColor(lin, lch);
+            color.fromOklch(lin, lch);
             const i = (y * RES_W + x) * 4;
             if (inGamut(lin)) {
                 writePixel(clipImage.data, i, lin);
                 writePixel(mappedImage.data, i, lin);
             } else {
                 writePixel(clipImage.data, i, color.clamp(clipped, lin));
-                writePixel(mappedImage.data, i, oklch.toColorInGamut(mapped, lch));
+                writePixel(mappedImage.data, i, color.fromOklchInGamut(mapped, lch));
             }
         }
     }
@@ -124,7 +124,7 @@ function computeBoundary() {
         let hi = 0.5;
         for (let k = 0; k < 24; k++) {
             const mid = (lo + hi) / 2;
-            if (inGamut(oklch.toColor(lin, oklch.set(lch, l, mid, hue)))) lo = mid;
+            if (inGamut(color.fromOklch(lin, oklch.set(lch, l, mid, hue)))) lo = mid;
             else hi = mid;
         }
         boundary.push(lo);
@@ -222,7 +222,7 @@ function drawStrip() {
     const w = planeW * 2 + GAP;
     const c = color.create();
     for (let i = 0; i < w; i++) {
-        oklch.toColorInGamut(c, [0.75, 0.4, (i / w) * 360]);
+        color.fromOklchInGamut(c, [0.75, 0.4, (i / w) * 360]);
         ctx.fillStyle = color.toCSS(c);
         ctx.fillRect(x0 + i, stripY, 1.5, STRIP_H);
     }
@@ -244,9 +244,9 @@ const _labB = oklab.create();
 
 function drawReadout(y: number) {
     oklch.set(requested, probeL, probeC, hue);
-    oklch.toColor(lin, requested);
+    color.fromOklch(lin, requested);
     oklch.fromColor(clipResult, color.clamp(clipped, lin));
-    oklch.fromColor(mappedResult, oklch.toColorInGamut(mapped, requested));
+    oklch.fromColor(mappedResult, color.fromOklchInGamut(mapped, requested));
     const requestedLab = oklch.toOklab(_labA, requested);
 
     const rows: [string, Color | null, Oklch, string][] = [
@@ -258,7 +258,7 @@ function drawReadout(y: number) {
             `Δh ${hueDelta(clipResult[2], hue).toFixed(1)}°  ΔE ${oklab.distance(requestedLab, oklch.toOklab(_labB, clipResult)).toFixed(3)}`,
         ],
         [
-            'toColorInGamut',
+            'fromOklchInGamut',
             mapped,
             mappedResult,
             `Δh ${hueDelta(mappedResult[2], hue).toFixed(1)}°  ΔE ${oklab.distance(requestedLab, oklch.toOklab(_labB, mappedResult)).toFixed(3)}`,
@@ -295,7 +295,7 @@ function draw() {
     }
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     drawPlane(clipX, clipBuffer, 'clip  color.clamp');
-    drawPlane(mappedX, mappedBuffer, 'oklch.toColorInGamut');
+    drawPlane(mappedX, mappedBuffer, 'color.fromOklchInGamut');
     drawStrip();
     drawReadout(stripY + STRIP_H + 36);
     drawProbe(clipX, clipResult);

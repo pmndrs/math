@@ -18,7 +18,7 @@ describe('hsl', () => {
         ];
         for (const linear of cases) {
             const h = hsl.fromColor(hsl.create(), linear);
-            const back = hsl.toColor(color.create(), h);
+            const back = color.fromHsl(color.create(), h);
             expect(back[0]).toBeCloseTo(linear[0], 6);
             expect(back[1]).toBeCloseTo(linear[1], 6);
             expect(back[2]).toBeCloseTo(linear[2], 6);
@@ -29,7 +29,7 @@ describe('hsl', () => {
         const gray = color.setScalar(color.create(), 0.5);
         const h = hsl.fromColor(hsl.create(), gray);
         expect(h[1]).toBe(0);
-        const back = hsl.toColor(color.create(), h);
+        const back = color.fromHsl(color.create(), h);
         expect(back[0]).toBeCloseTo(0.5, 6);
         expect(back[1]).toBeCloseTo(0.5, 6);
         expect(back[2]).toBeCloseTo(0.5, 6);

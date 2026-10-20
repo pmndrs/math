@@ -71,9 +71,9 @@ function sweep(n: number, at: (out: Color, t: number) => Color): Color[] {
 
 function hueSection(n: number): Section {
     const rows: [string, (out: Color, t: number) => Color][] = [
-        ['hsl   s 100%  l 50%', (out, t) => hsl.toColor(out, [t, 1, 0.5])],
-        ['oklch L 0.75  C 0.12', (out, t) => oklch.toColorInGamut(out, [0.75, 0.12, t * 360])],
-        ['oklch L 0.75  max C', (out, t) => oklch.toColorInGamut(out, [0.75, 0.4, t * 360])],
+        ['hsl   s 100%  l 50%', (out, t) => color.fromHsl(out, [t, 1, 0.5])],
+        ['oklch L 0.75  C 0.12', (out, t) => color.fromOklchInGamut(out, [0.75, 0.12, t * 360])],
+        ['oklch L 0.75  max C', (out, t) => color.fromOklchInGamut(out, [0.75, 0.4, t * 360])],
     ];
     return {
         title: 'hue sweep',
@@ -92,8 +92,8 @@ let seed = 1;
 function randomSection(rand: () => number): Section {
     const rows: [string, (out: Color) => Color][] = [
         ['rgb   uniform r g b', (out) => color.setFromSRGB(out, [rand(), rand(), rand()])],
-        ['hsl   random h', (out) => hsl.toColor(out, [rand(), 1, 0.5])],
-        ['oklch random h', (out) => oklch.toColorInGamut(out, [0.75, 0.12, rand() * 360])],
+        ['hsl   random h', (out) => color.fromHsl(out, [rand(), 1, 0.5])],
+        ['oklch random h', (out) => color.fromOklchInGamut(out, [0.75, 0.12, rand() * 360])],
     ];
     return {
         title: `random picks  seed ${seed}`,
@@ -113,7 +113,7 @@ const stopA: Color = [0, 0, 1];
 const stopB: Color = [1, 1, 0];
 
 function randomStop(out: Color, rand: () => number): Color {
-    return oklch.toColorInGamut(out, [0.45 + rand() * 0.45, 0.4, rand() * 360]);
+    return color.fromOklchInGamut(out, [0.45 + rand() * 0.45, 0.4, rand() * 360]);
 }
 
 function gradientSection(n: number): Section {
@@ -139,9 +139,9 @@ function gradientSection(n: number): Section {
             },
         ],
         ['rgb   linear lerp', (out, t) => color.lerp(out, stopA, stopB, t)],
-        ['hsl   lerp', (out, t) => hsl.toColor(out, hsl.lerp(h, hslA, hslB, t))],
-        ['oklab lerp', (out, t) => oklab.toColor(out, oklab.lerp(lab, labA, labB, t))],
-        ['oklch lerp', (out, t) => oklch.toColorInGamut(out, oklch.lerp(lch, lchA, lchB, t))],
+        ['hsl   lerp', (out, t) => color.fromHsl(out, hsl.lerp(h, hslA, hslB, t))],
+        ['oklab lerp', (out, t) => color.fromOklab(out, oklab.lerp(lab, labA, labB, t))],
+        ['oklch lerp', (out, t) => color.fromOklchInGamut(out, oklch.lerp(lch, lchA, lchB, t))],
     ];
     return {
         title: `gradients  #${color.toHexString(stopA)} → #${color.toHexString(stopB)}`,

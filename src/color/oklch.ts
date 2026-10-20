@@ -76,86 +76,7 @@ export function fromColor(out: Oklch, c: Const<Color>): Oklch {
     return fromOklab(out, oklab.fromColor(_lab, c));
 }
 
-/**
- * Write the linear-sRGB Color of an Oklch into `out`. Returns `out`.
- * Colors outside the sRGB gamut yield channels outside [0, 1]. Use `toColorInGamut` to map them
- * perceptually, or `color.clamp` for a cheaper clip that can shift hue.
- */
-export function toColor(out: Color, a: Const<Oklch>): Color {
-    return oklab.toColor(out, toOklab(_lab, a));
-}
-
 const _lab: Oklab = [0, 0, 0];
-
-/**
- * Write the linear-sRGB Color of an Oklch into `out`, mapped into the sRGB gamut. Returns `out`.
- *
- * Out-of-gamut colors keep their lightness and hue and lose chroma until they reach the gamut surface
- * (the CSS Color 4 ray trace method). Results are within about 0.02 deltaE OK of the CSS `oklch()`
- * gamut mapping algorithm, but not identical. L >= 1 maps to white and L <= 0 to black.
- */
-export function toColorInGamut(out: Color, a: Const<Oklch>): Color {
-    const l = a[0];
-    const h = a[2];
-
-    if (l >= 1 || l <= 0) {
-        const v = l >= 1 ? 1 : 0;
-        out[0] = v;
-        out[1] = v;
-        out[2] = v;
-        return out;
-    }
-
-    const lch = set(_toColorInGamut_lch, l, Math.max(a[1], 0), h);
-    toColor(out, lch);
-    if (isInUnitCube(out, 0)) return out;
-
-    // cast a ray in linear RGB from the gray of the same lightness out through the color, take
-    // where it leaves the [0, 1] cube, then restore L and h in Oklch and repeat to converge
-    const anchor = _toColorInGamut_anchor;
-    const last = _toColorInGamut_last;
-    // the Oklab gray of lightness l is l^3 in every linear sRGB channel
-    anchor[0] = anchor[1] = anchor[2] = l * l * l;
-    last[0] = out[0];
-    last[1] = out[1];
-    last[2] = out[2];
-
-    for (let i = 0; i < 4; i++) {
-        if (i > 0) {
-            fromColor(lch, out);
-            lch[0] = l;
-            lch[2] = h;
-            toColor(out, lch);
-        }
-
-        const t = rayExitUnitCube(anchor, out);
-        if (t < 0) {
-            out[0] = last[0];
-            out[1] = last[1];
-            out[2] = last[2];
-            break;
-        }
-
-        // a corrected color strictly inside the cube is a closer anchor for the next ray
-        const moveAnchor = i > 0 && isInUnitCube(out, 1e-12);
-        for (let k = 0; k < 3; k++) {
-            const hit = anchor[k] + (out[k] - anchor[k]) * t;
-            if (moveAnchor) anchor[k] = out[k];
-            out[k] = hit;
-            last[k] = hit;
-        }
-    }
-
-    // remove floating point noise at the surface
-    out[0] = Math.min(Math.max(out[0], 0), 1);
-    out[1] = Math.min(Math.max(out[1], 0), 1);
-    out[2] = Math.min(Math.max(out[2], 0), 1);
-    return out;
-}
-
-const _toColorInGamut_lch: Oklch = [0, 0, 0];
-const _toColorInGamut_anchor: Color = [0, 0, 0];
-const _toColorInGamut_last: Color = [0, 0, 0];
 
 /**
  * Interpolate from `a` to `b` by `t` into `out`, taking the shortest path around the hue circle.
@@ -179,34 +100,4 @@ export function lerp(out: Oklch, a: Const<Oklch>, b: Const<Oklch>, t: number): O
     out[1] = a[1] + (b[1] - a[1]) * t;
     out[2] = h;
     return out;
-}
-
-function isInUnitCube(c: Const<Color>, inset: number): boolean {
-    const lo = inset;
-    const hi = 1 - inset;
-    return c[0] >= lo && c[0] <= hi && c[1] >= lo && c[1] <= hi && c[2] >= lo && c[2] <= hi;
-}
-
-/**
- * Slab test for the ray from `start` toward `end` against the [0, 1] cube. Returns the ray parameter t
- * of the first crossing in the start to end direction (the exit point when `start` is inside), or -1 on a miss.
- */
-function rayExitUnitCube(start: Const<Color>, end: Const<Color>): number {
-    let tnear = -Infinity;
-    let tfar = Infinity;
-    for (let i = 0; i < 3; i++) {
-        const s = start[i];
-        const d = end[i] - s;
-        if (Math.abs(d) > 1e-12) {
-            const t1 = -s / d;
-            const t2 = (1 - s) / d;
-            tnear = Math.max(Math.min(t1, t2), tnear);
-            tfar = Math.min(Math.max(t1, t2), tfar);
-        } else if (s < 0 || s > 1) {
-            return -1;
-        }
-    }
-    if (tnear > tfar || tfar < 0) return -1;
-    const t = tnear < 0 ? tfar : tnear;
-    return Number.isFinite(t) ? t : -1;
 }

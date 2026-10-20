@@ -55,28 +55,6 @@ export function fromColor(out: Oklab, c: Const<Color>): Oklab {
     return out;
 }
 
-/**
- * Write the linear-sRGB Color of an Oklab into `out`. Returns `out`.
- * Colors outside the sRGB gamut yield channels outside [0, 1]. Clamp or gamut map if needed.
- */
-export function toColor(out: Color, a: Const<Oklab>): Color {
-    const L = a[0];
-    const A = a[1];
-    const B = a[2];
-
-    const l_ = L + 0.3963377773761749 * A + 0.2158037573099136 * B;
-    const m_ = L - 0.1055613458156586 * A - 0.0638541728258133 * B;
-    const s_ = L - 0.0894841775298119 * A - 1.2914855480194092 * B;
-    const l = l_ * l_ * l_;
-    const m = m_ * m_ * m_;
-    const s = s_ * s_ * s_;
-
-    out[0] = 4.076741636075959 * l - 3.307711539258062 * m + 0.2309699031821041 * s;
-    out[1] = -1.2684379732850313 * l + 2.6097573492876878 * m - 0.3413193760026569 * s;
-    out[2] = -0.004196076138675526 * l - 0.703418617935936 * m + 1.7076146940746113 * s;
-    return out;
-}
-
 /** Linearly interpolate from `a` to `b` by `t` into `out` (a perceptually even blend). Returns `out`. */
 export function lerp(out: Oklab, a: Const<Oklab>, b: Const<Oklab>, t: number): Oklab {
     out[0] = a[0] + (b[0] - a[0]) * t;
