@@ -528,11 +528,20 @@ export function lagrange(out: Vec3, a: Const<Vec3>, b: Const<Vec3>, c: Const<Vec
  * @returns out
  */
 export function slerp(out: Vec3, a: Const<Vec3>, b: Const<Vec3>, t: number): Vec3 {
-    const angle = Math.acos(Math.min(Math.max(dot(a, b), -1), 1));
-    const sinTotal = Math.sin(angle);
+    const cosTotal = Math.min(Math.max(dot(a, b), -1), 1);
 
-    const ratioA = Math.sin((1 - t) * angle) / sinTotal;
-    const ratioB = Math.sin(t * angle) / sinTotal;
+    let ratioA: number;
+    let ratioB: number;
+    if (1 - cosTotal > scalar.EPSILON) {
+        const angle = Math.acos(cosTotal);
+        const sinTotal = Math.sin(angle);
+        ratioA = Math.sin((1 - t) * angle) / sinTotal;
+        ratioB = Math.sin(t * angle) / sinTotal;
+    } else {
+        // the vectors are nearly identical so the arc is too short to divide by its sine, lerp instead
+        ratioA = 1 - t;
+        ratioB = t;
+    }
     out[0] = ratioA * a[0] + ratioB * b[0];
     out[1] = ratioA * a[1] + ratioB * b[1];
     out[2] = ratioA * a[2] + ratioB * b[2];
