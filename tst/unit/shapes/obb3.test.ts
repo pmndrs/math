@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import * as euler from '../../../src/core/euler';
+import { EulerOrder } from '../../../src/core/euler';
 import * as mat3 from '../../../src/core/mat3';
 import * as mat4 from '../../../src/core/mat4';
 import * as quat from '../../../src/core/quat';
@@ -55,7 +56,7 @@ describe('obb3', () => {
         it('returns true for point inside rotated OBB', () => {
             const obb = obb3.create();
             const rotation = quat.create();
-            const eulerAngles = euler.fromValues(0, Math.PI / 4, 0, 'xyz'); // Rotate 45° around Y axis
+            const eulerAngles = euler.fromValues(0, Math.PI / 4, 0, EulerOrder.XYZ); // Rotate 45° around Y axis
             quat.fromEuler(rotation, eulerAngles);
             obb3.setFromCenterHalfExtentsQuaternion(obb, [0, 0, 0], [1, 1, 1], rotation);
 
@@ -91,7 +92,7 @@ describe('obb3', () => {
         it('clamps along a rotated axis (90° about Z, long side along world +Y)', () => {
             const obb = obb3.create();
             const rot = quat.create();
-            quat.fromEuler(rot, euler.fromValues(0, 0, Math.PI / 2, 'xyz'));
+            quat.fromEuler(rot, euler.fromValues(0, 0, Math.PI / 2, EulerOrder.XYZ));
             // half extents (2,1,1): after +90° about Z the "2" axis points along world +Y
             obb3.setFromCenterHalfExtentsQuaternion(obb, [0, 0, 0], [2, 1, 1], rot);
 
@@ -152,7 +153,7 @@ describe('obb3', () => {
             obb3.setFromCenterHalfExtentsQuaternion(obb1, [0, 0, 0], [1, 1, 1], [0, 0, 0, 1]);
 
             const rotation = quat.create();
-            const eulerAngles = euler.fromValues(0, Math.PI / 4, 0, 'xyz');
+            const eulerAngles = euler.fromValues(0, Math.PI / 4, 0, EulerOrder.XYZ);
             quat.fromEuler(rotation, eulerAngles);
             const obb2 = obb3.create();
             obb3.setFromCenterHalfExtentsQuaternion(obb2, [0, 0, 0], [1, 1, 1], rotation);
@@ -163,7 +164,7 @@ describe('obb3', () => {
         it('returns false for two rotated OBBs separated by a large gap', () => {
             // both tilted 45° about Z so the R/AbsR/tInA path runs fully on a false result
             const rot = quat.create();
-            quat.fromEuler(rot, euler.fromValues(0, 0, Math.PI / 4, 'xyz'));
+            quat.fromEuler(rot, euler.fromValues(0, 0, Math.PI / 4, EulerOrder.XYZ));
             const obb1 = obb3.create();
             obb3.setFromCenterHalfExtentsQuaternion(obb1, [0, 0, 0], [1, 1, 1], rot);
             const obb2 = obb3.create();
@@ -201,7 +202,7 @@ describe('obb3', () => {
             obb3.setFromCenterHalfExtentsQuaternion(obb1, [0, 0, 0], [5, 0.5, 0.5], [0, 0, 0, 1]);
 
             const rotation = quat.create();
-            quat.fromEuler(rotation, euler.fromValues(0, 0, 1e-4, 'xyz'));
+            quat.fromEuler(rotation, euler.fromValues(0, 0, 1e-4, EulerOrder.XYZ));
             const obb2 = obb3.create();
             obb3.setFromCenterHalfExtentsQuaternion(obb2, [1, 0, 0], [5, 0.5, 0.5], rotation);
 
@@ -240,7 +241,7 @@ describe('obb3', () => {
             // 90° rotation around Z axis: (1,0,0) -> (0,1,0)
             const matrix = mat4.create();
             const rotation = quat.create();
-            quat.fromEuler(rotation, euler.fromValues(0, 0, Math.PI / 2, 'xyz'));
+            quat.fromEuler(rotation, euler.fromValues(0, 0, Math.PI / 2, EulerOrder.XYZ));
             mat4.fromRotationTranslation(matrix, rotation, [0, 0, 0]);
 
             const result = obb3.create();
@@ -272,13 +273,13 @@ describe('obb3', () => {
             // OBB rotated 90° around Y (X-axis points toward +Z)
             const obb = obb3.create();
             const obbRotation = quat.create();
-            quat.fromEuler(obbRotation, euler.fromValues(0, Math.PI / 2, 0, 'xyz'));
+            quat.fromEuler(obbRotation, euler.fromValues(0, Math.PI / 2, 0, EulerOrder.XYZ));
             obb3.setFromCenterHalfExtentsQuaternion(obb, [0, 0, 0], [1, 1, 1], obbRotation);
 
             // Matrix: 90° rotation around Z (Y-axis points toward -X)
             const matrix = mat4.create();
             const matRotation = quat.create();
-            quat.fromEuler(matRotation, euler.fromValues(0, 0, Math.PI / 2, 'xyz'));
+            quat.fromEuler(matRotation, euler.fromValues(0, 0, Math.PI / 2, EulerOrder.XYZ));
             mat4.fromRotationTranslation(matrix, matRotation, [0, 0, 0]);
 
             const result = obb3.create();
@@ -314,12 +315,12 @@ describe('obb3', () => {
 
         it('handles combined rotation, non-uniform scale, and translation', () => {
             const obbRotation = quat.create();
-            quat.fromEuler(obbRotation, euler.fromValues(0.3, -0.7, 1.1, 'xyz'));
+            quat.fromEuler(obbRotation, euler.fromValues(0.3, -0.7, 1.1, EulerOrder.XYZ));
             const obb = obb3.create();
             obb3.setFromCenterHalfExtentsQuaternion(obb, [2, -1, 4], [1, 2, 3], obbRotation);
 
             const matRotation = quat.create();
-            quat.fromEuler(matRotation, euler.fromValues(-0.5, 0.9, 0.2, 'xyz'));
+            quat.fromEuler(matRotation, euler.fromValues(-0.5, 0.9, 0.2, EulerOrder.XYZ));
             const matrix = mat4.create();
             mat4.fromRotationTranslationScale(matrix, matRotation, [5, -2, 1], [2, 0.5, 3]);
 
@@ -348,13 +349,13 @@ describe('obb3', () => {
 
         it('supports transforming in place (out === obb)', () => {
             const obbRotation = quat.create();
-            quat.fromEuler(obbRotation, euler.fromValues(0.2, 0.4, -0.6, 'xyz'));
+            quat.fromEuler(obbRotation, euler.fromValues(0.2, 0.4, -0.6, EulerOrder.XYZ));
             const obb = obb3.create();
             obb3.setFromCenterHalfExtentsQuaternion(obb, [1, 1, 1], [1, 2, 3], obbRotation);
             const reference = obb3.clone(obb);
 
             const matRotation = quat.create();
-            quat.fromEuler(matRotation, euler.fromValues(0.5, -0.3, 0.8, 'xyz'));
+            quat.fromEuler(matRotation, euler.fromValues(0.5, -0.3, 0.8, EulerOrder.XYZ));
             const matrix = mat4.create();
             mat4.fromRotationTranslationScale(matrix, matRotation, [3, -1, 2], [1.5, 2, 0.5]);
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Euler, Mat3, Quat, Vec3 } from '../../../src';
-import { mat4, quat, vec3 } from '../../../src';
+import { EulerOrder, mat4, quat, vec3 } from '../../../src';
 
 describe('quat', () => {
     describe('create', () => {
@@ -325,7 +325,7 @@ describe('quat', () => {
 
     describe('fromEuler', () => {
         it('should create quaternion from euler angles', () => {
-            const euler: Euler = [Math.PI / 4, Math.PI / 6, Math.PI / 3, 'xyz'];
+            const euler: Euler = [Math.PI / 4, Math.PI / 6, Math.PI / 3, EulerOrder.XYZ];
             const result = quat.create();
 
             quat.fromEuler(result, euler);
@@ -334,7 +334,14 @@ describe('quat', () => {
         });
 
         it('should handle different euler orders', () => {
-            const orders: Array<'xyz' | 'yxz' | 'zxy' | 'zyx' | 'yzx' | 'xzy'> = ['xyz', 'yxz', 'zxy', 'zyx', 'yzx', 'xzy'];
+            const orders: EulerOrder[] = [
+                EulerOrder.XYZ,
+                EulerOrder.YXZ,
+                EulerOrder.ZXY,
+                EulerOrder.ZYX,
+                EulerOrder.YZX,
+                EulerOrder.XZY,
+            ];
 
             orders.forEach((order) => {
                 const euler: Euler = [Math.PI / 4, Math.PI / 6, Math.PI / 8, order];
@@ -350,7 +357,7 @@ describe('quat', () => {
         it('should create quaternion from euler angles in degrees', () => {
             const result = quat.create();
 
-            quat.fromDegrees(result, 45, 30, 60, 'xyz');
+            quat.fromDegrees(result, 45, 30, 60, EulerOrder.XYZ);
 
             expect(quat.length(result)).toBeCloseTo(1);
         });

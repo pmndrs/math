@@ -13,7 +13,7 @@ Every type is a plain fixed-length tuple of numbers — no classes, no wrappers,
 
 - `Vec2` `[x, y]`, `Vec3` `[x, y, z]`, `Vec4` `[x, y, z, w]`
 - `Quat` `[x, y, z, w]`, `Quat2` `[x, y, z, w, x2, y2, z2, w2]`
-- `Euler` `[x, y, z, order?]`, radians, order defaulting to `'xyz'`
+- `Euler` `[x, y, z, order]`, radians, with `order` an `EulerOrder` enum value (`EulerOrder.XYZ` is 0). Convert with `euler.order('xyz')` and `euler.orderString(order)`
 - `Mat2` (4), `Mat2d` (6), `Mat3` (9), `Mat4` (16) — contiguous and column-major, with `Mat4` translation in `m[12]`, `m[13]`, `m[14]`
 - `Polar` `[r, theta]`, `Spherical` `[r, theta, phi]`
 

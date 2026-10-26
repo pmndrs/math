@@ -6,17 +6,47 @@ import { clamp, EPSILON } from './scalar';
 
 const DEG2RAD = Math.PI / 180;
 
-/** Euler orders */
-export type EulerOrder = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx';
+/** Euler rotation orders */
+export enum EulerOrder {
+    XYZ = 0,
+    XZY = 1,
+    YXZ = 2,
+    YZX = 3,
+    ZXY = 4,
+    ZYX = 5,
+}
 
-/** A Euler in 3D space, with an optional order (default is 'xyz') */
-export type Euler = [x: number, y: number, z: number, order?: EulerOrder];
+/** Euler rotation orders as strings */
+export type EulerOrderString = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx';
+
+const ORDER_STRINGS: EulerOrderString[] = ['xyz', 'xzy', 'yxz', 'yzx', 'zxy', 'zyx'];
+
+/** A Euler in 3D space, with its rotation order */
+export type Euler = [x: number, y: number, z: number, order: EulerOrder];
 
 /**
- * Creates a new Euler with default values (0, 0, 0, 'xyz').
+ * Converts an order string such as 'xyz' to its EulerOrder.
+ * @param order The order string.
+ * @returns The EulerOrder.
+ */
+export function order(order: EulerOrderString): EulerOrder {
+    return ORDER_STRINGS.indexOf(order);
+}
+
+/**
+ * Converts an EulerOrder to its string, such as 'xyz'.
+ * @param order The EulerOrder.
+ * @returns The order string.
+ */
+export function orderString(order: EulerOrder): EulerOrderString {
+    return ORDER_STRINGS[order];
+}
+
+/**
+ * Creates a new Euler with default values (0, 0, 0, EulerOrder.XYZ).
  */
 export function create(): Euler {
-    return [0, 0, 0, 'xyz'];
+    return [0, 0, 0, EulerOrder.XYZ];
 }
 
 /**
@@ -25,7 +55,7 @@ export function create(): Euler {
  * @returns A new Euler.
  */
 export function clone(a: Const<Euler>): Euler {
-    return a.length === 3 ? [a[0], a[1], a[2]] : [a[0], a[1], a[2], a[3]];
+    return [a[0], a[1], a[2], a[3]];
 }
 
 /**
@@ -50,13 +80,7 @@ export function copy(out: Euler, a: Const<Euler>): Euler {
     out[0] = a[0];
     out[1] = a[1];
     out[2] = a[2];
-
-    if (a.length === 3) {
-        out.length = 3;
-    } else {
-        out[3] = a[3];
-    }
-
+    out[3] = a[3];
     return out;
 }
 
@@ -101,7 +125,7 @@ export function fromDegrees(out: Euler, x: number, y: number, z: number, order: 
  * @param order The order of the Euler angles.
  * @returns The output Euler.
  */
-export function fromRotationMat4(out: Euler, rotationMatrix: Const<Mat4>, order: EulerOrder = out[3] || 'xyz'): Euler {
+export function fromRotationMat4(out: Euler, rotationMatrix: Const<Mat4>, order: EulerOrder = out[3]): Euler {
     return fromRotationMatrixValues(
         out,
         rotationMatrix[0],
@@ -135,7 +159,7 @@ function fromRotationMatrixValues(
     order: EulerOrder,
 ): Euler {
     switch (order) {
-        case 'xyz':
+        case EulerOrder.XYZ:
             out[1] = Math.asin(clamp(m13, -1, 1));
 
             if (Math.abs(m13) < 0.9999999) {
@@ -148,7 +172,7 @@ function fromRotationMatrixValues(
 
             break;
 
-        case 'yxz':
+        case EulerOrder.YXZ:
             out[0] = Math.asin(-clamp(m23, -1, 1));
 
             if (Math.abs(m23) < 0.9999999) {
@@ -161,7 +185,7 @@ function fromRotationMatrixValues(
 
             break;
 
-        case 'zxy':
+        case EulerOrder.ZXY:
             out[0] = Math.asin(clamp(m32, -1, 1));
 
             if (Math.abs(m32) < 0.9999999) {
@@ -174,7 +198,7 @@ function fromRotationMatrixValues(
 
             break;
 
-        case 'zyx':
+        case EulerOrder.ZYX:
             out[1] = Math.asin(-clamp(m31, -1, 1));
 
             if (Math.abs(m31) < 0.9999999) {
@@ -187,7 +211,7 @@ function fromRotationMatrixValues(
 
             break;
 
-        case 'yzx':
+        case EulerOrder.YZX:
             out[2] = Math.asin(clamp(m21, -1, 1));
 
             if (Math.abs(m21) < 0.9999999) {
@@ -200,7 +224,7 @@ function fromRotationMatrixValues(
 
             break;
 
-        case 'xzy':
+        case EulerOrder.XZY:
             out[2] = Math.asin(-clamp(m12, -1, 1));
 
             if (Math.abs(m12) < 0.9999999) {

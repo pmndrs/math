@@ -1,6 +1,6 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { type Euler, euler, type Quat, quat } from 'math';
+import { type Euler, EulerOrder, euler, type Quat, quat } from 'math';
 import { mulberry32 } from 'math/random';
 import { lineInk, ink, light, pixels } from './common/ink';
 import { createRenderer } from './common/renderer';
@@ -120,7 +120,7 @@ scene.add(eulerBox);
 
 const eA = euler.create();
 const eB = euler.create();
-const eL: Euler = [0, 0, 0, 'xyz'];
+const eL: Euler = [0, 0, 0, EulerOrder.XYZ];
 
 scene.updateWorldMatrix();
 camera.updateViewMatrix();
@@ -141,8 +141,8 @@ function frame(tms: number) {
     quat.copy(slerpEdges.quaternion, slerpBox.quaternion);
 
     // naive: interpolate euler angles instead
-    euler.fromQuat(eA, keyframes[k], 'xyz');
-    euler.fromQuat(eB, keyframes[kn], 'xyz');
+    euler.fromQuat(eA, keyframes[k], EulerOrder.XYZ);
+    euler.fromQuat(eB, keyframes[kn], EulerOrder.XYZ);
     eL[0] = eA[0] + (eB[0] - eA[0]) * local;
     eL[1] = eA[1] + (eB[1] - eA[1]) * local;
     eL[2] = eA[2] + (eB[2] - eA[2]) * local;

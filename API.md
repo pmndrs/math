@@ -26,8 +26,9 @@ overview, installation, and examples, see the [README](./README.md).
 - `type Vec2 = [ x: number, y: number ]` — A 2D vector
 - `type Vec3 = [ x: number, y: number, z: number ]` — A 3D vector
 - `type Vec4 = [ x: number, y: number, z: number, w: number ]` — A 4D vector
-- `type Euler = [ x: number, y: number, z: number, order?: EulerOrder ]` — A Euler in 3D space, with an optional order (default is 'xyz')
-- `type EulerOrder = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx'` — Euler orders
+- `type Euler = [ x: number, y: number, z: number, order: EulerOrder ]` — A Euler in 3D space, with its rotation order
+- `type EulerOrderString = 'xyz' | 'xzy' | 'yxz' | 'yzx' | 'zxy' | 'zyx'` — Euler rotation orders as strings
+- `enum EulerOrder = XYZ | XZY | YXZ | YZX | ZXY | ZYX` — Euler rotation orders
 - `type Quat = [ x: number, y: number, z: number, w: number ]` — A quaternion that represents rotation
 - `type Quat2 = [ x: number, y: number, z: number, w: number, x2: number, y2: number, z2: number, w2: number ]` — A dual quaternion that represents both rotation and translation
 - `type Mat2 = [ e1: number, e2: number, e3: number, e4: number ]` — A 2x2 matrix
@@ -291,11 +292,13 @@ import { euler } from 'math';
 
 **Create**
 
-- `euler.create(): Euler` — Creates a new Euler with default values (0, 0, 0, 'xyz').
+- `euler.order(order: EulerOrderString): EulerOrder` — Converts an order string such as 'xyz' to its EulerOrder.
+- `euler.orderString(order: EulerOrder): EulerOrderString` — Converts an EulerOrder to its string, such as 'xyz'.
+- `euler.create(): Euler` — Creates a new Euler with default values (0, 0, 0, EulerOrder.XYZ).
 - `euler.fromValues(x: number, y: number, z: number, order: EulerOrder): Euler` — Creates a new Euler from the given values.
 - `euler.set(out: Euler, x: number, y: number, z: number, order: EulerOrder): Euler` — Sets a given Euler from the given values.
 - `euler.fromDegrees(out: Euler, x: number, y: number, z: number, order: EulerOrder): Euler` — Sets Euler angle radians from given degrees
-- `euler.fromRotationMat4(out: Euler, rotationMatrix: Mat4, order: EulerOrder = out[3] || 'xyz'): Euler` — Sets the Euler angles from a rotation matrix.
+- `euler.fromRotationMat4(out: Euler, rotationMatrix: Mat4, order: EulerOrder = out[3]): Euler` — Sets the Euler angles from a rotation matrix.
 - `euler.fromQuat(out: Euler, q: Quat, order: EulerOrder): Euler` — Sets the Euler angles from a quaternion.
 - `euler.reorder(out: Euler, a: Euler, order: EulerOrder): Euler` — Reorders the Euler based on the specified order.
 

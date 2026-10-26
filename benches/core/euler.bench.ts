@@ -1,6 +1,7 @@
 import { assert, bench, group } from "@pmndrs/labs";
 import * as euler from "../../src/core/euler";
-import type { Euler, EulerOrder } from "../../src/core/euler";
+import type { Euler } from "../../src/core/euler";
+import { EulerOrder } from "../../src/core/euler";
 import * as mat4 from "../../src/core/mat4";
 import type { Mat4 } from "../../src/core/mat4";
 import * as quat from "../../src/core/quat";
@@ -9,7 +10,7 @@ import * as mulberry32 from "../../src/random/mulberry32";
 
 const N = 10_000;
 
-const ORDERS: EulerOrder[] = ["xyz", "xzy", "yxz", "yzx", "zxy", "zyx"];
+const ORDERS: EulerOrder[] = [EulerOrder.XYZ, EulerOrder.XZY, EulerOrder.YXZ, EulerOrder.YZX, EulerOrder.ZXY, EulerOrder.ZYX];
 
 function makeQuats(seed: number): Quat[] {
   const rand = mulberry32.create(seed);
@@ -65,7 +66,7 @@ group("euler ops 10k @core @euler", () => {
     const acc = yield () => {
       let acc = 0;
       for (let i = 0; i < N; i++) {
-        euler.fromRotationMat4(out, mats[i], "xyz");
+        euler.fromRotationMat4(out, mats[i], EulerOrder.XYZ);
         acc += out[0];
       }
       return acc;
@@ -80,7 +81,7 @@ group("euler ops 10k @core @euler", () => {
     const acc = yield () => {
       let acc = 0;
       for (let i = 0; i < N; i++) {
-        euler.fromRotationMat4(out, mats[i], "zyx");
+        euler.fromRotationMat4(out, mats[i], EulerOrder.ZYX);
         acc += out[0];
       }
       return acc;
@@ -95,7 +96,7 @@ group("euler ops 10k @core @euler", () => {
     const acc = yield () => {
       let acc = 0;
       for (let i = 0; i < N; i++) {
-        euler.fromQuat(out, quats[i], "xyz");
+        euler.fromQuat(out, quats[i], EulerOrder.XYZ);
         acc += out[0];
       }
       return acc;
@@ -110,7 +111,7 @@ group("euler ops 10k @core @euler", () => {
     const acc = yield () => {
       let acc = 0;
       for (let i = 0; i < N; i++) {
-        euler.reorder(out, eulers[i], "zyx");
+        euler.reorder(out, eulers[i], EulerOrder.ZYX);
         acc += out[0];
       }
       return acc;
@@ -125,7 +126,7 @@ group("euler ops 10k @core @euler", () => {
     const acc = yield () => {
       let acc = 0;
       for (let i = 0; i < N; i++) {
-        euler.fromDegrees(out, i * 0.01, i * 0.02, i * 0.03, "xyz");
+        euler.fromDegrees(out, i * 0.01, i * 0.02, i * 0.03, EulerOrder.XYZ);
         acc += out[0];
       }
       return acc;

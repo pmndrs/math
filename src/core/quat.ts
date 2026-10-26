@@ -1,6 +1,7 @@
-import type { Const } from './const';
 import type { MutableArrayLike } from './arrays';
-import type { Euler, EulerOrder } from './euler';
+import type { Const } from './const';
+import type { Euler } from './euler';
+import { EulerOrder } from './euler';
 import type { Mat3 } from './mat3';
 import * as mat3 from './mat3';
 import type { Mat4 } from './mat4';
@@ -11,7 +12,6 @@ import * as vec4 from './vec4';
 
 /** A quaternion that represents rotation */
 export type Quat = [x: number, y: number, z: number, w: number];
-
 
 /**
  * Creates a new identity quat
@@ -485,7 +485,7 @@ export function fromEuler(out: Quat, euler: Const<Euler>): Quat {
     const x = euler[0];
     const y = euler[1];
     const z = euler[2];
-    const order = euler[3] || 'xyz';
+    const order = euler[3];
 
     const cos = Math.cos;
     const sin = Math.sin;
@@ -499,42 +499,42 @@ export function fromEuler(out: Quat, euler: Const<Euler>): Quat {
     const s3 = sin(z / 2);
 
     switch (order) {
-        case 'xyz':
+        case EulerOrder.XYZ:
             out[0] = s1 * c2 * c3 + c1 * s2 * s3;
             out[1] = c1 * s2 * c3 - s1 * c2 * s3;
             out[2] = c1 * c2 * s3 + s1 * s2 * c3;
             out[3] = c1 * c2 * c3 - s1 * s2 * s3;
             break;
 
-        case 'yxz':
+        case EulerOrder.YXZ:
             out[0] = s1 * c2 * c3 + c1 * s2 * s3;
             out[1] = c1 * s2 * c3 - s1 * c2 * s3;
             out[2] = c1 * c2 * s3 - s1 * s2 * c3;
             out[3] = c1 * c2 * c3 + s1 * s2 * s3;
             break;
 
-        case 'zxy':
+        case EulerOrder.ZXY:
             out[0] = s1 * c2 * c3 - c1 * s2 * s3;
             out[1] = c1 * s2 * c3 + s1 * c2 * s3;
             out[2] = c1 * c2 * s3 + s1 * s2 * c3;
             out[3] = c1 * c2 * c3 - s1 * s2 * s3;
             break;
 
-        case 'zyx':
+        case EulerOrder.ZYX:
             out[0] = s1 * c2 * c3 - c1 * s2 * s3;
             out[1] = c1 * s2 * c3 + s1 * c2 * s3;
             out[2] = c1 * c2 * s3 - s1 * s2 * c3;
             out[3] = c1 * c2 * c3 + s1 * s2 * s3;
             break;
 
-        case 'yzx':
+        case EulerOrder.YZX:
             out[0] = s1 * c2 * c3 + c1 * s2 * s3;
             out[1] = c1 * s2 * c3 + s1 * c2 * s3;
             out[2] = c1 * c2 * s3 - s1 * s2 * c3;
             out[3] = c1 * c2 * c3 - s1 * s2 * s3;
             break;
 
-        case 'xzy':
+        case EulerOrder.XZY:
             out[0] = s1 * c2 * c3 - c1 * s2 * s3;
             out[1] = c1 * s2 * c3 - s1 * c2 * s3;
             out[2] = c1 * c2 * s3 + s1 * s2 * c3;
@@ -548,7 +548,7 @@ export function fromEuler(out: Quat, euler: Const<Euler>): Quat {
     return out;
 }
 
-const _fromDegrees_euler: Euler = [0, 0, 0, 'xyz'];
+const _fromDegrees_euler: Euler = [0, 0, 0, 0];
 
 /**
  * Creates a quaternion from euler angles specified in degrees.
