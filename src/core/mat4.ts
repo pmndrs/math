@@ -1870,6 +1870,49 @@ export function perspectiveZO(out: Mat4, fovy: number, aspect: number, near: num
 }
 
 /**
+ * Generates a reverse-Z perspective projection matrix with the given bounds.
+ * The near plane maps to a normalized device coordinate Z of 1 and the far plane to 0,
+ * using WebGPU/Vulkan/DirectX/Metal's [0, 1] clip volume.
+ * Pair with a floating point depth buffer, a depth clear of 0 and a `greater` depth compare
+ * for much better depth precision than a standard projection.
+ * Passing Infinity for far will generate an infinite projection matrix,
+ * where depth approaches 0 as distance approaches infinity.
+ *
+ * @param out mat4 frustum matrix will be written into
+ * @param fovy Vertical field of view in radians
+ * @param aspect Aspect ratio. typically viewport width/height
+ * @param near Near bound of the frustum
+ * @param far Far bound of the frustum, can be Infinity
+ * @returns out
+ */
+export function perspectiveReverseZ(out: Mat4, fovy: number, aspect: number, near: number, far: number): Mat4 {
+    const f = 1.0 / Math.tan(fovy / 2);
+    out[0] = f / aspect;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = f;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 0;
+    out[9] = 0;
+    out[11] = -1;
+    out[12] = 0;
+    out[13] = 0;
+    out[15] = 0;
+    if (far !== Number.POSITIVE_INFINITY) {
+        const fn = 1 / (far - near);
+        out[10] = near * fn;
+        out[14] = far * near * fn;
+    } else {
+        out[10] = 0;
+        out[14] = near;
+    }
+    return out;
+}
+
+/**
  * Generates a perspective projection matrix with the given field of view.
  * This is primarily useful for generating projection matrices to be used
  * with the still experimental WebVR API.
