@@ -1,5 +1,7 @@
 import type { Color, ColorInput } from './color';
 import { srgbToLinear } from './colorspace';
+import { hslToLinearSrgb, oklabToLinearSrgb } from './conversion';
+import * as oklch from './oklch';
 
 const CSS_COLORS: Record<string, number> = {
     aliceblue: 0xf0f8ff,
@@ -159,9 +161,13 @@ const CSS_COLORS: Record<string, number> = {
  *   - CSS hex strings:       '#f00', '#ff0000'
  *   - CSS rgb():             'rgb(255, 0, 0)', 'rgb(100%, 0%, 0%)'
  *   - CSS hsl():             'hsl(0, 100%, 50%)'
+ *   - CSS oklab():           'oklab(0.63 0.22 0.13)', 'oklab(63% 55% 32%)'
+ *   - CSS oklch():           'oklch(0.63 0.26 29)', 'oklch(63% 65% 29deg)'
  *   - 0xRRGGBB integers:     0xff0000 (sRGB gamma)
  *   - Named CSS colors:      'red', 'lime', 'deepskyblue', ...
  *   - [r, g, b] array:       treated as already-linear [0, 1]
+ *
+ * oklab() and oklch() colors outside sRGB are kept as-is, with channels outside [0, 1]. Alpha is ignored.
  */
 export function setFromColorInput(out: Color, input: ColorInput): Color {
     const parsed = parse(input);
@@ -207,6 +213,11 @@ function parse(input: ColorInput): Color | null {
         if (result) return result;
     }
 
+    if (s.startsWith('oklab(') || s.startsWith('oklch(')) {
+        const result = parseOkString(s);
+        if (result) return result;
+    }
+
     const hex = CSS_COLORS[s];
     if (hex !== undefined) {
         return parseHex6(`#${hex.toString(16).padStart(6, '0')}`);
@@ -247,30 +258,27 @@ function parseHslString(str: string): Color | null {
     const h = parseFloat(m[1]) / 360;
     const s = parseFloat(m[2]) / 100;
     const l = parseFloat(m[3]) / 100;
-    return hslToLinear(h, s, l);
+    return hslToLinearSrgb([0, 0, 0], h, s, l);
 }
 
-function hslToLinear(h: number, s: number, l: number): Color {
-    let r: number;
-    let g: number;
-    let b: number;
-    if (s === 0) {
-        r = g = b = l;
-    } else {
-        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        const p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1 / 3);
-        g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1 / 3);
+function parseOkString(str: string): Color | null {
+    // CSS Color 4 space-separated syntax with an optional ' / alpha'
+    const m = str.match(/^ok(lab|lch)\(\s*(\S+)\s+(\S+)\s+([^\s/)]+)\s*(?:\/\s*[^)]*)?\)$/);
+    if (!m) return null;
+    // percentages: 100% is L = 1, and a, b or C = 0.4
+    const l = parseOkChannel(m[2], 1);
+    const x = parseOkChannel(m[3], 0.4);
+    if (m[1] === 'lab') {
+        const y = parseOkChannel(m[4], 0.4);
+        return oklabToLinearSrgb([0, 0, 0], l, x, y);
     }
-    return [srgbToLinear(r), srgbToLinear(g), srgbToLinear(b)];
+    const h = m[4] === 'none' ? 0 : parseFloat(m[4]);
+    const lab = oklch.toOklab([0, 0, 0], [l, x, h]);
+    return oklabToLinearSrgb(lab, lab[0], lab[1], lab[2]);
 }
 
-function hue2rgb(p: number, q: number, t: number): number {
-    if (t < 0) t += 1;
-    if (t > 1) t -= 1;
-    if (t < 1 / 6) return p + (q - p) * 6 * t;
-    if (t < 1 / 2) return q;
-    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-    return p;
+function parseOkChannel(s: string, percentScale: number): number {
+    if (s === 'none') return 0;
+    if (s.endsWith('%')) return (parseFloat(s) / 100) * percentScale;
+    return parseFloat(s);
 }
