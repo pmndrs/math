@@ -297,6 +297,11 @@ describe('vec3', () => {
             const result = vec3.slerp(out, v1, v2, 0.5);
             expect(vec3.length(result)).toBeCloseTo(1);
         });
+
+        it('should return the shared direction when both vectors are equal', () => {
+            const v: Vec3 = [1, 0, 0];
+            expect(vec3.slerp(out, v, v, 0.5)).toEqual([1, 0, 0]);
+        });
     });
 
     describe('hermite', () => {
