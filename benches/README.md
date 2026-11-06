@@ -31,9 +31,11 @@ localize a regression once one shows up.
 
 Results are saved to `.labs/` (gitignored). Comparisons only report a change when it is statistically significant and the effect size is meaningful — see the labs README for details.
 
+Re-record baselines after upgrading to labs 0.12.0 to use its updated preparation and sampling defaults.
+
 ## Writing a bench
 
-Benches use a generator: code before `yield` is setup, the yielded function is measured, code after is teardown. Each sample starts with a forced GC by default; chain `.gc(false)` to opt out.
+Benches use a generator: code before `yield` is setup, the yielded function is measured, code after is teardown. Samples run consecutively after one initial GC, with natural GC included in timing. Chain `.gc(false)` to disable GC observation, or set `heap: false` in `labs.config.ts` to skip the separate heap diagnostics.
 
 `yield` hands back the result of the first untimed call, so teardown can check it. Return it from the generator and labs snapshots it against the baseline: a compare then reports `output changed` (and exits 1) if a refactor altered the result, alongside the speed verdict. Use `assert` from labs for hard invariants.
 
