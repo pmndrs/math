@@ -1,3 +1,4 @@
+import type { Vec3 } from '../core/vec3';
 import { createPermutation, type Permutation } from './permutation';
 
 /** A seeded 3D simplex noise generator. Create one with {@link create}. */
@@ -26,7 +27,22 @@ export function create(seed: number): Simplex3DGenerator {
  * @param z Z coordinate
  * @returns The noise value at (x, y, z)
  */
-export function sample({ perm, grad3 }: Simplex3DGenerator, x: number, y: number, z: number): number {
+export function sample(generator: Simplex3DGenerator, x: number, y: number, z: number): number {
+    _sample_point[0] = x;
+    _sample_point[1] = y;
+    _sample_point[2] = z;
+    evaluate(_sample_point, generator);
+    return _sample_point[0];
+}
+
+// A shared tuple keeps coordinates and the result unboxed across the non-inlined call.
+const _sample_point: Vec3 = [0, 0, 0];
+
+function evaluate(point: Vec3, { perm, grad3 }: Simplex3DGenerator): void {
+    const x = point[0];
+    const y = point[1];
+    const z = point[2];
+
     // Skew the input space to determine which simplex cell we're in
     const s = (x + y + z) * F3; // Hairy factor for 3D
     let i = Math.floor(x + s);
@@ -146,5 +162,5 @@ export function sample({ perm, grad3 }: Simplex3DGenerator, x: number, y: number
     }
     // Add contributions from each corner to get the final noise value.
     // The result is scaled to return values in the interval [-1,1].
-    return 32 * (n0 + n1 + n2 + n3);
+    point[0] = 32 * (n0 + n1 + n2 + n3);
 }

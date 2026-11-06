@@ -8,7 +8,6 @@ import * as scalar from './scalar';
 /** A 3D vector */
 export type Vec3 = [x: number, y: number, z: number];
 
-
 /**
  * Creates a new, empty vec3
  *
@@ -823,6 +822,15 @@ const _rotateTowards_axis: Vec3 = [0, 0, 0];
  * @returns out
  */
 export function rotateTowards(out: Vec3, from: Const<Vec3>, to: Const<Vec3>, maxAngle: number): Vec3 {
+    _rotateTowards_limit[0] = maxAngle;
+    return rotateTowardsLimit(out, from, to);
+}
+
+// A tuple carries the scalar limit without boxing across the larger rotation call.
+const _rotateTowards_limit: [number] = [0];
+
+function rotateTowardsLimit(out: Vec3, from: Const<Vec3>, to: Const<Vec3>): Vec3 {
+    const maxAngle = _rotateTowards_limit[0];
     const fx = from[0];
     const fy = from[1];
     const fz = from[2];

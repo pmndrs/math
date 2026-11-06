@@ -1,3 +1,4 @@
+import type { Vec3 } from '../core/vec3';
 import { fade, lerp } from '../core/scalar';
 import { createPermutation, type Permutation } from './permutation';
 
@@ -23,7 +24,22 @@ export function create(seed: number): Perlin3DGenerator {
  * @param z Z coordinate
  * @returns The noise value at (x, y, z)
  */
-export function sample({ perm, grad3 }: Perlin3DGenerator, x: number, y: number, z: number): number {
+export function sample(generator: Perlin3DGenerator, x: number, y: number, z: number): number {
+    _sample_point[0] = x;
+    _sample_point[1] = y;
+    _sample_point[2] = z;
+    evaluate(_sample_point, generator);
+    return _sample_point[0];
+}
+
+// A shared tuple keeps coordinates and the result unboxed across the non-inlined call.
+const _sample_point: Vec3 = [0, 0, 0];
+
+function evaluate(point: Vec3, { perm, grad3 }: Perlin3DGenerator): void {
+    let x = point[0];
+    let y = point[1];
+    let z = point[2];
+
     // Find unit grid cell containing point
     let X = Math.floor(x);
     let Y = Math.floor(y);
@@ -75,5 +91,5 @@ export function sample({ perm, grad3 }: Perlin3DGenerator, x: number, y: number,
     const w = fade(z);
 
     // Interpolate
-    return lerp(lerp(lerp(n000, n100, u), lerp(n001, n101, u), w), lerp(lerp(n010, n110, u), lerp(n011, n111, u), w), v);
+    point[0] = lerp(lerp(lerp(n000, n100, u), lerp(n001, n101, u), w), lerp(lerp(n010, n110, u), lerp(n011, n111, u), w), v);
 }

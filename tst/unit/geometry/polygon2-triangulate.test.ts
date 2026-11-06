@@ -82,6 +82,13 @@ describe('triangulatePolygon2', () => {
         checkTriangulation(out, count, hexagon, 6);
     });
 
+    it('triangulates an outline with collinear boundary vertices', () => {
+        const outline = [0, 0, 2, 0, 4, 0, 4, 2, 4, 4, 2, 4, 0, 4, 0, 2];
+        const out: number[] = [];
+        const count = triangulatePolygon2(out, outline, 8);
+        checkTriangulation(out, count, outline, 8);
+    });
+
     it('accepts clockwise input (normalises winding)', () => {
         const cw: number[] = [];
         for (let i = 5; i >= 0; i--) cw.push(lShape[i * 2], lShape[i * 2 + 1]);

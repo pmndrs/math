@@ -751,11 +751,17 @@ export function iterate(chain: Chain3, target: Const<Vec3>): number {
  * @returns the distance from the effector to `target`, also stored as `chain.solveDistance`
  */
 export function solve(chain: Chain3, target: Const<Vec3>): number {
+    solveChain(chain, target);
+    return chain.solveDistance;
+}
+
+// The small public wrapper reads the result without boxing a numeric return value.
+function solveChain(chain: Chain3, target: Const<Vec3>): void {
     const count = chain.bones.length;
 
     if (count === 0) {
         chain.solveDistance = Number.POSITIVE_INFINITY;
-        return chain.solveDistance;
+        return;
     }
 
     // in case bones were pushed onto the chain directly rather than through addBone
@@ -788,8 +794,6 @@ export function solve(chain: Chain3, target: Const<Vec3>): number {
     }
 
     chain.solveDistance = best;
-
-    return best;
 }
 
 /** Creates an empty structure. */
@@ -896,6 +900,8 @@ const _pass_reference: Vec3 = [0, 0, 0];
 const _pass_direction: Vec3 = [0, 0, 0];
 const _constrain_axis: Vec3 = [0, 0, 0];
 const _constrain_reference: Vec3 = [0, 0, 0];
+// Clockwise and anticlockwise bounds. Slot 0 holds the selected angle after clamping.
+const _constrain_limits: [number, number] = [0, 0];
 const _constrain_basis: Mat3 = /* @__PURE__ */ mat3.create();
 
 function clampAngle(radians: number): number {
@@ -924,12 +930,15 @@ function normalizeOr(out: Vec3, fallback: Const<Vec3>): Vec3 {
 }
 
 /**
- * Flattens a direction into a hinge's plane.
+ * Flattens `out` into a hinge's plane.
  *
  * A direction parallel to the hinge axis projects to nothing, leaving no in-plane direction to
  * normalize. Fall back to the hinge's reference axis, which lies in the plane by construction.
  */
-function projectOntoHinge(out: Vec3, x: number, y: number, z: number, axis: Const<Vec3>, referenceAxis: Const<Vec3>): Vec3 {
+function projectOntoHinge(out: Vec3, axis: Const<Vec3>, referenceAxis: Const<Vec3>): Vec3 {
+    const x = out[0];
+    const y = out[1];
+    const z = out[2];
     const d = x * axis[0] + y * axis[1] + z * axis[2];
 
     out[0] = x - axis[0] * d;
@@ -943,8 +952,9 @@ function projectOntoHinge(out: Vec3, x: number, y: number, z: number, axis: Cons
     return vec3.normalize(out, out);
 }
 
-/** Rotates the unit vector `a` about the unit vector `axis` by `radians` (Rodrigues). */
-function rotateAboutAxis(out: Vec3, a: Const<Vec3>, axis: Const<Vec3>, radians: number): Vec3 {
+/** Rotates the unit vector `a` about `axis` by the selected hinge limit (Rodrigues). */
+function rotateAboutAxis(out: Vec3, a: Const<Vec3>, axis: Const<Vec3>): Vec3 {
+    const radians = _constrain_limits[0];
     const ax = a[0];
     const ay = a[1];
     const az = a[2];
@@ -964,27 +974,44 @@ function rotateAboutAxis(out: Vec3, a: Const<Vec3>, axis: Const<Vec3>, radians: 
 }
 
 /** Flattens into the hinge plane, then clamps the swing about the reference axis. Writes `_pass_direction`. */
-function constrainHinge(
-    x: number,
-    y: number,
-    z: number,
-    axis: Const<Vec3>,
-    referenceAxis: Const<Vec3>,
-    clockwise: number,
-    anticlockwise: number,
-): void {
-    projectOntoHinge(_pass_direction, x, y, z, axis, referenceAxis);
+function constrainHinge(axis: Const<Vec3>, referenceAxis: Const<Vec3>): void {
+    projectOntoHinge(_pass_direction, axis, referenceAxis);
+    const clockwise = _constrain_limits[0];
+    const anticlockwise = _constrain_limits[1];
 
     if (clockwise >= Math.PI && anticlockwise >= Math.PI) return;
 
     // anticlockwise about the hinge axis is positive
-    const signed = vec3.signedAngle(referenceAxis, _pass_direction, axis);
+    const nx = axis[0];
+    const ny = axis[1];
+    const nz = axis[2];
+
+    // drop the components along the axis - they carry no signed angle
+    const ad = referenceAxis[0] * nx + referenceAxis[1] * ny + referenceAxis[2] * nz;
+    const ax = referenceAxis[0] - nx * ad;
+    const ay = referenceAxis[1] - ny * ad;
+    const az = referenceAxis[2] - nz * ad;
+
+    const bd = _pass_direction[0] * nx + _pass_direction[1] * ny + _pass_direction[2] * nz;
+    const bx = _pass_direction[0] - nx * bd;
+    const by = _pass_direction[1] - ny * bd;
+    const bz = _pass_direction[2] - nz * bd;
+
+    // (a x b) . axis is |a||b|sin(theta), a . b is |a||b|cos(theta)
+    const cx = ay * bz - az * by;
+    const cy = az * bx - ax * bz;
+    const cz = ax * by - ay * bx;
+
+    const signed = Math.atan2(cx * nx + cy * ny + cz * nz, ax * bx + ay * by + az * bz);
 
     if (signed > anticlockwise) {
-        rotateAboutAxis(_pass_direction, referenceAxis, axis, anticlockwise);
+        _constrain_limits[0] = anticlockwise;
     } else if (signed < -clockwise) {
-        rotateAboutAxis(_pass_direction, referenceAxis, axis, -clockwise);
+        _constrain_limits[0] = -clockwise;
+    } else {
+        return;
     }
+    rotateAboutAxis(_pass_direction, referenceAxis, axis);
 }
 
 /**
@@ -1075,7 +1102,7 @@ function constrainForward(chain: Chain3, index: number, x: number, y: number, z:
         const type = chain.baseboneConstraintType;
 
         if (type === BaseboneConstraintType.GLOBAL_HINGE || type === BaseboneConstraintType.LOCAL_HINGE) {
-            projectOntoHinge(_pass_direction, x, y, z, chain.baseboneWorldAxis, chain.baseboneWorldReferenceAxis);
+            projectOntoHinge(_pass_direction, chain.baseboneWorldAxis, chain.baseboneWorldReferenceAxis);
             return;
         }
 
@@ -1085,13 +1112,13 @@ function constrainForward(chain: Chain3, index: number, x: number, y: number, z:
         const joint = chain.bones[index].joint;
 
         if (joint.type === JointType.GLOBAL_HINGE) {
-            projectOntoHinge(_pass_direction, x, y, z, joint.rotationAxis, joint.referenceAxis);
+            projectOntoHinge(_pass_direction, joint.rotationAxis, joint.referenceAxis);
             return;
         }
 
         if (joint.type === JointType.LOCAL_HINGE) {
             resolveLocalHinge(chain, index, joint);
-            projectOntoHinge(_pass_direction, x, y, z, _constrain_axis, _constrain_reference);
+            projectOntoHinge(_pass_direction, _constrain_axis, _constrain_reference);
             return;
         }
     }
@@ -1131,15 +1158,9 @@ function constrainBackward(chain: Chain3, index: number, x: number, y: number, z
             }
             case BaseboneConstraintType.GLOBAL_HINGE:
             case BaseboneConstraintType.LOCAL_HINGE: {
-                constrainHinge(
-                    x,
-                    y,
-                    z,
-                    chain.baseboneWorldAxis,
-                    chain.baseboneWorldReferenceAxis,
-                    chain.baseboneClockwise,
-                    chain.baseboneAnticlockwise,
-                );
+                _constrain_limits[0] = chain.baseboneClockwise;
+                _constrain_limits[1] = chain.baseboneAnticlockwise;
+                constrainHinge(chain.baseboneWorldAxis, chain.baseboneWorldReferenceAxis);
                 return;
             }
             default:
@@ -1156,12 +1177,16 @@ function constrainBackward(chain: Chain3, index: number, x: number, y: number, z
             return;
         }
         case JointType.GLOBAL_HINGE: {
-            constrainHinge(x, y, z, joint.rotationAxis, joint.referenceAxis, joint.clockwise, joint.anticlockwise);
+            _constrain_limits[0] = joint.clockwise;
+            _constrain_limits[1] = joint.anticlockwise;
+            constrainHinge(joint.rotationAxis, joint.referenceAxis);
             return;
         }
         case JointType.LOCAL_HINGE: {
             resolveLocalHinge(chain, index, joint);
-            constrainHinge(x, y, z, _constrain_axis, _constrain_reference, joint.clockwise, joint.anticlockwise);
+            _constrain_limits[0] = joint.clockwise;
+            _constrain_limits[1] = joint.anticlockwise;
+            constrainHinge(_constrain_axis, _constrain_reference);
             return;
         }
         default:
