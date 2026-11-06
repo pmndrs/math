@@ -47,6 +47,7 @@ export function getWorldPosition(out: Vec3, world: World, i: number): Vec3 { /* 
 - One epsilon does not fit every operation or scale. Choose each tolerance and say why.
 - Define behavior for empty input, zero-length vectors, degenerate geometry, NaN, and exact boundary contact.
 - Compare squared distances; reach for `squaredLength` / `squaredDistance` over their square-rooted pairs.
+- `Math.hypot` boxes every argument and its result, so it allocates on every call even in optimized code. Use `vec2.length` / `vec3.length` on a scratch tuple, or `Math.sqrt(x * x + y * y)`.
 - Integers in the range [-2^30, 2^30) are stored in the pointer itself (V8 Smi), with no heap object. Use them for indices, handles, packed IDs, bitmasks, and counts.
 - Where possible avoid plain array element kind transitions (small integers, doubles, array with holes). Especially avoid unnecessary SMI or PACKED_DOUBLE to holey transitions when holey arrays are not desired.
 - **Keep hot-path storage consistent.** Mixing plain arrays and typed arrays in the same math function can make element accesses polymorphic and reduce optimization. The tuple types help enforce this consistency. Casting a `Float32Array` to `Vec3` doesn't change its runtime storage. Marshal at boundaries when needed to keep the hot path monomorphic.
