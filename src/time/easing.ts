@@ -7,12 +7,31 @@ export const sineOut = (x: number) => Math.sin((x * Math.PI) / 2);
 export const sineInOut = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2;
 
 export const cubicIn = (x: number) => x * x * x;
-export const cubicOut = (x: number) => 1 - (1 - x) ** 3;
-export const cubicInOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
+export function cubicOut(x: number): number {
+    const t = 1 - x;
+    return 1 - t * t * t;
+}
 
-export const quintIn = (x: number) => x ** 5;
-export const quintOut = (x: number) => 1 - (1 - x) ** 5;
-export const quintInOut = (x: number) => (x < 0.5 ? 16 * x ** 5 : 1 - (-2 * x + 2) ** 5 / 2);
+export function cubicInOut(x: number): number {
+    if (x < 0.5) return 4 * x * x * x;
+    const t = -2 * x + 2;
+    return 1 - (t * t * t) / 2;
+}
+
+export function quintIn(x: number): number {
+    return x * x * x * x * x;
+}
+
+export function quintOut(x: number): number {
+    const t = 1 - x;
+    return 1 - t * t * t * t * t;
+}
+
+export function quintInOut(x: number): number {
+    if (x < 0.5) return 16 * x * x * x * x * x;
+    const t = -2 * x + 2;
+    return 1 - (t * t * t * t * t) / 2;
+}
 
 export const circIn = (x: number) => 1 - Math.sqrt(1 - x * x);
 export const circOut = (x: number) => Math.sqrt(1 - (x - 1) * (x - 1));

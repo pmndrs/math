@@ -2,6 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { easing } from '../../../src/time';
 
 describe('easing', () => {
+    it.each([
+        ['cubicOut', easing.cubicOut, 0.578125, 0.875, 0.984375],
+        ['cubicInOut', easing.cubicInOut, 0.0625, 0.5, 0.9375],
+        ['quintIn', easing.quintIn, 0.0009765625, 0.03125, 0.2373046875],
+        ['quintOut', easing.quintOut, 0.7626953125, 0.96875, 0.9990234375],
+        ['quintInOut', easing.quintInOut, 0.015625, 0.5, 0.984375],
+    ] as const)('%s follows its curve between the endpoints', (_name, fn, quarter, half, threeQuarters) => {
+        expect(fn(0.25)).toBeCloseTo(quarter, 12);
+        expect(fn(0.5)).toBeCloseTo(half, 12);
+        expect(fn(0.75)).toBeCloseTo(threeQuarters, 12);
+    });
+
     // in/out families should pin the unit interval endpoints
     const unitInterval: [string, (t: number) => number][] = [
         ['linear', easing.linear],

@@ -228,6 +228,16 @@ describe('euler', () => {
     });
 
     describe('fromQuat', () => {
+        it('can reuse the quaternion array for the converted angles', () => {
+            for (const order of ORDERS) {
+                const q = quat.fromEuler(quat.create(), [0.3, -0.7, 1.2, order]);
+                const expected = euler.fromQuat(euler.create(), q, order);
+
+                expect(euler.fromQuat(q as Euler, q, order)).toBe(q);
+                expect(q).toEqual(expected);
+            }
+        });
+
         it('should convert quaternion to Euler angles', () => {
             const q = quat.setAxisAngle(quat.create(), [0, 0, 1], Math.PI / 4);
             const result = euler.create();

@@ -56,6 +56,21 @@ describe('triangulatePolygon2', () => {
         checkTriangulation(out, count, plus, 12);
     });
 
+    it('reuses working storage across polygons of different sizes', () => {
+        const scratch = new Array<number>(plus.length / 2).fill(0);
+        const out: number[] = [];
+
+        for (const vertices of [plus, lShape, square]) {
+            const n = vertices.length / 2;
+            const expected: number[] = [];
+            triangulatePolygon2(expected, vertices, n);
+
+            const count = triangulatePolygon2(out, vertices, n, scratch);
+            expect(out.slice(0, count * 3)).toEqual(expected);
+            checkTriangulation(out, count, vertices, n);
+        }
+    });
+
     it('triangulates a regular polygon', () => {
         const hexagon: number[] = [];
         for (let i = 0; i < 6; i++) {

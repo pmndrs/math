@@ -30,19 +30,12 @@ function collinear(ax: number, ay: number, bx: number, by: number, cx: number, c
 
 /** True if segments (a,b) and (c,d) properly cross (no collinear/endpoint contact). */
 function intersectProp(ax: number, ay: number, bx: number, by: number, cx: number, cy: number, dx: number, dy: number): boolean {
-    if (
-        collinear(ax, ay, bx, by, cx, cy) ||
-        collinear(ax, ay, bx, by, dx, dy) ||
-        collinear(cx, cy, dx, dy, ax, ay) ||
-        collinear(cx, cy, dx, dy, bx, by)
-    ) {
-        return false;
-    }
-    const l1 = area2(ax, ay, bx, by, cx, cy) < 0;
-    const l2 = area2(ax, ay, bx, by, dx, dy) < 0;
-    const l3 = area2(cx, cy, dx, dy, ax, ay) < 0;
-    const l4 = area2(cx, cy, dx, dy, bx, by) < 0;
-    return l1 !== l2 && l3 !== l4;
+    const abC = area2(ax, ay, bx, by, cx, cy);
+    const abD = area2(ax, ay, bx, by, dx, dy);
+    const cdA = area2(cx, cy, dx, dy, ax, ay);
+    const cdB = area2(cx, cy, dx, dy, bx, by);
+    if (abC === 0 || abD === 0 || cdA === 0 || cdB === 0) return false;
+    return abC < 0 !== abD < 0 && cdA < 0 !== cdB < 0;
 }
 
 /** True if point c lies on the closed segment (a,b), assuming the three are collinear. */
@@ -168,9 +161,10 @@ function diagonal(
  * @param out output array of triangle indices
  * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
  * @param n number of vertices to read from `vertices`
+ * @param scratch optional reusable working array with room for `n` indices, distinct from `out` and `vertices`
  * @returns the number of triangles written
  */
-export function triangulatePolygon2(out: number[], vertices: readonly number[], n: number): number {
+export function triangulatePolygon2(out: number[], vertices: readonly number[], n: number, scratch?: number[]): number {
     if (n < 3) return 0;
 
     // Order the working list so the resolved polygon winds clockwise, which is
@@ -178,7 +172,7 @@ export function triangulatePolygon2(out: number[], vertices: readonly number[], 
     // vertex indices, so emitted triangles refer back to the caller's vertices
     // regardless of input winding.
     const ccw = signedArea(vertices, n) >= 0;
-    const indices = new Array<number>(n);
+    const indices = scratch ?? new Array<number>(n);
     for (let i = 0; i < n; i++) indices[i] = ccw ? n - 1 - i : i;
 
     let ntris = 0;
