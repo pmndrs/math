@@ -1,3 +1,4 @@
+import type { Vec4 } from '../core/vec4';
 import { createPermutation, type Permutation } from './permutation';
 
 /** A seeded 4D simplex noise generator. Create one with {@link create}. */
@@ -30,7 +31,24 @@ export function create(seed: number): Simplex4DGenerator {
  * @param w W coordinate
  * @returns The noise value at (x, y, z, w)
  */
-export function sample({ perm, grad4 }: Simplex4DGenerator, x: number, y: number, z: number, w: number): number {
+export function sample(generator: Simplex4DGenerator, x: number, y: number, z: number, w: number): number {
+    _sample_point[0] = x;
+    _sample_point[1] = y;
+    _sample_point[2] = z;
+    _sample_point[3] = w;
+    evaluate(_sample_point, generator);
+    return _sample_point[0];
+}
+
+// A shared tuple keeps coordinates and the result unboxed across the non-inlined call.
+const _sample_point: Vec4 = [0, 0, 0, 0];
+
+function evaluate(point: Vec4, { perm, grad4 }: Simplex4DGenerator): void {
+    const x = point[0];
+    const y = point[1];
+    const z = point[2];
+    const w = point[3];
+
     // Skew the input space to determine which simplex cell we're in
     const s = (x + y + z + w) * F4; // Factor for 4D skewing
     const i = Math.floor(x + s);
@@ -147,5 +165,5 @@ export function sample({ perm, grad4 }: Simplex4DGenerator, x: number, y: number
 
     // Add contributions from each corner to get the final noise value.
     // The result is scaled to return values in the interval [-1, 1].
-    return 27 * (n0 + n1 + n2 + n3 + n4);
+    point[0] = 27 * (n0 + n1 + n2 + n3 + n4);
 }

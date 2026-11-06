@@ -151,6 +151,21 @@ describe('mat4', () => {
             mat4.multiply(result, m, identity);
             expect(result).toEqual(m);
         });
+
+        it('should allow the result to replace either or both operands', () => {
+            const a: Mat4 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+            const b: Mat4 = [16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+            const expected = mat4.multiply(mat4.create(), a, b);
+            const left = mat4.clone(a);
+            const right = mat4.clone(b);
+            const square = mat4.clone(a);
+
+            expect(mat4.multiply(left, left, b)).toBe(left);
+            expect(left).toEqual(expected);
+            expect(mat4.multiply(right, a, right)).toBe(right);
+            expect(right).toEqual(expected);
+            expect(mat4.multiply(square, square, square)).toEqual(mat4.multiply(mat4.create(), a, a));
+        });
     });
 
     describe('translate', () => {

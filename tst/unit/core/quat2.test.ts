@@ -351,6 +351,16 @@ describe('quat2', () => {
     });
 
     describe('rotateAroundAxis', () => {
+        it('supports rotating in place', () => {
+            const rotation = quat.setAxisAngle(quat.create(), [0, 1, 0], 0.4);
+            const dq = quat2.fromRotationTranslation(quat2.create(), rotation, [1, 2, 3]);
+            const axis: Vec3 = [1, 2, 3];
+            const expected = quat2.rotateAroundAxis(quat2.create(), dq, axis, 0.7);
+
+            expect(quat2.rotateAroundAxis(dq, dq, axis, 0.7)).toBe(dq);
+            expect(dq).toEqual(expected);
+        });
+
         it('should rotate dual quaternion around arbitrary axis', () => {
             const dq = quat2.create();
             quat2.identity(dq);

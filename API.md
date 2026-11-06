@@ -1073,7 +1073,7 @@ import { frustum } from 'math/shapes';
 - <a id="circumcircle"></a>`circumcircle(out: Circle, a: Vec2, b: Vec2, c: Vec2): Circle` — Calculates the circumcircle of three points and stores the center in the output parameter.
 - <a id="decomposepolygon2quick"></a>`decomposePolygon2Quick(vertices: number[], n: number): number[][]` — Decomposes a simple polygon into convex sub-polygons using Bayazit's fast
 - <a id="decomposepolygon2quality"></a>`decomposePolygon2Quality(vertices: number[], n: number): number[][]` — Decomposes a simple polygon into the (near-)minimum number of convex
-- <a id="triangulatepolygon2"></a>`triangulatePolygon2(out: number[], vertices: number[], n: number): number` — Triangulates a simple polygon by ear clipping, writing triangle indices into
+- <a id="triangulatepolygon2"></a>`triangulatePolygon2(out: number[], vertices: readonly number[], n: number, scratch?: number[]): number` — Triangulates a simple polygon by ear clipping, writing triangle indices into
 - <a id="quickhull2"></a>`quickhull2(points: number[]): number[]` — Computes the convex hull of a set of 2D points using the QuickHull algorithm.
 - <a id="quickhull3"></a>`quickhull3(points: number[]): number[]` — Computes the convex hull of a set of 3D points using an incremental QuickHull algorithm.
 
@@ -1097,11 +1097,11 @@ import { easing } from 'math/time';
 - `easing.sineOut(x: number)`
 - `easing.sineInOut(x: number)`
 - `easing.cubicIn(x: number)`
-- `easing.cubicOut(x: number)`
-- `easing.cubicInOut(x: number)`
-- `easing.quintIn(x: number)`
-- `easing.quintOut(x: number)`
-- `easing.quintInOut(x: number)`
+- `easing.cubicOut(x: number): number`
+- `easing.cubicInOut(x: number): number`
+- `easing.quintIn(x: number): number`
+- `easing.quintOut(x: number): number`
+- `easing.quintInOut(x: number): number`
 - `easing.circIn(x: number)`
 - `easing.circOut(x: number)`
 - `easing.circInOut(x: number)`

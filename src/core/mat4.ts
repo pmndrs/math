@@ -24,7 +24,6 @@ export type Mat4 = [
     e16: number,
 ];
 
-
 /**
  * Creates a new identity mat4
  *
@@ -843,6 +842,15 @@ export function scale(out: Mat4, a: Const<Mat4>, v: Const<Vec3>): Mat4 {
  * @returns out
  */
 export function rotate(out: Mat4, a: Const<Mat4>, rad: number, axis: Const<Vec3>): Mat4 | null {
+    _rotate_angle[0] = rad;
+    return rotateAngle(out, a, axis);
+}
+
+// Shared angle storage avoids boxing across the larger rotation call.
+const _rotate_angle: [number] = [0];
+
+function rotateAngle(out: Mat4, a: Const<Mat4>, axis: Const<Vec3>): Mat4 | null {
+    const rad = _rotate_angle[0];
     let x = axis[0];
     let y = axis[1];
     let z = axis[2];
@@ -1607,7 +1615,13 @@ export function fromRotationTranslationScale(out: Mat4, q: Const<Quat>, v: Const
  * @param o The origin vector around which to scale and rotate
  * @returns out
  */
-export function fromRotationTranslationScaleOrigin(out: Mat4, q: Const<Quat>, v: Const<Vec3>, s: Const<Vec3>, o: Const<Vec3>): Mat4 {
+export function fromRotationTranslationScaleOrigin(
+    out: Mat4,
+    q: Const<Quat>,
+    v: Const<Vec3>,
+    s: Const<Vec3>,
+    o: Const<Vec3>,
+): Mat4 {
     // Quaternion math
     const x = q[0];
     const y = q[1];

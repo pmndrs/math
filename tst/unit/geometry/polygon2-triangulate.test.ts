@@ -56,6 +56,21 @@ describe('triangulatePolygon2', () => {
         checkTriangulation(out, count, plus, 12);
     });
 
+    it('reuses working storage across polygons of different sizes', () => {
+        const scratch = new Array<number>(plus.length / 2).fill(0);
+        const out: number[] = [];
+
+        for (const vertices of [plus, lShape, square]) {
+            const n = vertices.length / 2;
+            const expected: number[] = [];
+            triangulatePolygon2(expected, vertices, n);
+
+            const count = triangulatePolygon2(out, vertices, n, scratch);
+            expect(out.slice(0, count * 3)).toEqual(expected);
+            checkTriangulation(out, count, vertices, n);
+        }
+    });
+
     it('triangulates a regular polygon', () => {
         const hexagon: number[] = [];
         for (let i = 0; i < 6; i++) {
@@ -65,6 +80,13 @@ describe('triangulatePolygon2', () => {
         const out: number[] = [];
         const count = triangulatePolygon2(out, hexagon, 6);
         checkTriangulation(out, count, hexagon, 6);
+    });
+
+    it('triangulates an outline with collinear boundary vertices', () => {
+        const outline = [0, 0, 2, 0, 4, 0, 4, 2, 4, 4, 2, 4, 0, 4, 0, 2];
+        const out: number[] = [];
+        const count = triangulatePolygon2(out, outline, 8);
+        checkTriangulation(out, count, outline, 8);
     });
 
     it('accepts clockwise input (normalises winding)', () => {

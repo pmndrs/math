@@ -14,32 +14,23 @@ group('polygon2 triangulation @geometry @polygon2', () => {
         convex.push(Math.cos(a) * 5, Math.sin(a) * 5);
     }
 
-    const N = 5_000;
-
-    bench('triangulatePolygon2 (14-gon, concave)', function* () {
-        const out: number[] = [];
-        const acc = yield () => {
-            let acc = 0;
-            for (let i = 0; i < N; i++) {
-                acc += triangulatePolygon2(out, comb, combN);
-            }
-            return acc;
-        };
-        // a simple polygon with n vertices always yields n - 2 triangles
-        assert(acc === N * (combN - 2), 'triangle count must be n - 2 on every call');
-        return [acc, ...out];
-    });
-
-    bench('triangulatePolygon2 (32-gon, convex)', function* () {
-        const out: number[] = [];
-        const acc = yield () => {
-            let acc = 0;
-            for (let i = 0; i < N; i++) {
-                acc += triangulatePolygon2(out, convex, CONVEX_N);
-            }
-            return acc;
-        };
-        assert(acc === N * (CONVEX_N - 2), 'triangle count must be n - 2 on every call');
-        return [acc, ...out];
-    });
+    for (const [label, vertices, n] of [
+        ['14-gon, concave', comb, combN],
+        ['32-gon, convex', convex, CONVEX_N],
+    ] as const) {
+        for (const reuseScratch of [false, true]) {
+            bench(`triangulatePolygon2 (${label}${reuseScratch ? ', reused scratch' : ''})`, function* () {
+                const out: number[] = [];
+                const scratch = reuseScratch ? new Array<number>(n).fill(0) : undefined;
+                // Short batches let the workload reach its optimized tier during warmup.
+                const acc = yield () => {
+                    let acc = 0;
+                    for (let i = 0; i < 100; i++) acc += triangulatePolygon2(out, vertices, n, scratch);
+                    return acc;
+                };
+                assert(acc === 100 * (n - 2), 'triangle count must be n - 2 on every call');
+                return [acc, ...out];
+            });
+        }
+    }
 });

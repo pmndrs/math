@@ -126,38 +126,16 @@ export function fromDegrees(out: Euler, x: number, y: number, z: number, order: 
  * @returns The output Euler.
  */
 export function fromRotationMat4(out: Euler, rotationMatrix: Const<Mat4>, order: EulerOrder = out[3]): Euler {
-    return fromRotationMatrixValues(
-        out,
-        rotationMatrix[0],
-        rotationMatrix[4],
-        rotationMatrix[8],
-        rotationMatrix[1],
-        rotationMatrix[5],
-        rotationMatrix[9],
-        rotationMatrix[2],
-        rotationMatrix[6],
-        rotationMatrix[10],
-        order,
-    );
-}
+    const m11 = rotationMatrix[0];
+    const m12 = rotationMatrix[4];
+    const m13 = rotationMatrix[8];
+    const m21 = rotationMatrix[1];
+    const m22 = rotationMatrix[5];
+    const m23 = rotationMatrix[9];
+    const m31 = rotationMatrix[2];
+    const m32 = rotationMatrix[6];
+    const m33 = rotationMatrix[10];
 
-/**
- * Sets the Euler angles from the elements of a rotation matrix (column-major, so `mNM` is row N, column M).
- * Shared by {@link fromRotationMat4} and {@link fromQuat} so neither has to allocate or read back a scratch matrix.
- */
-function fromRotationMatrixValues(
-    out: Euler,
-    m11: number,
-    m12: number,
-    m13: number,
-    m21: number,
-    m22: number,
-    m23: number,
-    m31: number,
-    m32: number,
-    m33: number,
-    order: EulerOrder,
-): Euler {
     switch (order) {
         case EulerOrder.XYZ:
             out[1] = Math.asin(clamp(m13, -1, 1));
@@ -279,6 +257,9 @@ export function equals(a: Const<Euler>, b: Const<Euler>): boolean {
     );
 }
 
+// Passing a matrix keeps its components unboxed across the conversion call.
+const _fromQuat_matrix: Mat4 = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
 /**
  * Sets the Euler angles from a quaternion.
  * @param out The output Euler.
@@ -306,19 +287,17 @@ export function fromQuat(out: Euler, q: Const<Quat>, order: EulerOrder): Euler {
     const wy = w * y2;
     const wz = w * z2;
 
-    return fromRotationMatrixValues(
-        out,
-        1 - yy - zz,
-        yx - wz,
-        zx + wy,
-        yx + wz,
-        1 - xx - zz,
-        zy - wx,
-        zx - wy,
-        zy + wx,
-        1 - xx - yy,
-        order,
-    );
+    _fromQuat_matrix[0] = 1 - yy - zz;
+    _fromQuat_matrix[4] = yx - wz;
+    _fromQuat_matrix[8] = zx + wy;
+    _fromQuat_matrix[1] = yx + wz;
+    _fromQuat_matrix[5] = 1 - xx - zz;
+    _fromQuat_matrix[9] = zy - wx;
+    _fromQuat_matrix[2] = zx - wy;
+    _fromQuat_matrix[6] = zy + wx;
+    _fromQuat_matrix[10] = 1 - xx - yy;
+
+    return fromRotationMat4(out, _fromQuat_matrix, order);
 }
 
 const _reorderQuaternion = /*@__PURE__*/ quat.create();

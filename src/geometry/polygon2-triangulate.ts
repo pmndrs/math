@@ -24,42 +24,39 @@ function area2(ax: number, ay: number, bx: number, by: number, cx: number, cy: n
     return (bx - ax) * (cy - ay) - (cx - ax) * (by - ay);
 }
 
-function collinear(ax: number, ay: number, bx: number, by: number, cx: number, cy: number): boolean {
-    return area2(ax, ay, bx, by, cx, cy) === 0;
-}
+/** Tests a diagonal against an edge. Coordinate offsets avoid boxing across the call. */
+function intersects(vertices: readonly number[], a: number, b: number, c: number, d: number, loose: boolean): boolean {
+    const ax = vertices[a];
+    const ay = vertices[a + 1];
+    const bx = vertices[b];
+    const by = vertices[b + 1];
+    const cx = vertices[c];
+    const cy = vertices[c + 1];
+    const dx = vertices[d];
+    const dy = vertices[d + 1];
 
-/** True if segments (a,b) and (c,d) properly cross (no collinear/endpoint contact). */
-function intersectProp(ax: number, ay: number, bx: number, by: number, cx: number, cy: number, dx: number, dy: number): boolean {
-    if (
-        collinear(ax, ay, bx, by, cx, cy) ||
-        collinear(ax, ay, bx, by, dx, dy) ||
-        collinear(cx, cy, dx, dy, ax, ay) ||
-        collinear(cx, cy, dx, dy, bx, by)
-    ) {
+    // Shared endpoints do not obstruct the diagonal.
+    if ((ax === cx && ay === cy) || (bx === cx && by === cy) || (ax === dx && ay === dy) || (bx === dx && by === dy))
         return false;
+
+    const abC = area2(ax, ay, bx, by, cx, cy);
+    const abD = area2(ax, ay, bx, by, dx, dy);
+    const cdA = area2(cx, cy, dx, dy, ax, ay);
+    const cdB = area2(cx, cy, dx, dy, bx, by);
+    if (abC !== 0 && abD !== 0 && cdA !== 0 && cdB !== 0 && abC < 0 !== abD < 0 && cdA < 0 !== cdB < 0) {
+        return true;
     }
-    const l1 = area2(ax, ay, bx, by, cx, cy) < 0;
-    const l2 = area2(ax, ay, bx, by, dx, dy) < 0;
-    const l3 = area2(cx, cy, dx, dy, ax, ay) < 0;
-    const l4 = area2(cx, cy, dx, dy, bx, by) < 0;
-    return l1 !== l2 && l3 !== l4;
-}
+    if (loose) return false;
 
-/** True if point c lies on the closed segment (a,b), assuming the three are collinear. */
-function between(ax: number, ay: number, bx: number, by: number, cx: number, cy: number): boolean {
-    if (!collinear(ax, ay, bx, by, cx, cy)) return false;
-    if (ax !== bx) return (ax <= cx && cx <= bx) || (ax >= cx && cx >= bx);
-    return (ay <= cy && cy <= by) || (ay >= cy && cy >= by);
-}
-
-/** True if segments (a,b) and (c,d) intersect, including collinear/endpoint contact. */
-function intersectSeg(ax: number, ay: number, bx: number, by: number, cx: number, cy: number, dx: number, dy: number): boolean {
-    if (intersectProp(ax, ay, bx, by, cx, cy, dx, dy)) return true;
     return (
-        between(ax, ay, bx, by, cx, cy) ||
-        between(ax, ay, bx, by, dx, dy) ||
-        between(cx, cy, dx, dy, ax, ay) ||
-        between(cx, cy, dx, dy, bx, by)
+        (abC === 0 &&
+            (ax !== bx ? (ax <= cx && cx <= bx) || (ax >= cx && cx >= bx) : (ay <= cy && cy <= by) || (ay >= cy && cy >= by))) ||
+        (abD === 0 &&
+            (ax !== bx ? (ax <= dx && dx <= bx) || (ax >= dx && dx >= bx) : (ay <= dy && dy <= by) || (ay >= dy && dy >= by))) ||
+        (cdA === 0 &&
+            (cx !== dx ? (cx <= ax && ax <= dx) || (cx >= ax && ax >= dx) : (cy <= ay && ay <= dy) || (cy >= ay && ay >= dy))) ||
+        (cdB === 0 &&
+            (cx !== dx ? (cx <= bx && bx <= dx) || (cx >= bx && bx >= dx) : (cy <= by && by <= dy) || (cy >= by && by >= dy)))
     );
 }
 
@@ -82,34 +79,16 @@ function diagonalie(
     indices: readonly number[],
     loose: boolean,
 ): boolean {
-    const d0x = vX(vertices, indices, i);
-    const d0y = vY(vertices, indices, i);
-    const d1x = vX(vertices, indices, j);
-    const d1y = vY(vertices, indices, j);
+    const a = (indices[i] & IDX_MASK) * 2;
+    const b = (indices[j] & IDX_MASK) * 2;
 
     for (let k = 0; k < n; k++) {
         const k1 = nextIdx(k, n);
         if (k === i || k1 === i || k === j || k1 === j) continue;
 
-        const e0x = vX(vertices, indices, k);
-        const e0y = vY(vertices, indices, k);
-        const e1x = vX(vertices, indices, k1);
-        const e1y = vY(vertices, indices, k1);
-
-        // Ignore edges that share an endpoint with the diagonal.
-        if (
-            (d0x === e0x && d0y === e0y) ||
-            (d1x === e0x && d1y === e0y) ||
-            (d0x === e1x && d0y === e1y) ||
-            (d1x === e1x && d1y === e1y)
-        ) {
-            continue;
-        }
-
-        const hit = loose
-            ? intersectProp(d0x, d0y, d1x, d1y, e0x, e0y, e1x, e1y)
-            : intersectSeg(d0x, d0y, d1x, d1y, e0x, e0y, e1x, e1y);
-        if (hit) return false;
+        const c = (indices[k] & IDX_MASK) * 2;
+        const d = (indices[k1] & IDX_MASK) * 2;
+        if (intersects(vertices, a, b, c, d, loose)) return false;
     }
     return true;
 }
@@ -168,9 +147,10 @@ function diagonal(
  * @param out output array of triangle indices
  * @param vertices polygon vertices as a flat array `[x0, y0, x1, y1, ...]`
  * @param n number of vertices to read from `vertices`
+ * @param scratch optional reusable working array with room for `n` indices, distinct from `out` and `vertices`
  * @returns the number of triangles written
  */
-export function triangulatePolygon2(out: number[], vertices: readonly number[], n: number): number {
+export function triangulatePolygon2(out: number[], vertices: readonly number[], n: number, scratch?: number[]): number {
     if (n < 3) return 0;
 
     // Order the working list so the resolved polygon winds clockwise, which is
@@ -178,7 +158,7 @@ export function triangulatePolygon2(out: number[], vertices: readonly number[], 
     // vertex indices, so emitted triangles refer back to the caller's vertices
     // regardless of input winding.
     const ccw = signedArea(vertices, n) >= 0;
-    const indices = new Array<number>(n);
+    const indices = scratch ?? new Array<number>(n);
     for (let i = 0; i < n; i++) indices[i] = ccw ? n - 1 - i : i;
 
     let ntris = 0;

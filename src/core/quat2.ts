@@ -7,7 +7,6 @@ import type { Vec3 } from './vec3';
 /** A dual quaternion that represents both rotation and translation */
 export type Quat2 = [x: number, y: number, z: number, w: number, x2: number, y2: number, z2: number, w2: number];
 
-
 /**
  * Creates a new identity dual quat
  *
@@ -423,6 +422,9 @@ export function translate(out: Quat2, a: Const<Quat2>, v: Const<Vec3>): Quat2 {
     return out;
 }
 
+// Shared angle storage avoids boxing when the rotation kernels stay out of line.
+const _rotate_angle: [number] = [0];
+
 /**
  * Rotates a dual quat around the X axis
  *
@@ -432,6 +434,12 @@ export function translate(out: Quat2, a: Const<Quat2>, v: Const<Vec3>): Quat2 {
  * @returns out
  */
 export function rotateX(out: Quat2, a: Const<Quat2>, rad: number): Quat2 {
+    _rotate_angle[0] = rad;
+    return rotateXAngle(out, a);
+}
+
+function rotateXAngle(out: Quat2, a: Const<Quat2>): Quat2 {
+    const rad = _rotate_angle[0];
     let bx = -a[0];
     let by = -a[1];
     let bz = -a[2];
@@ -476,6 +484,12 @@ export function rotateX(out: Quat2, a: Const<Quat2>, rad: number): Quat2 {
  * @returns out
  */
 export function rotateY(out: Quat2, a: Const<Quat2>, rad: number): Quat2 {
+    _rotate_angle[0] = rad;
+    return rotateYAngle(out, a);
+}
+
+function rotateYAngle(out: Quat2, a: Const<Quat2>): Quat2 {
+    const rad = _rotate_angle[0];
     let bx = -a[0];
     let by = -a[1];
     let bz = -a[2];
@@ -520,6 +534,12 @@ export function rotateY(out: Quat2, a: Const<Quat2>, rad: number): Quat2 {
  * @returns out
  */
 export function rotateZ(out: Quat2, a: Const<Quat2>, rad: number): Quat2 {
+    _rotate_angle[0] = rad;
+    return rotateZAngle(out, a);
+}
+
+function rotateZAngle(out: Quat2, a: Const<Quat2>): Quat2 {
+    const rad = _rotate_angle[0];
     let bx = -a[0];
     let by = -a[1];
     let bz = -a[2];
@@ -631,6 +651,12 @@ export function rotateByQuatPrepend(out: Quat2, q: Const<Quat>, a: Const<Quat2>)
  * @returns out
  */
 export function rotateAroundAxis(out: Quat2, a: Const<Quat2>, axis: Const<Vec3>, rad: number): Quat2 {
+    _rotate_angle[0] = rad;
+    return rotateAroundAxisAngle(out, a, axis);
+}
+
+function rotateAroundAxisAngle(out: Quat2, a: Const<Quat2>, axis: Const<Vec3>): Quat2 {
+    let rad = _rotate_angle[0];
     //Special case for rad = 0
     if (Math.abs(rad) < EPSILON) {
         return copy(out, a);
