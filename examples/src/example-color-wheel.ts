@@ -1,12 +1,12 @@
 import * as g from 'gpucat';
 import { d } from 'gpucat';
-import { color, hsl } from 'math/color';
+import { color } from 'math/color';
 import { createRenderer } from './common/renderer';
 import { clearColor } from './common/theme';
 
 // An HSL colour wheel: hue around the circle, saturation from the grey centre to
 // the vivid rim (lightness fixed at 0.5). Every vertex colour is computed with
-// math/color (hsl.toColor -> color.toSRGB). Move the pointer to pick a colour;
+// math/color (color.fromHsl -> color.toSRGB). Move the pointer to pick a colour;
 // the readout shows its HSL / RGB / hex, all via math/color.
 
 const RADIUS = 1.4;
@@ -58,7 +58,7 @@ const lin = color.create();
 const srgb: [number, number, number] = [0, 0, 0];
 
 function pushColor(hue: number, sat: number) {
-    hsl.toColor(lin, [hue, sat, LIGHTNESS]);
+    color.fromHsl(lin, [hue, sat, LIGHTNESS]);
     color.toSRGB(srgb, lin); // gpucat outputs sRGB directly
     colors.push(srgb[0], srgb[1], srgb[2]);
 }
@@ -128,7 +128,7 @@ function pick(wx: number, wy: number) {
     const hue = (angle / (Math.PI * 2) + 1) % 1;
     const sat = Math.min(radius / RADIUS, 1);
 
-    hsl.toColor(picked, [hue, sat, LIGHTNESS]);
+    color.fromHsl(picked, [hue, sat, LIGHTNESS]);
 
     // marker sits on the wheel (clamped to the rim)
     const cr = Math.min(radius, RADIUS);

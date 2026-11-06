@@ -21,6 +21,20 @@ describe('color', () => {
         expect(color.fromColorInput([0.25, 0.5, 0.75])).toEqual([0.25, 0.5, 0.75]);
     });
 
+    it('parses CSS oklab() and oklch() to linear', () => {
+        // sRGB red, as written in the CSS Color 4 spec
+        for (const input of ['oklch(62.8% 0.2577 29.23)', 'oklch(0.628 0.2577 29.23deg / 0.5)', 'oklab(0.628 0.2249 0.1258)']) {
+            const c = color.fromColorInput(input)!;
+            expect(c[0]).toBeCloseTo(1, 3);
+            expect(c[1]).toBeCloseTo(0, 3);
+            expect(c[2]).toBeCloseTo(0, 3);
+        }
+        // percentages for chroma and a, b scale so that 100% is 0.4
+        expect(color.fromColorInput('oklch(70% 50% 120)')).toEqual(color.fromColorInput('oklch(0.7 0.2 120)'));
+        // colors outside sRGB are kept, not clipped
+        expect(Math.min(...color.fromColorInput('oklch(0.7 0.35 150)')!)).toBeLessThan(0);
+    });
+
     it('returns null for unrecognised input', () => {
         expect(color.fromColorInput('not-a-color')).toBeNull();
     });

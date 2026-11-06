@@ -1,10 +1,9 @@
 import type { Const } from '../core/const';
 import type { Color } from './color';
-import { linearToSrgb, srgbToLinear } from './colorspace';
+import { linearToSrgb } from './colorspace';
 
 /** A hue-saturation-lightness color: [h, s, l], all in [0, 1] (hue wraps). */
 export type HSL = [hue: number, saturation: number, lightness: number];
-
 
 /** Create a new HSL initialized to [0, 0, 0] (black). */
 export function create(): HSL {
@@ -37,7 +36,7 @@ export function set(out: HSL, h: number, s: number, l: number): HSL {
     return out;
 }
 
-/** Write the HSL of a linear Color into `out`. Returns `out`. */
+/** Write the HSL of a linear-sRGB Color into `out`. Returns `out`. */
 export function fromColor(out: HSL, c: Const<Color>): HSL {
     // linear -> sRGB gamma; HSL is defined on gamma-encoded sRGB
     const r = linearToSrgb(c[0]);
@@ -65,39 +64,23 @@ export function fromColor(out: HSL, c: Const<Color>): HSL {
     return out;
 }
 
-/** Write the linear Color of an HSL into `out`. Returns `out`. */
-export function toColor(out: Color, a: Const<HSL>): Color {
-    const h = a[0];
-    const s = a[1];
-    const l = a[2];
-
-    if (s === 0) {
-        const v = srgbToLinear(l);
-        out[0] = v;
-        out[1] = v;
-        out[2] = v;
-        return out;
-    }
-
-    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    const p = 2 * l - q;
-    out[0] = srgbToLinear(hue(p, q, h + 1 / 3));
-    out[1] = srgbToLinear(hue(p, q, h));
-    out[2] = srgbToLinear(hue(p, q, h - 1 / 3));
-    return out;
-}
-
 /**
  * Interpolate from `a` to `b` by `t` into `out`, taking the shortest path around
  * the hue wheel (so e.g. 350°→10° passes through 0°, not all the way back).
+ * If only one endpoint is gray (s = 0), it has no hue and takes the other endpoint's hue.
  * Returns `out`.
  */
 export function lerp(out: HSL, a: Const<HSL>, b: Const<HSL>, t: number): HSL {
-    let dh = b[0] - a[0];
+    let ha = a[0];
+    let hb = b[0];
+    if (a[1] === 0 && b[1] !== 0) ha = hb;
+    else if (b[1] === 0 && a[1] !== 0) hb = ha;
+
+    let dh = hb - ha;
     if (dh > 0.5) dh -= 1;
     else if (dh < -0.5) dh += 1;
 
-    let h = a[0] + dh * t;
+    let h = ha + dh * t;
     h -= Math.floor(h); // wrap into [0, 1)
 
     out[0] = h;
@@ -121,13 +104,4 @@ export function offset(out: HSL, a: Const<HSL>, dh: number, ds: number, dl: numb
 
 function clamp01(x: number): number {
     return x < 0 ? 0 : x > 1 ? 1 : x;
-}
-
-function hue(p: number, q: number, t: number): number {
-    if (t < 0) t += 1;
-    if (t > 1) t -= 1;
-    if (t < 1 / 6) return p + (q - p) * 6 * t;
-    if (t < 1 / 2) return q;
-    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-    return p;
 }
