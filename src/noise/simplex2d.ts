@@ -60,26 +60,16 @@ export function sample({ perm, grad3 }: Simplex2DGenerator, x: number, y: number
     const gi0 = (i + perm[j]) * 3;
     const gi1 = (i + i1 + perm[j + j1]) * 3;
     const gi2 = (i + 1 + perm[j + 1]) * 3;
-    // Calculate the contribution from the three corners
-    let n0 = 0;
-    let n1 = 0;
-    let n2 = 0;
-    let t0 = 0.5 - x0 * x0 - y0 * y0;
-    if (t0 >= 0) {
-        t0 *= t0;
-        n0 = t0 * t0 * (grad3[gi0] * x0 + grad3[gi0 + 1] * y0);
+    // Scale the three corner contributions to the interval [-1, 1].
+    return 70 * (contribution(grad3, gi0, x0, y0) + contribution(grad3, gi1, x1, y1) + contribution(grad3, gi2, x2, y2));
+}
+
+/** Computes one corner's gradient contribution with radial attenuation. */
+function contribution(grad3: Float64Array, index: number, x: number, y: number): number {
+    let t = 0.5 - x * x - y * y;
+    if (t >= 0) {
+        t *= t;
+        return t * t * (grad3[index] * x + grad3[index + 1] * y);
     }
-    let t1 = 0.5 - x1 * x1 - y1 * y1;
-    if (t1 >= 0) {
-        t1 *= t1;
-        n1 = t1 * t1 * (grad3[gi1] * x1 + grad3[gi1 + 1] * y1);
-    }
-    let t2 = 0.5 - x2 * x2 - y2 * y2;
-    if (t2 >= 0) {
-        t2 *= t2;
-        n2 = t2 * t2 * (grad3[gi2] * x2 + grad3[gi2 + 1] * y2);
-    }
-    // Add contributions from each corner to get the final noise value.
-    // The result is scaled to return values in the interval [-1,1].
-    return 70 * (n0 + n1 + n2);
+    return 0;
 }
