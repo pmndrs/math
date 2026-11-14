@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { binomial, lagrange, repeat, round, smootherstep, smoothstep, wrap } from '../../../src';
+import { binomial, lagrange, remapClamp, repeat, round, smootherstep, smoothstep, wrap } from '../../../src';
 
 describe('scalar', () => {
     describe('wrap', () => {
@@ -144,6 +144,21 @@ describe('scalar', () => {
         it('should return 0 when k is out of range', () => {
             expect(binomial(3, 5)).toBe(0);
             expect(binomial(5, -1)).toBe(0);
+        });
+    });
+
+    describe('remapClamp', () => {
+        it('should remap and clamp to the output range', () => {
+            expect(remapClamp(5, 0, 10, 0, 100)).toBe(50);
+            expect(remapClamp(-5, 0, 10, 0, 100)).toBe(0);
+            expect(remapClamp(15, 0, 10, 0, 100)).toBe(100);
+        });
+
+        it('should clamp to an inverted output range', () => {
+            expect(remapClamp(5, 0, 10, 100, 0)).toBe(50);
+            expect(remapClamp(-5, 0, 10, 100, 0)).toBe(100);
+            expect(remapClamp(15, 0, 10, 100, 0)).toBe(0);
+            expect(remapClamp(0.5, 0, 1, 10, -10)).toBe(0);
         });
     });
 
