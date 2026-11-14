@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Mat4, Vec3 } from '../../../src';
-import type { Box3, Plane3, Sphere } from '../../../src/shapes';
+import type { Box3, Box3Corners, Plane3, Sphere } from '../../../src/shapes';
 import { box3 } from '../../../src/shapes';
 
 describe('box3', () => {
@@ -81,6 +81,33 @@ describe('box3', () => {
             expect(box[3]).toBe(1);
             expect(box[4]).toBe(1);
             expect(box[5]).toBe(1);
+        });
+    });
+
+    describe('corners', () => {
+        it('should return the eight corners in frustum order', () => {
+            const box: Box3 = [0, 0, 0, 1, 2, 3];
+            const out: Box3Corners = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+            ];
+
+            expect(box3.corners(out, box)).toEqual([
+                [0, 0, 0],
+                [0, 2, 0],
+                [1, 2, 0],
+                [1, 0, 0],
+                [0, 0, 3],
+                [0, 2, 3],
+                [1, 2, 3],
+                [1, 0, 3],
+            ]);
         });
     });
 
