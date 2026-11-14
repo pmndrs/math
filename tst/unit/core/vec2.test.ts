@@ -291,6 +291,38 @@ describe('vec2', () => {
         });
     });
 
+    describe('hermite', () => {
+        const p0: Vec2 = [0, 0];
+        const p1: Vec2 = [2, 2];
+        const t0: Vec2 = [1, 0];
+        const t1: Vec2 = [0, 1];
+
+        it('should pass through both points', () => {
+            expect(vec2.hermite(out, p0, t0, t1, p1, 0)).toEqual([0, 0]);
+            expect(vec2.hermite(out, p0, t0, t1, p1, 1)).toEqual([2, 2]);
+        });
+
+        it('should bend toward the tangents in between', () => {
+            expect(vec2.hermite(out, p0, t0, t1, p1, 0.5)).toEqual([1.125, 0.875]);
+        });
+    });
+
+    describe('bezier', () => {
+        const p0: Vec2 = [0, 0];
+        const p1: Vec2 = [0, 1];
+        const p2: Vec2 = [1, 1];
+        const p3: Vec2 = [1, 0];
+
+        it('should start at the first point and end at the last', () => {
+            expect(vec2.bezier(out, p0, p1, p2, p3, 0)).toEqual([0, 0]);
+            expect(vec2.bezier(out, p0, p1, p2, p3, 1)).toEqual([1, 0]);
+        });
+
+        it('should be pulled toward the control points in between', () => {
+            expect(vec2.bezier(out, p0, p1, p2, p3, 0.5)).toEqual([0.5, 0.75]);
+        });
+    });
+
     describe('transformMat2', () => {
         it('should transform vector by 2x2 matrix', () => {
             // Identity matrix should return original vector
