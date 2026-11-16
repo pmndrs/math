@@ -4,7 +4,7 @@ import type { Mat4 } from "../../src/core/mat4";
 import type { Vec3 } from "../../src/core/vec3";
 import * as mulberry32 from "../../src/random/mulberry32";
 import * as box3 from "../../src/shapes/box3";
-import type { Box3 } from "../../src/shapes/box3";
+import type { Box3, Box3Corners } from "../../src/shapes/box3";
 import type { Plane3 } from "../../src/shapes/plane3";
 import type { Sphere } from "../../src/shapes/sphere";
 
@@ -239,5 +239,29 @@ group("box3 ops 10k @shapes @box3", () => {
       return acc;
     };
     return acc;
+  });
+
+  bench("corners", function* () {
+    const boxes = makeBoxes(1);
+    const out: Box3Corners = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ];
+
+    const acc = yield () => {
+      let acc = 0;
+      for (let i = 0; i < N; i++) {
+        box3.corners(out, boxes[i]);
+        acc += out[6][0];
+      }
+      return acc;
+    };
+    return [acc, ...out.flat()];
   });
 });

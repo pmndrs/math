@@ -2,11 +2,19 @@ import type { Const } from '../core/const';
 import { EPSILON } from '../core/scalar';
 import type { Mat4 } from '../core/mat4';
 import type { Vec3 } from '../core/vec3';
+import * as vec3 from '../core/vec3';
 import type { Plane3 } from './plane3';
 import type { Sphere } from './sphere';
 
 /** A box in 3D space */
 export type Box3 = [minX: number, minY: number, minZ: number, maxX: number, maxY: number, maxZ: number];
+
+/**
+ * The eight corners of a box, as returned by [[corners]].
+ * Ordered like frustum corners: the min z face, then the max z face, each going
+ * (minX, minY), (minX, maxY), (maxX, maxY), (maxX, minY).
+ */
+export type Box3Corners = [Vec3, Vec3, Vec3, Vec3, Vec3, Vec3, Vec3, Vec3];
 
 
 /**
@@ -110,6 +118,34 @@ export function max(out: Vec3, box: Const<Box3>): Vec3 {
     out[0] = box[3];
     out[1] = box[4];
     out[2] = box[5];
+    return out;
+}
+
+/**
+ * Computes the eight corners of a Box3.
+ *
+ * Output order matches frustum corners: min z bottom-left, min z top-left, min z top-right,
+ * min z bottom-right, then the same four on the max z face.
+ *
+ * @param out - The output corners (8 vec3s)
+ * @param box - The input Box3
+ * @returns The output corners
+ */
+export function corners(out: Box3Corners, box: Const<Box3>): Box3Corners {
+    const minX = box[0];
+    const minY = box[1];
+    const minZ = box[2];
+    const maxX = box[3];
+    const maxY = box[4];
+    const maxZ = box[5];
+    vec3.set(out[0], minX, minY, minZ);
+    vec3.set(out[1], minX, maxY, minZ);
+    vec3.set(out[2], maxX, maxY, minZ);
+    vec3.set(out[3], maxX, minY, minZ);
+    vec3.set(out[4], minX, minY, maxZ);
+    vec3.set(out[5], minX, maxY, maxZ);
+    vec3.set(out[6], maxX, maxY, maxZ);
+    vec3.set(out[7], maxX, minY, maxZ);
     return out;
 }
 

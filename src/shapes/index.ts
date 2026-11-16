@@ -5,7 +5,7 @@ export * as box2 from './box2';
 export type { Box2 } from './box2';
 
 export * as box3 from './box3';
-export type { Box3 } from './box3';
+export type { Box3, Box3Corners } from './box3';
 
 export * as obb3 from './obb3';
 export type { OBB3 } from './obb3';
