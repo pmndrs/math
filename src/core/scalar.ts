@@ -140,11 +140,11 @@ export function remap(number: number, inLow: number, inHigh: number, outLow: num
 
 /**
  * Remaps a number from one range to another, clamping the result to the output range.
+ * The output range may be inverted (`outLow > outHigh`).
  */
 export function remapClamp(value: number, inLow: number, inHigh: number, outLow: number, outHigh: number): number {
-    const scale = (value - inLow) / (inHigh - inLow);
-    const remapped = outLow + scale * (outHigh - outLow);
-    return Math.max(outLow, Math.min(outHigh, remapped));
+    const remapped = remap(value, inLow, inHigh, outLow, outHigh);
+    return outLow <= outHigh ? clamp(remapped, outLow, outHigh) : clamp(remapped, outHigh, outLow);
 }
 
 /**
