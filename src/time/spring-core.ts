@@ -36,17 +36,21 @@ export function coefficients(smoothTime: number, dampingRatio: number, delta: nu
         coef.vp = (-e * omega * omega * s) / wd;
         coef.vv = e * (c + (za * s) / wd);
     } else {
-        // over-damped — two real roots, no overshoot
-        const za = -omega * dampingRatio;
-        const zb = omega * Math.sqrt(dampingRatio * dampingRatio - 1);
-        const r1 = za - zb;
-        const r2 = za + zb;
-        const den = r1 - r2;
-        const e1 = Math.exp(r1 * delta);
-        const e2 = Math.exp(r2 * delta);
-        coef.pp = (r1 * e2 - r2 * e1) / den;
-        coef.pv = (e1 - e2) / den;
-        coef.vp = (omega * omega * (e2 - e1)) / den; // r1·r2 = omega²
-        coef.vv = (r1 * e1 - r2 * e2) / den;
+        overdampedCoefficients(omega, dampingRatio, delta);
     }
+}
+
+function overdampedCoefficients(omega: number, dampingRatio: number, delta: number): void {
+    // Overdamped springs have two real roots and do not overshoot.
+    const za = -omega * dampingRatio;
+    const zb = omega * Math.sqrt(dampingRatio * dampingRatio - 1);
+    const r1 = za - zb;
+    const r2 = za + zb;
+    const den = r1 - r2;
+    const e1 = Math.exp(r1 * delta);
+    const e2 = Math.exp(r2 * delta);
+    coef.pp = (r1 * e2 - r2 * e1) / den;
+    coef.pv = (e1 - e2) / den;
+    coef.vp = (omega * omega * (e2 - e1)) / den; // r1·r2 = omega²
+    coef.vv = (r1 * e1 - r2 * e2) / den;
 }
