@@ -79,6 +79,13 @@ describe('quat', () => {
             expect(outAxis[1]).toBe(0);
             expect(outAxis[2]).toBe(0);
         });
+
+        it('should return 0 when rounding pushes w past 1', () => {
+            const q = quat.setAxisAngle(quat.create(), [0, 0, 1], Math.PI / 36);
+            const result = quat.multiply(quat.create(), q, quat.conjugate(quat.create(), q));
+
+            expect(quat.getAxisAngle([0, 0, 0], result)).toBe(0);
+        });
     });
 
     describe('getAngle', () => {
@@ -96,6 +103,12 @@ describe('quat', () => {
 
             const angle = quat.getAngle(q1, q2);
             expect(angle).toBeCloseTo(0);
+        });
+
+        it('should return 0 when rounding pushes the dot product past 1', () => {
+            const q = quat.setAxisAngle(quat.create(), [0, 0, 1], Math.PI / 36);
+
+            expect(quat.getAngle(q, q)).toBe(0);
         });
     });
 

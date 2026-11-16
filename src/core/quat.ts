@@ -99,7 +99,7 @@ export function setAxisAngle(out: Quat, axis: Const<Vec3>, rad: number): Quat {
  * @return     Angle, in radians, of the rotation
  */
 export function getAxisAngle(out_axis: Vec3, q: Const<Quat>): number {
-    const rad = Math.acos(q[3]) * 2.0;
+    const rad = Math.acos(Math.min(Math.max(q[3], -1), 1)) * 2.0;
     const s = Math.sin(rad / 2.0);
     if (s > EPSILON) {
         out_axis[0] = q[0] / s;
@@ -124,7 +124,7 @@ export function getAxisAngle(out_axis: Vec3, q: Const<Quat>): number {
 export function getAngle(a: Const<Quat>, b: Const<Quat>): number {
     const dotproduct = dot(a, b);
 
-    return Math.acos(2 * dotproduct * dotproduct - 1);
+    return Math.acos(Math.min(2 * dotproduct * dotproduct - 1, 1));
 }
 
 /**
