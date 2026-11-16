@@ -108,6 +108,8 @@ import { vec2 } from 'math';
 - `vec2.cross(out: Vec3, a: Vec2, b: Vec2): Vec3` — Computes the cross product of two vec2's
 - `vec2.lerp(out: Vec2, a: Vec2, b: Vec2, t: number): Vec2` — Performs a linear interpolation between two vec2's
 - `vec2.lagrange(out: Vec2, a: Vec2, b: Vec2, c: Vec2, t: number): Vec2` — Quadratic interpolation through three vectors using Lagrange interpolation.
+- `vec2.hermite(out: Vec2, a: Vec2, b: Vec2, c: Vec2, d: Vec2, t: number): Vec2` — Performs a hermite interpolation with two control points
+- `vec2.bezier(out: Vec2, a: Vec2, b: Vec2, c: Vec2, d: Vec2, t: number): Vec2` — Performs a bezier interpolation with two control points
 - `vec2.signedAngle(a: Vec2, b: Vec2): number` — Get the signed angle from `a` to `b`, in the range (-PI, PI].
 
 **Transform**
